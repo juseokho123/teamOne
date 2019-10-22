@@ -1,0 +1,284 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.smart.rider.goods.mapper.GoodsdbMapper">
+	<!-- 삭제가능리스트 상세보기  -->
+	<select id="yesGoodsDblist" resultMap="ASid">
+		SELECT
+		gb.*
+		,p.*
+		FROM goods_database gb LEFT JOIN purchase p
+		ON
+		gb.goods_database_code = p.goods_database_code
+		
+		WHERE
+		p.goods_database_code IS NULL
+		AND gb.goods_database_code = #{goodDbCode}
+
+	</select>
+	<!-- 삭제가능한 DB리스트 -->
+	<select id="goodsDbYlist" parameterType="String" resultMap="ASid">
+		SELECT
+		gb.*
+		,p.*
+		FROM goods_database gb LEFT JOIN purchase p
+		ON
+		gb.goods_database_code = p.goods_database_code
+		WHERE
+		p.goods_database_code IS NULL
+		<if test="searchInput neq null and searchInput neq ''.toString()">
+			AND
+			gb.${select} LIKE CONCAT('%',#{searchInput},'%')
+		</if>
+		<if test="beginDate neq ''.toString() and endDate eq ''.toString()">
+			AND
+			gb.goods_database_date between #{beginDate} and NOW()
+		</if>
+		<if test="beginDate eq ''.toString() and endDate neq ''.toString()">
+			AND
+			gb.goods_database_date  between '2000-01-01' and #{endDate}
+		</if>
+		<if
+			test="beginDate neq ''.toString() and endDate neq ''.toString()">
+			AND
+			gb.goods_database_date between #{beginDate} and #{endDate}
+		</if>
+
+	</select>
+	<!-- 삭제불가능한 DB리스트 -->
+	<select id="goodsDbNlist" parameterType="String" resultMap="ASid">
+		SELECT
+		gb.*
+		,p.*
+		FROM goods_database gb , purchase p
+		WHERE
+		gb.goods_database_code = p.goods_database_code
+		<if test="searchInput neq null and searchInput neq ''.toString()">
+			AND
+			gb.${select} LIKE CONCAT('%',#{searchInput},'%')
+		</if>
+		<if test="beginDate neq ''.toString() and endDate eq ''.toString()">
+			AND
+			gb.goods_database_date between #{beginDate} and NOW()
+		</if>
+		<if test="beginDate eq ''.toString() and endDate neq ''.toString()">
+			AND
+			gb.goods_database_date between '2009-01-01' and  #{endDate}
+		</if>
+		<if
+			test="beginDate neq ''.toString() and endDate neq ''.toString()">
+			AND
+			gb.goods_database_date between #{beginDate} and #{endDate}
+		</if>
+
+	</select>
+
+	<select id="goodsDbSearchList" parameterType="String"	resultType="com.smart.rider.goods.dto.GoodsdbDTO">
+		SELECT
+		goods_database_code AS goodsDbCode,
+		gdb.member_id AS memberId,
+		goods_database_name AS goodsDbName,
+		goods_database_category AS
+		goodsDbCategory,
+		goods_database_number AS goodsDbNumber,
+		goods_database_color AS goodsDbColor,
+		goods_database_weight AS
+		goodsDbWeight,
+		goods_database_speed AS goodsDbSpeed,
+		goods_database_size AS goodsDbSize,
+		goods_database_nation AS
+		goodsDbNation,
+		goods_database_load AS goodsDbLoad,
+		goods_database_distance AS goodsDbDistance,
+		goods_database_battery AS
+		goodsDbBattery,
+		goods_database_time AS goodsDbTime,
+		goods_database_made
+		AS goodsDbMade,
+		goods_database_description AS goodsDbDescription,
+		goods_database_image AS goodsDbImage,
+		gdb.goods_database_date AS
+		goodsDbDate
+
+		FROM
+		goods_database gdb INNER JOIN member m
+		ON gdb.member_id = m.member_id
+		<if test="searchInput != null and searchInput neq ''.toString()">
+			WHERE
+			${select} Like CONCAT('%',#{searchInput},'%')
+		</if>
+		<if test="beginDate neq ''.toString() and endDate eq ''.toString()">
+			AND
+			gdb.goods_database_date between #{beginDate} and NOW()
+		</if>
+		<if test="beginDate eq ''.toString() and endDate neq ''.toString()">
+			AND
+			gdb.goods_database_date between '2000-01-01' and
+			#{endDate}
+		</if>
+		<if
+			test="beginDate neq ''.toString() and endDate neq ''.toString()">
+			AND
+			gdb.goods_database_date between #{beginDate} and #{endDate}
+		</if>
+
+	</select>
+
+	<delete id="goodsDbDelete" parameterType="String">
+		DELETE
+		gdb
+		FROM
+		goods_database gdb INNER JOIN member m
+		WHERE
+		gdb.goods_database_code =
+		#{goodsDbCode}
+		AND m.member_id = #{memberId}
+		AND m.member_pw =
+		#{memberPw}
+	</delete>
+
+	<select id="getGoodsDbCodeMax" resultType="String">
+		SELECT 
+			MAX(LPAD(RIGHT(goods_database_code, 4)+1, 4 , '0')) 
+		FROM goods_database;
+	</select>
+
+
+	<insert id="goodsDbInsert"	parameterType="com.smart.rider.goods.dto.GoodsdbDTO">
+		
+		INSERT INTO goods_database(
+		goods_database_code,
+		member_id,
+		goods_database_name,
+		goods_database_category,
+		goods_database_number,
+		goods_database_color,
+		goods_database_weight,
+		goods_database_speed,
+		goods_database_size,
+		goods_database_nation,
+		goods_database_load,
+		goods_database_distance,
+		goods_database_battery,
+		goods_database_time,
+		goods_database_made,
+		goods_database_description,
+		goods_database_image,
+		goods_database_date)
+		VALUES (
+		#{goodsDbCode},
+		#{memberId},
+		#{goodsDbName},
+		#{goodsDbCategory},
+		#{goodsDbNumber},
+		#{goodsDbColor},
+		#{goodsDbWeight},
+		#{goodsDbSpeed},
+		#{goodsDbSize},
+		#{goodsDbNation},
+		#{goodsDbLoad},
+		#{goodsDbDistance},
+		#{goodsDbBattery},
+		#{goodsDbTime},
+		#{goodsDbMade},
+		#{goodsDbDescription},
+		#{goodsDbImage},
+		NOW())
+
+	</insert>
+	<select id="goodsDbList"	resultType="com.smart.rider.goods.dto.GoodsdbDTO">
+		SELECT
+		goods_database_code AS goodsDbCode,
+		gdb.member_id AS memberId,
+		goods_database_name AS goodsDbName,
+		goods_database_category AS
+		goodsDbCategory,
+		goods_database_number AS goodsDbNumber,
+		goods_database_color AS goodsDbColor,
+		goods_database_weight AS
+		goodsDbWeight,
+		goods_database_speed AS goodsDbSpeed,
+		goods_database_size AS goodsDbSize,
+		goods_database_nation AS
+		goodsDbNation,
+		goods_database_load AS goodsDbLoad,
+		goods_database_distance AS goodsDbDistance,
+		goods_database_battery AS
+		goodsDbBattery,
+		goods_database_time AS goodsDbTime,
+		goods_database_made
+		AS goodsDbMade,
+		goods_database_description AS goodsDbDescription,
+		goods_database_image AS goodsDbImage,
+		gdb.goods_database_date AS
+		goodsDbDate
+
+		FROM
+		goods_database gdb INNER JOIN member m
+		ON gdb.member_id = m.member_id		
+	</select>
+	
+	<select id="getGoodsDbCode"	resultType="com.smart.rider.goods.dto.GoodsdbDTO">
+		SELECT
+		goods_database_code AS goodsDbCode,
+		m.member_id AS
+		memberId,
+		goods_database_name AS goodsDbName,
+		goods_database_category AS
+		goodsDbCategory,
+		goods_database_number AS goodsDbNumber,
+		goods_database_color AS goodsDbColor,
+		goods_database_weight AS
+		goodsDbWeight,
+		goods_database_speed AS goodsDbSpeed,
+		goods_database_size AS goodsDbSize,
+		goods_database_nation AS
+		goodsDbNation,
+		goods_database_load AS goodsDbLoad,
+		goods_database_distance AS goodsDbDistance,
+		goods_database_battery AS
+		goodsDbBattery,
+		goods_database_time AS goodsDbTime,
+		goods_database_made
+		AS goodsDbMade,
+		goods_database_description AS goodsDbDescription,
+		goods_database_image AS goodsDbImage,
+		goods_database_date AS
+		goodsDbDate
+		FROM
+		goods_database gdb INNER JOIN member m
+		ON gdb.member_id
+		= m.member_id
+		WHERE
+		goods_database_code = #{goodsDbCode}
+	</select>
+	
+	<resultMap type="com.smart.rider.goods.dto.GoodsHapDTO" id="ASid">
+    	<result column="purchase_code"     property="purchaseCode"/>
+    	<result column="account_code"     property="accountCode"/>
+    	<result column="contract_shop_code"     		property="contractShopCode"/>
+    	<result column="goods_database_code"    	property="goodsDbCode"/>
+    	<result column="purchase_pay" 		property="purchasePay"/>
+    	<result column="purchase_state"     property="purchaseState"/>
+    	<result column="purchase_date"	 	property="purchaseDate"/>
+    	<result column="goods_database_name"	 	property="goodsDbName"/>
+    	<result column="goods_database_category"     property="goodsDbCategory"/>
+    	<result column="goods_database_number"     property="goodsDbNumber"/>
+    	<result column="goods_database_color"     		property="goodsDbColor"/>
+    	<result column="goods_database_speed"     		property="goodsDbSpeed"/>
+    	<result column="goods_database_weight"    	property="goodsDbWeight"/>
+    	<result column="goods_database_size" 		property="goodsDbSize"/>
+    	<result column="goods_database_nation"     property="goodsDbNation"/>
+    	<result column="goods_database_load"	 	property="goodsDbLoad"/>
+    	<result column="goods_database_distance"	 	property="goodsDbDistance"/>
+    	<result column="goods_database_battery"     property="goodsDbBattery"/>
+    	<result column="goods_database_time"     property="goodsDbTime"/>
+    	<result column="goods_database_made"     		property="goodsDbMade"/>
+    	<result column="goods_database_description"    	property="goodsDbDescription"/>
+    	<result column="goods_database_date"    	property="goodsDbDate"/>
+    	<result column="account_market"    	property="accountMarket"/>
+    	
+	</resultMap>
+	
+</mapper>

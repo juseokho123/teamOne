@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{layout/default}">
+<th:block layout:fragment="customTitle">
+</th:block>
+<th:block layout:fragment="customContents">
+	<div class="container mt-5">
+		<div class="row tm-content-row">
+			<div class="col-xl mx-auto tm-block-col tm-col-account-settings">
+				<!-- 상세보기한 id의 이름과 권한 -->
+				<div class="tm-bg-primary-dark tm-block tm-block-h-auto">
+					<h2 class="tm-block-title" id="searchName">[[${memberList.memberName}]]</h2>
+					<p class="text-white" id="searchLevel">[[${memberList.memberLevel}]]</p>
+				</div>
+			</div>
+		</div>
+		<!-- row -->
+		<div class="row tm-content-row">
+			<div class="col-xl mx-auto tm-block-col tm-col-account-settings">
+				<div class="tm-bg-primary-dark tm-block tm-block-settings">
+					<h2 class="tm-block-title">회원정보</h2>
+					<form action="/memberUpdate" class="tm-signup-form row" method="post" onsubmit="return sendIt();">
+						<div class="form-group col-lg-6">
+							<label for="id">아이디</label>
+							<input id="memberId" name="memberId" type="text" 
+								   th:value="${memberList.memberId}" class="form-control validate" style="background-color: #54657D" readonly="readonly"/>
+						</div>
+						<!-- 비밀번호수정버튼 클릭으로 수정 -->
+						<div class="form-group col-lg-6">
+							<label for="password">비밀번호</label>
+							<!----------------- 팝업으로 수정하기 -------------------->
+							<button class="btn btn-outline-info form-control validate" id="updatePw" type="button">
+									비밀번호 수정
+							</button>
+						</div>
+						<div class="form-group col-lg-6">
+							<label for="name">이름</label>
+							<input id="memberName" name="memberName" type="text" 
+								   th:value="${memberList.memberName}" class="form-control validate" required="required"/>
+						</div>
+						<div class="form-group col-lg-6">
+							<label for="birth">생년월일</label>
+							<input id="memberBirth" name="memberBirth" type="text" 
+								   th:value="${memberList.memberBirth}" class="form-control validate" required="required"/>
+						</div>
+						<div class="form-group col-lg-6">
+							<label for="address">주소</label>
+							<input id="memberAddress" name="memberAddress" type="text" 
+								   th:value="${memberList.memberAddress}" class="form-control validate" required="required"/>
+						</div>
+						<div class="form-group col-lg-6">
+							<label for="email">이메일</label>
+							<input id="memberEmail" name="memberEmail" type="text" 
+								   th:value="${memberList.memberEmail}" class="form-control validate" required="required"/>
+						</div>
+						<div class="form-group col-lg-6">
+							<label for="phone">전화번호</label>
+							<input id="memberPhone" name="memberPhone" type="text" 
+								   th:value="${memberList.memberPhone}" class="form-control validate" required="required"/>
+						</div>
+						<div class="form-group col-lg-6">
+							<label>&nbsp;</label>
+							<button type="submit" class="btn btn-primary btn-block text-uppercase" onclick="sendIt()">
+								회원 수정
+							</button>
+						</div>
+						<div class="form-group col">
+							<label>&nbsp;</label>
+							<a id="deleteBtn" class="btn btn-primary btn-block text-uppercase" 
+								th:href="@{/memberDelete(memberId=${memberList.memberId})}">
+								회원 탈퇴
+							</a>
+						</div>
+					</form>
+				</div>
+			</div>
+		</div>
+	</div>
+</th:block>
+<th:block layout:fragment="customScript">
+<script type="text/javascript">
+	$(document).ready(function(){
+		$('#updatePw').click(function(){
+			var memberId = $("#memberId").val();
+			window.open('/changePassword?memberId='+memberId+'','비밀번호수정'
+						,'left='+(screen.availWidth-550)/2+',top='+(screen.availHeight-430)/3+',width=430,height=550,location=no,status=no,scrollbars=yes')
+		});
+	});
+	
+	function sendIt() {
+		var getCheck= RegExp(/^[a-zA-Z0-9]{4,12}$/);
+		var getName= RegExp(/^[가-힣]+$/);
+		var getNumber= RegExp(/^[0-9]+$/);
+		var getMail = RegExp(/^[A-Za-z0-9_\.\-]+@[A-Za-z0-9\-]+\.[A-Za-z0-9\-]+/);
+		
+		//이름
+		if (!getName.test($("#memberName").val())) {
+			alert("이름을 한글로 적어주세요.");
+			$("#memberName").val("");
+			$("#memberName").focus();
+			return false;
+		}
+		//생년월일
+		if(!getNumber.test($("#memberBirth").val())) {
+			alert("생년월일은 숫자만 입력해주세요!");
+			$("#memberBirth").val("");
+			$("#memberBirth").focus();
+			return false;
+		}
+		//전화번호
+		if(!getNumber.test($("#memberPhone").val())) {
+			alert("전화번호는 숫자만 입력해주세요!");
+			$("#memberPhone").val("");
+			$("#memberPhone").focus();
+			return false;
+		}
+		//주소
+		if (!getName.test($("#memberAddress").val())) {
+			alert("주소가 올바르지 않습니다.");
+			$("#memberAddress").val("");
+			$("#memberAddress").focus();
+			return false;
+		}
+		//이메일
+		if(!getMail.test($("#memberEmail").val())){
+			alert("이메일형식에 맞게 입력해주세요.")
+			$("#memberEmail").val("");
+			$("#memberEmail").focus();
+			return false;
+		}
+	}
+</script>
+</th:block>
+</html>

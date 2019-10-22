@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{layout/default}">
+<th:block layout:fragment="customTitle">
+</th:block>
+<th:block layout:fragment="customContents">
+
+	<div class="main-height">
+		<div class="container">
+			<div class="row">
+				<div class="col">
+					<p class="text-white mt-5 mb-5">
+					<h2 class="tm-block-title">재고리스트</h2>
+				</div>
+			</div>
+			<div class="row tm-content-row">
+					<div class="col-12 tm-block-col">
+					<div class="tm-bg-primary-dark tm-block tm-block-h-auto-copy">
+						<form action="inventoryList" class="tm-search-form row" method="post">
+							<div class="form-group col-3">
+								<select class="custom-select" name="purchaseDate">
+									<option value="purchase_date">등록일자</option>
+								</select>
+							</div>
+							<div class="form-group col-3">
+								<input id="beginDate" name="beginDate" 
+									   type="text" class="form-control validate"/>
+							</div>
+							<div class="form-group col-1 text-center">
+								<h2 class="tm-site-title mb-0">~</h2>
+							</div>
+							<div class="form-group col-3">
+								<input id="endDate" name="endDate" 
+									   type="text" class="form-control validate"/>
+							</div>
+							<div class="form-group col-2">
+							</div>
+							
+							<div class="form-group col-3">
+								
+								<select class="custom-select" name="select">
+									
+									<option value="goods_database_category">상품 카테고리명</option>
+																
+								</select>
+							</div>
+							<div class="form-group col-7">
+								
+								<input id="searchInput" name="searchInput" type="text" class="form-control validate" />
+							</div>
+							<div class="form-group col-2">
+								
+								<button type="submit" id="searchButton" name="searchButton" class="btn btn-primary btn-block">
+									검색
+								</button>
+							</div>
+						</form>
+					</div>
+				</div>
+			</div>
+			
+			<div class="row tm-content-row">
+				<div class="col-12 tm-block-col">
+					<div class="col-lx tm-bg-primary-dark tm-block-sub tm-block-scroll">
+						<table class="table">
+							<thead>
+								<tr>
+									<th scope="col">상품명</th>									
+									<th scope="col">판매상태</th>
+									<th scope="col">대여상태</th>
+									<th scope="col">매입일자</th>
+									<th scope="col">상품등록일</th>
+									<th scope="col">재고확인일자</th>
+													
+									
+									<th scope="col" class="text-center">수정</th>
+									
+								</tr>
+							</thead>
+							<tbody>
+								<tr th:each="i : ${iList}" >
+									<th th:text="${i.goodsDbName}"></th>
+									<td th:text="${i.goodsCompletionState} ? ${i.goodsCompletionState}: '상품으로 등록하지않음'" ></td>								
+									<td th:text="${i.goodsRentalState} ? ${i.goodsRentalState} : '무'"></td>
+									<td th:text="${i.purchaseDate}"></td>
+									<td th:text="${i.goodsDate} ? ${i.goodsDate} : '등록안함'"></td>									
+									<td th:text="${i.goodsInventoryDate} ? ${i.goodsInventoryDate} : '확인하여등록해주세요'"></td>
+																							
+									<td class="text-center">
+										<a th:href="@{/getinventoryList(purchaseCode=${i.purchaseCode})}"
+										   	class="tm-product-delete-link">
+										   <i class="fas fa-check tm-product-check-icon" style="color: white"></i>
+										</a>
+									</td>
+									
+
+								</tr>
+								
+
+							</tbody>
+						</table>
+					</div>
+				</div>
+			</div>
+		</div>
+		
+	</div>
+	<script>
+		$('#beginDate').datepicker({
+		});
+		$('#beginDate').datepicker('option','dateFormat','yy-mm-dd'); // 기존 dd/mm/yy에서 yy-mm-dd로 format 변경   
+		
+		//종료 일자 텍스트상자 클릭시 달력 표기 
+		$('#endDate').datepicker({
+		});
+		$('#endDate').datepicker('option','dateFormat','yy-mm-dd'); // 기존 dd/mm/yy에서 yy-mm-dd로 format 변경 
+	</script>
+</th:block>
+<th:block layout:fragment="customScript">
+</th:block>
+</html>

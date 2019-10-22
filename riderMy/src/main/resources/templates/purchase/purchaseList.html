@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{layout/default}">
+<th:block layout:fragment="customTitle">
+</th:block>
+<th:block layout:fragment="customContents">
+	<!-- MAIN -->
+	<div class="main">
+		<div class="container mt-5">
+			<h2 class="tm-block-title">매입리스트</h2>
+			<div class="row tm-content-row">
+				<div class="col-12 tm-block-col">
+						<div class="tm-bg-primary-dark tm-block tm-block-h-auto-copy">
+						<form action="purchaseSearchList" class="tm-search-form row" method="post">
+							<div class="form-group col-3">
+								<select class="custom-select" name="purchaseDate">
+									<option value="purchase_Date">매입등록일자검색</option>
+								</select>
+							</div>
+							<div class="form-group col-3">
+								<input id="beginDate" name="beginDate" 
+									   type="text" class="form-control validate"/>
+							</div>
+							<div class="form-group col-1 text-center">
+								<h2 class="tm-site-title mb-0">~</h2>
+							</div>
+							<div class="form-group col-3">
+								<input id="endDate" name="endDate" 
+									   type="text" class="form-control validate"/>
+							</div>
+							<div class="form-group col-2">
+							</div>
+							
+							<div class="form-group col-3">
+								
+								<select class="custom-select" name="select">
+									
+									<option th:value="goods_database_category">상품 카테고리명</option>
+																
+								</select>
+							</div>
+							<div class="form-group col-7">
+								
+								<input id="searchInput" name="searchInput" type="text" class="form-control validate" />
+							</div>
+							<div class="form-group col-2">
+								
+								<button type="submit" id="searchButton" name="searchButton" class="btn btn-primary btn-block">
+									검색
+								</button>
+							</div>
+						</form>
+					</div>
+				</div>
+			</div>
+			<div class="row tm-content-row">
+				<div class="col-sm-12 col-md-12  tm-block-col">
+					<div class="tm-bg-primary-dark tm-block tm-block-products">
+						<div class="tm-bg-primary-dark tm-block-scroll tm-block-sc">
+							<h2 class="tm-block-title">매입상품/// 상세보기하여 매입삭제와 판매상품등록할수있고 현상품상태확인으로 재고파악가능</h2>
+							<table class="table">
+								<thead>
+									<tr>
+										<th scope="col">상품명</th>
+										<th scope="col">상품카테고리</th>
+										<th scope="col">매입 가격</th>
+										<th scope="col">매입시 상품상태</th>
+										<th scope="col">현재 상품상태</th>
+										<th scope="col">매입일자</th>
+										<th scope="col">상세보기</th>
+
+									</tr>
+								</thead>
+								<tbody>
+									
+								<!-- 	
+									<tr th:each="pl: ${hList}">
+										<th th:text="${pl.goodsDbName}"></th>
+										<th th:text="${pl.goodsDbCategory}"></th>																			
+										<th th:text="${pl.purchasePay}"></th>
+										<th th:text="${pl.purchaseState}"></th>
+										<th th:text="${pl.purchaseDate}"></th>
+										<td><a
+											th:href="@{/getPurchaseList(purchaseCode=${pl.purchaseCode})}"
+											class="tm-product-delete-link"> <i
+												class="fas fa-check tm-product-check-icon"></i>
+										</a></td>										
+
+									</tr> -->
+									
+									<!-- 삭제가능한 매입리스트  -->
+									<tr th:each="y: ${yList}">
+										<th th:text="${y.goodsDbName}"></th>
+										<th th:text="${y.goodsDbCategory}"></th>																			
+										<th th:text="${y.purchasePay}"></th>
+										<th th:text="${y.purchaseState}"></th>
+										<th th:text="${y.goodsState} ? ${y.goodsState} : 상품등록하지않음 "></th>
+										<th th:text="${y.purchaseDate}"></th>
+										<td>
+										<a
+											th:href="@{/yesPurchaseList(purchaseCode=${y.purchaseCode})}"
+											class="tm-product-delete-link"> <i
+												class="fas fa-check tm-product-check-icon"></i>
+										</a>
+										</td>
+									</tr>
+									
+									<!-- 삭제불가한 리스트 -->
+									<tr th:each="n: ${nList}">
+										<th th:text="${n.goodsDbName}"></th>
+										<th th:text="${n.goodsDbCategory}"></th>																			
+										<th th:text="${n.purchasePay}"></th>
+										<th th:text="${n.purchaseState}"></th>
+										<th th:text="${n.goodsState} ? ${n.goodsState} : 상품등록하지않음 "></th>
+										<th th:text="${n.purchaseDate}"></th>
+										<td><a
+											th:href="@{/getPurchaseList(purchaseCode=${n.purchaseCode})}"
+											class="tm-product-delete-link"> <i
+												class="fas fa-check tm-product-check-icon"></i>
+										</a></td>										
+
+									</tr>
+									
+									 
+									<th:block th:if="${alert} neq null">
+										<tr class="text-center">
+											<td colspan="7" th:text="${alert}"></td>
+										</tr>
+									</th:block>		
+								</tbody>
+							</table>					
+						</div>
+						<a href="/goodsDbList"
+							class="btn btn-primary btn-block text-uppercase mb-3">매입추가하기</a>			
+					</div>
+				</div>
+			</div>
+		</div>
+
+	</div>
+	<!-- END MAIN -->
+	<script>
+		$(function() {
+			$(".tm-product-name").on("click", function() {
+				window.location.href = "#";
+			});
+		});
+		//시작 일자 텍스트상자 클릭시 달력 표기 
+		$('#beginDate').datepicker({
+		});
+		$('#beginDate').datepicker('option','dateFormat','yy-mm-dd'); // 기존 dd/mm/yy에서 yy-mm-dd로 format 변경   
+		
+		//종료 일자 텍스트상자 클릭시 달력 표기 
+		$('#endDate').datepicker({
+		});
+		$('#endDate').datepicker('option','dateFormat','yy-mm-dd'); // 기존 dd/mm/yy에서 yy-mm-dd로 format 변경 
+	</script>
+</th:block>
+</th:block>
+<th:block layout:fragment="customScript">
+</th:block>
+</html>
+
+

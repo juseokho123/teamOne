@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{layout/default}">
+
+<th:block layout:fragment="customTitle">
+</th:block>
+<th:block layout:fragment="customContents">
+
+	<!-- MAIN -->
+	<div class="main-height">
+		<!-- MAIN CONTENT -->
+		<div class="main-content">
+			<div class="container">
+				<div class="row">
+					<div class="col">
+						<p class="text-white mt-5 mb-5">
+							<b>지출/매출 > 지출 > 통합</b>
+						</p>
+						<p class="text-white mt-5 mb-5">
+							<b>※ 지출 통합 현황 페이지입니다. 매출, 급여, 공과금/기타 지출이 통합되어 차트로 보여집니다 ※</b>
+						</p>
+					</div>
+				</div>
+
+				<th:block th:if="${session.SLEVEL eq '관리자'}">
+					<div class="row tm-content-row">
+						<div class="col-12 tm-block-col">
+							<div class="tm-bg-primary-dark tm-block-select">
+								<form action="/spendManagement" method="get" id="spendManagementForm">
+									<input type="hidden" name="selectShopCode" th:value="${contractShopCode}">
+									<span style="float: left" th:each="shop : ${shop}">
+										<strong class="tm-block-title text-center" th:text="${shop.shopName}"></strong>
+									</span> 
+									<span style="float: right"> 
+									<select
+										style="width: 800px;"
+										class="custom-select"
+										name="spendManagement"
+										id="spendManagement">
+										<option value="spendTotal" id="spendTotal">통합</option>
+										<option value="spendSalary" id="spendSalary">급여</option>
+										<option value="spendUtility" id="spendUtility">공과금/기타</option>
+									</select>
+									</span>
+								</form>
+							</div>
+						</div>
+					</div>
+				</th:block>
+
+
+				<!-- 통합 지출 현황 -->
+				<div class="row tm-content-row">
+					<div class="col-12 tm-block-col">
+						<div class="tm-bg-primary-dark tm-block-util">
+						<form action="/spendTotal" method="get" id="selectYearForm" name="selectYearForm">
+								<input type="hidden" name="contractShopCode" th:value="${contractShopCode}">
+								<span style="display: inline-block; float: left"> 
+									<strong class="tm-block-title">통합 지출 현황 </strong>
+								</span> 
+								<span style="display: inline-block; float: right"> 
+									<select
+										style="width: 100px;" 
+										class="custom-select" 
+										name="totalYear"
+										id="totalYear"
+										><option value="2019" id="2019">2019</option>
+									</select>
+								</span>
+							</form>
+
+							<!-- charts.js -->
+							<canvas id="totalChart" height="100px;"></canvas>
+						</div>
+					</div>
+				</div>
+
+			</div>
+		</div>
+	</div>
+</th:block>
+<th:block layout:fragment="customScript">
+
+	<script th:inline="javascript">
+	 
+	$('#spendManagement').change(function() {
+		$('#spendManagementForm').submit()
+	});
+	
+	$(function() {
+		var url = $(location).attr('pathname');
+		//console.log(url);
+		
+		if(url == '/spendUtility'){
+			$('#spendUtility').attr('selected', 'selected');
+		} else if(url == '/spendSalary'){
+			$('#spendSalary').attr('selected', 'selected');
+		} else if(url == '/spendUtilityList'){
+			$('#spendUtility').attr('selected', 'selected');
+		} else if(url == '/spendSalaryList'){
+			$('#spendSalary').attr('selected', 'selected');
+		} else {
+			$('#spendTotal').attr('selected', 'selected');
+		}
+	})
+	
+	
+	
+	 <!-- charts.js script-->
+	var salaryJanuary 	= [[${salary0}]];
+	var salaryFebruary 	= [[${salary1}]];
+	var salaryMarch 	= [[${salary2}]];
+	var salaryApril 	= [[${salary3}]];
+	var salaryMay 		= [[${salary4}]];
+	var salaryJune		= [[${salary5}]];
+	var salaryJuly		= [[${salary6}]];
+	var salaryAugust	= [[${salary7}]];
+	var salarySeptember = [[${salary8}]];
+	var salaryOctober 	= [[${salary9}]];
+	var salaryNovember 	= [[${salary10}]];
+	var salaryDecember 	= [[${salary11}]];
+	
+	var utilityJanuary 		= [[${utility0}]];
+	var utilityFebruary 	= [[${utility1}]];
+	var utilityMarch 		= [[${utility2}]];
+	var utilityApril 		= [[${utility3}]];
+	var utilityMay 			= [[${utility4}]];
+	var utilityJune			= [[${utility5}]];
+	var utilityJuly			= [[${utility6}]];
+	var utilityAugust		= [[${utility7}]];
+	var utilitySeptember	= [[${utility8}]];
+	var utilityOctober 		= [[${utility9}]];
+	var utilityNovember 	= [[${utility10}]];
+	var utilityDecember 	= [[${utility11}]];
+	
+	var purchaseJanuary 	= [[${purchase0}]];
+	var purchaseFebruary 	= [[${purchase1}]];
+	var purchaseMarch 		= [[${purchase2}]];
+	var purchaseApril 		= [[${purchase3}]];
+	var purchaseMay 		= [[${purchase4}]];
+	var purchaseJune		= [[${purchase5}]];
+	var purchaseJuly		= [[${purchase6}]];
+	var purchaseAugust		= [[${purchase7}]];
+	var purchaseSeptember	= [[${purchase8}]];
+	var purchaseOctober 	= [[${purchase9}]];
+	var purchaseNovember 	= [[${purchase10}]];
+	var purchaseDecember 	= [[${purchase11}]];
+
+	var tctx = document.getElementById('totalChart').getContext('2d');
+	var totalChart = new Chart(tctx, {
+		
+	    // The type of chart we want to create
+	    type: 'bar',
+	
+	    // The data for our dataset
+	    data: {
+	        labels: ['1월', '2월', '3월', '4월', '5월', '6월', '7월','8월','9월','10월','11월','12월'],
+	        datasets: [{
+				label: '매입',
+				backgroundColor: 'rgb(255, 204, 102)',
+	            borderColor: 'rgb(255, 204, 102)',
+				data: [
+					purchaseJanuary, purchaseFebruary, purchaseMarch, purchaseApril, purchaseMay, purchaseJune, purchaseJuly
+					, purchaseAugust, purchaseSeptember, purchaseOctober, purchaseNovember, purchaseDecember
+				]
+			}, {
+				label: '급여',
+				backgroundColor: 'rgb(255, 153, 0)',
+	            borderColor: 'rgb(255, 153, 0)',
+				data: [
+					salaryJanuary, salaryFebruary, salaryMarch, salaryApril, salaryMay, salaryJune, salaryJuly
+					, salaryAugust, salarySeptember, salaryOctober, salaryNovember, salaryDecember, salaryDecember
+				]
+			}, {
+				label: '공과금/기타',
+				backgroundColor: 'rgb(255, 204, 0)',
+	            borderColor: 'rgb(255, 204, 0)',
+				data: [
+					utilityJanuary, utilityFebruary, utilityMarch, utilityApril, utilityMay, utilityJune, utilityJuly
+					, utilityAugust, utilitySeptember, utilityOctober, utilityNovember, 
+				]
+			}]
+	    },
+	
+	    // Configuration options
+	    options: {
+	    	legend: {
+	             labels: {
+	                  fontColor: 'white' // label color
+	                 }
+	              },
+		    scales: {
+		    	// y축
+		        yAxes: [{
+		        	stacked: true,
+		            ticks: {
+		                fontColor:'white' // y축 폰트 color
+		            }
+		     	}],
+		     	// x축
+		     	xAxes: [{
+		     		stacked: true,
+		            ticks: {
+		                fontColor:'white' // x축 폰트 color
+		            }
+		     	}]
+		    }
+	    }
+	});
+	
+</script>
+</th:block>
+</html>
+

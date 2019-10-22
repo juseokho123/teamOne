@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{layout/default}">
+<th:block layout:fragment="customTitle">
+</th:block>
+<th:block layout:fragment="customContents">
+	<div class="container tm-mt-big tm-mb-big main-height">
+		<div class="tm-bg-primary-dark tm-block tm-block-h-auto-copy">
+			<form action="contractSearchList" class="tm-search-form row" method="post">
+				<div class="form-group col-3">
+					<select class="custom-select-sj">
+						<option selected="selected">계약 일자</option>
+					</select>
+				</div>
+				<div class="form-group col-3">
+					<input id="beginDate" name="beginDate" readonly style="background-color: #4e657a" 
+						   type="text" class="form-control validate" />
+				</div>
+				<div class="form-group col-1 text-center">
+					<h2 class="tm-site-title mb-0">~</h2>
+				</div>
+				<div class="form-group col-3">
+					<input id="endDate" name="endDate" readonly style="background-color: #4e657a" 
+						   type="text" class="form-control validate" />
+				</div>
+				<div class="form-group col-2"></div>
+				<div class="form-group col-3">
+					<select class="custom-select" id="searchKey" name="searchKey">
+						<option value="">납부방식</option>
+						<option value="월 납부">월 납부</option>
+						<option value="1년 일시불">1년 일시불</option>
+						<option value="2년 일시불">2년 일시불</option>
+					</select>
+				</div>
+				<div class="form-group col-7">
+					<input class="form-control placeholder validate" name="searchValue" type="text" id="input" 
+						   style="background-color: #4e657a" placeholder="점주 아이디를 입력해주세요" />
+				</div>
+				<div class="form-group col-2">
+					<button type="submit" class="btn btn-primary btn-block">
+						검색
+					</button>
+				</div>
+			</form>
+		</div>
+		<br /><br /><br />
+		<div class="tm-bg-primary-dark tm-block tm-block-h-auto">
+			<div class="row">
+				<div class="col-12">
+					<h2 class="tm-block-title d-inline-block">계약내용 상세조회</h2>
+				</div>
+			</div>
+			<table class="table">
+				<thead>
+					<tr>
+						<th scope="col">계약자<br/> 아이디
+						</th>
+						<th scope="col">서비스 <br/>시작일자
+						</th>
+						<th scope="col">서비스 <br/>종료일자
+						</th>
+						<th scope="col">계약<br/> 유효기간
+						</th>
+						<th scope="col">계약금액</th>
+						<th scope="col">계약금<br/>납입방식
+						</th>
+						<th scope="col">계약일</th>
+						<th scope="col" style="width: 8%" class="text-center">수정</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr th:each="cList : ${contractList}">
+						<th th:text="${cList.memberId}"></th>
+						<th th:text="${cList.contractStart}"></th>
+						<th th:text="${cList.contractFinish}"></th>
+						<th th:text="${cList.contractValidDate}"></th>
+						<th th:text="${cList.contractPay}"></th>
+						<th th:text="${cList.contractMethod}"></th>
+						<th th:text="${cList.contractDate}"></th>
+						<td class="text-center">
+							<a th:href="@{getContractList(contractCode=${cList.contractCode},contractUnitCode=${cList.contractUnitCode})}"
+							   class="tm-product-delete-link"> 
+							   <i class="fas fa-check tm-product-check-icon" style="color: white"></i>
+							</a>
+						</td>
+					</tr>
+				</tbody>
+				<th:block th:if="${alert} neq null">
+					<tr class="text-center">
+						<td colspan="7" th:text="${alert}"></td>
+					</tr>
+				</th:block>
+			</table>
+		</div>
+	</div>
+</th:block>
+<th:block layout:fragment="customScript">
+	<script type="text/javascript">
+		$(function() {
+			$(".tm-product-name").on("click", function() {
+				window.location.href = "#";
+			});
+		});
+		//시작 일자 텍스트상자 클릭시 달력 표기 
+		$('#beginDate').datepicker({});
+		$('#beginDate').datepicker('option', 'dateFormat', 'yy-mm-dd'); // 기존 dd/mm/yy에서 yy-mm-dd로 format 변경   
+
+		//종료 일자 텍스트상자 클릭시 달력 표기 
+		$('#endDate').datepicker({});
+		$('#endDate').datepicker('option', 'dateFormat', 'yy-mm-dd'); // 기존 dd/mm/yy에서 yy-mm-dd로 format 변경
+	</script>
+</th:block>
+</html>

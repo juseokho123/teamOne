@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{layout/default}">
+<th:block layout:fragment="customTitle">
+</th:block>
+<th:block layout:fragment="customContents">
+	
+
+	<div  class="container tm-mt-big tm-mb-big main-height">
+		<div class="row"  >
+			<div class="col-xl-9 col-lg-10 col-md-12 col-sm-12 mx-auto">
+				<div class="tm-bg-primary-dark tm-block tm-block-h-auto">
+					<div class="row">
+						<div class="col-12" >
+						 <h2 class="tm-block-title d-inline-block">매장릴레이션 등록</h2>
+						</div>
+					</div>
+            		<div class="row tm-edit-product-row">
+              			<div  class="col-xl-12 col-lg-6 col-md-12" style="float:right;">
+                			<form action="/relationInsert" id="form" class="tm-edit-product-form" method="post">
+                			
+				                   <div class="form-group mb-3">
+				                    <label
+				                      for="name"
+				                      style="float:right;"
+				                      >매장코드
+				                    </label>
+				                    <!-- required : 입력란 설정  -->
+				                    
+				                    <select class="custom-select tm-select-accounts" name="shopCode" id="shopCode">
+				                    	<option selected >매장코드 선택</option>
+				                        <option th:each="slist : ${shopList}"  th:text="${slist.shopCode}"></option>
+				                    </select>
+				                  </div>
+				              
+		       					<div class="form-group mb-3">
+				                    <label
+				                      for="name"
+				                      style="float:right;"
+				                      >사용여부
+				                    </label>
+				                    <!-- required : 입력란 설정  -->
+				                    
+				                    <select class="custom-select tm-select-accounts" name="contractShopUse" id="contractShopUse">
+				                    	<option selected >==선택해주세요==</option>
+				                        <option value="사용">사용 중</option>
+				                        <option value="사용 안함">사용 안함</option>
+				                    </select>
+				                  </div>
+ 
+                  					<br/>
+					         		<div style="float:right;">
+					              		<div class="col-12">
+					               		 <button type="submit"  class="btn btn-primary btn-block text-uppercase">계약매장코드 생성</button>
+					              		</div>
+					              </div>
+            				</form>
+            			</div>
+          			</div>
+        		</div>
+      		</div>
+    	</div>
+	</div>
+
+</th:block>
+<th:block layout:fragment="customScript">
+
+
+
+</th:block>
+</html>

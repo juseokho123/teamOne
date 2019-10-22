@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.smart.rider.member.mapper.EmployeeMapper">
+	
+	<!-- 직원 등록처리 -->
+	<insert id="employeeInsert" parameterType="com.smart.rider.member.dto.MemberDTO">
+		INSERT INTO member(
+			 member_id
+			,member_pw
+			,member_name
+			,member_level
+			,member_birth
+			,member_address
+			,member_email
+			,member_phone
+			,contract_shop_code
+			,member_insert_date
+			,member_update_date
+		)VALUES (
+			 #{memberId}
+			,#{memberPw}
+			,#{memberName}
+			,'직원'
+			,#{memberBirth}
+			,#{memberAddress}
+			,#{memberEmail}
+			,#{memberPhone}
+			,#{contractShopCode}
+			,CURDATE()
+			,CURDATE())
+	</insert>
+	
+	<!-- 직원 목록 -->
+	<select id="employeeList" parameterType="String" resultType="com.smart.rider.member.dto.MemberDTO">
+		SELECT 
+			 member_id 			AS memberId
+			,member_pw 			AS memberPw
+			,member_name		AS memberName
+			,member_level 		AS memberLevel
+			,member_birth 		AS memberBirth
+			,member_address 	AS memberAddress
+			,member_email 		AS memberEmail
+			,member_phone 		AS memberPhone
+			,contract_shop_code	AS contractShopCode
+			,member_insert_date AS memberInsertDate
+			,member_update_date AS memberUpdateDate
+		FROM member
+		WHERE
+			contract_shop_code = #{contractShopCode}
+	</select>
+	
+	<!-- 19.09.20작성 직원 상세보기 -->
+	<select id="getEmployeeList" parameterType="String" resultType="com.smart.rider.member.dto.MemberDTO">
+		SELECT 
+			 member_id 			AS memberId
+			,member_pw 			AS memberPw
+			,member_name		AS memberName
+			,member_level 		AS memberLevel
+			,member_birth 		AS memberBirth
+			,member_address 	AS memberAddress
+			,member_email 		AS memberEmail
+			,member_phone 		AS memberPhone
+			,contract_shop_code	AS contractShopCode
+		FROM member
+		WHERE
+			member_id 			= #{memberId}
+	</select>
+	
+	<!-- 19.09.25작성 직원 수정처리 -->
+	<update id="employeeUpdate" parameterType="com.smart.rider.member.dto.MemberDTO">
+		UPDATE member
+		SET
+			 member_name		= #{memberName}
+			,member_birth		= #{memberBirth}
+			,member_address		= #{memberAddress}
+			,member_email		= #{memberEmail}
+			,member_phone		= #{memberPhone}
+			,member_update_date	= CURDATE()
+			,contract_shop_code	= #{contractShopCode}
+		WHERE
+			member_id = #{memberId}
+	</update>
+	
+	<!-- 직원 탈퇴처리 -->
+	<delete id="employeeDelete" parameterType="String">
+		DELETE 
+		FROM member
+		WHERE
+			member_id = #{memberId}
+		AND member_pw = #{memberPw}
+	</delete>
+	
+	<!-- 19.09.26작성 직원 검색 -->
+	<select id="searchEmployee" parameterType="String" resultType="com.smart.rider.member.dto.MemberDTO">
+		SELECT 
+			 member_id 			AS memberId
+			,member_pw 			AS memberPw
+			,member_name		AS memberName
+			,member_level 		AS memberLevel
+			,member_birth 		AS memberBirth
+			,member_address 	AS memberAddress
+			,member_email 		AS memberEmail
+			,member_phone 		AS memberPhone
+			,contract_shop_code AS contractShopCode
+			,member_insert_date AS memberInsertDate
+			,member_update_date AS memberUpdateDate
+		FROM member
+		<trim prefix="where" prefixOverrides="AND|OR">
+			<if test="searchInput neq null and searchInput neq ''.toString()">
+				AND ${select} Like CONCAT('%',#{searchInput},'%')
+			</if>
+			<if test="beginDate neq ''.toString() and endDate neq ''.toString()">
+				AND member_insert_date between #{beginDate} and #{endDate}
+			</if>
+			<if test="beginDate eq ''.toString() and endDate neq ''.toString()">
+				AND member_insert_date between '2000-01-01' and #{endDate}
+			</if>
+			<if test="beginDate neq ''.toString() and endDate eq ''.toString()">
+				AND member_insert_date between #{beginDate} and NOW()
+			</if>
+			<if test="contractShopCode neq null and contractShopCode neq ''.toString()">
+				AND contract_shop_code = #{contractShopCode}
+			</if>
+		</trim>
+	</select>
+	
+	<select id="getShopRelationCode" parameterType="String" resultType="com.smart.rider.shop.dto.SsrHapDTO">
+	SELECT DISTINCT
+		sr.contract_shop_code AS contractShopCode 
+		,s.shop_name AS shopName
+	
+	FROM shop_relation sr, shop s
+	WHERE sr.shop_code =s.shop_code AND sr.member_id =#{SID}
+	</select>
+</mapper>

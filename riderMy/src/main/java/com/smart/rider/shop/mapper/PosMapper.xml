@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.smart.rider.shop.mapper.PosMapper">
+	
+	<!-- PosMap -->
+	<resultMap type="com.smart.rider.shop.dto.PosDTO" id="PosMap">
+		<result column="pos_code" 					property="posCode"/>
+		<result column="contract_shop_code" 		property="contractShopCode"/>
+		<result column="pos_name" 					property="posName"/>
+		<result column="pos_number" 				property="posNumber"/>
+		<result column="pos_use" 					property="posUse"/>
+	</resultMap>	
+
+	<!-- POS코드 자동증가 -->
+	<select id="posCodeMax" resultType="String">
+		SELECT 
+			MAX(LPAD(RIGHT(pos_code, 4)+1, '4' , '0')) 
+		FROM pos;
+	</select>
+	
+	<!--세션으로 받은 id값으로 계약매장코드 조회 -->
+	<select id="getMemberId" parameterType="String" resultType="com.smart.rider.shop.dto.SsrHapDTO" >
+		SELECT 
+		DISTINCT 
+		 	 sr.contract_shop_code 	AS contractShopCode
+			,s.shop_name 			AS shopName
+		FROM shop_relation sr,shop s 
+		WHERE sr.shop_code = s.shop_code AND sr.member_id = #{memberId}; 
+	</select>
+	
+	<!-- POS데이터 생성 쿼리 -->
+	<insert id="posInsert" parameterType="com.smart.rider.shop.dto.PosDTO">
+		INSERT INTO pos
+			(
+			 pos_code
+			,contract_shop_code
+			,pos_name
+			,pos_number
+			,pos_use)
+		VALUES (
+			 #{posCode}
+			,#{contractShopCode}
+			,#{posName}
+			,#{posNumber}
+			,#{posUse})
+	</insert>
+	
+	<!-- POS 상세목록 -->
+	<select id="getPosList" parameterType="String" resultMap="PosMap">
+		SELECT 
+		 	pos_code
+			,contract_shop_code
+			,pos_name
+			,pos_number
+			,pos_use
+		FROM pos
+		<if test="level neq '관리자'.toString()">
+		WHERE contract_shop_code=#{contractShopCode}
+		</if>
+	</select>
+	
+	<!-- 수정 데이터 얻기 -->
+	<select id="posUpdate" parameterType="String" resultMap="PosMap">
+		SELECT 
+		 	pos_code
+			,contract_shop_code
+			,pos_name
+			,pos_number
+			,pos_use
+		FROM pos
+		WHERE pos_code=#{posCode}
+	</select>
+	
+	<!--입력 데이터로 수정 -->
+	<update id="posUpdateSet" parameterType="com.smart.rider.shop.dto.PosDTO">
+		UPDATE pos
+		SET
+			pos_name=#{posName},
+			pos_number=#{posNumber},
+			pos_use=#{posUse}
+		WHERE pos_code=#{posCode}
+	</update>
+	
+	
+	<!--posCode로 memberId구하기 -->
+	<select id="getId" parameterType="String" resultType="String">
+		SELECT 
+			sr.member_id
+		FROM pos p INNER JOIN shop_relation sr
+		ON p.contract_shop_code = sr.contract_shop_code
+		WHERE p.pos_code=#{posCode}
+	</select>
+	
+	<!-- id로 pw와 birth조회 -->
+	<select id="getMember" parameterType="String" resultType="com.smart.rider.member.dto.MemberDTO">
+		SELECT
+			 member_pw 		AS memberPw
+			,member_birth	AS memberBirth
+		FROM member
+		WHERE member_id = #{memberId}
+	</select>
+	
+	<!-- 삭제 -->
+	<delete id="posDeleteSet" parameterType="String">
+		DELETE 
+			FROM pos
+		WHERE 
+			pos_code= #{posCode}
+	</delete>
+</mapper>

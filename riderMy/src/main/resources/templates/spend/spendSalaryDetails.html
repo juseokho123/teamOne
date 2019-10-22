@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{layout/default}">
+
+<th:block layout:fragment="customTitle">
+</th:block>
+<th:block layout:fragment="customContents">
+
+	<!-- MAIN -->
+	<div class="height-sub">
+		<!-- MAIN CONTENT -->
+		<div class="main-content">
+			<div class="container">
+				<div class="row">
+					<div class="col">
+						<p class="text-white mt-5 mb-5">
+							<b>지출/매출 > 지출 > 급여 > 상세보기</b>
+						</p>
+					</div>
+				</div>
+
+				<div class="row tm-content-row">
+
+					<!-- 공과금 내역 상세보기-->
+					<div class="col-12 tm-block-col">
+						<div class="tm-bg-primary-dark tm-block-details-salary">
+						<form action="/salaryUpdate" method="post" id="salaryUpdateForm">
+						<th:block th:each="details : ${salaryDetails}">
+						<input type="hidden" name="spendSalaryCode" th:value="${details.spendSalaryCode}">
+						<input type="hidden" name="selectShopCode" th:value="${details.contractShopCode}">
+							<h4 class="tm-block-title">등록내역 상세보기</h4>
+							<table class="table">
+								<tr>
+									<td class="text-center" style="width: 15%">직원명</td>
+									<td>
+										<input 
+											type="text" 
+											class="form-control validate"
+											name="memberName"
+											th:value="${details.memberName}" 
+											style="background-color: #54657D" 
+											readonly>
+									</td>
+									<td class="text-center" style="width: 15%">등록일자</td>
+									<td>
+										<input 
+											type="text" 
+											class="form-control validate"
+											name="memberName"
+											th:value="${details.spendSalaryDate}" 
+											style="background-color: #54657D" 
+											readonly>
+									</td>
+									
+								</tr>
+							</table>
+							
+							<hr>
+							
+							<table class="table">
+								<tr>
+									<td class="text-center" style="width: 15%">기본급여</td>
+									<td><input 
+											type="text" 
+											class="form-control validate"
+											name="spendSalaryPay" 
+											id="spendSalaryPay"
+											th:value="${details.spendSalaryPay}"
+											style="background-color: #54657D;" >
+									</td>
+									<td class="text-center" style="width: 15%">시간외수당</td>
+									<td><input 
+											type="text" 
+											class="form-control validate"
+											name="spendSalaryOverpay"
+											id="spendSalaryOverpay"
+											th:value="${details.spendSalaryOverpay}"
+											style="background-color: #54657D;">
+									</td>
+								</tr>
+								<tr>
+									<td class="text-center" style="width: 15%">상여금</td>
+									<td><input 
+											type="text" 
+											class="form-control validate"
+											name="spendSalaryBonus" 
+											id="spendSalaryBonus"
+											th:value="${details.spendSalaryBonus}"
+											style="background-color: #54657D;">
+									</td>
+									<td class="text-center" style="width: 15%">비과세액</td>
+									<td><input 
+											type="text" 
+											class="form-control validate"
+											name="spendSalaryFree"
+											id="spendSalaryFree"
+											th:value="${details.spendSalaryFree}" 
+											style="background-color: #54657D;">
+									</td>
+								</tr>
+							</table>
+														
+							<hr>
+
+							<table class="table">
+								<tr>
+									<td class="text-center" style="width: 15%">총액</td>
+									<td>
+										<input 
+											type="text" 
+											class="form-control validate"
+											name="spendSalaryTotal"
+											id="spendSalaryTotal"
+											th:value="${details.spendSalaryTotal}"
+											style="background-color: #54657D" 
+											readonly>
+									</td>
+								</tr>
+							</table>
+							
+							<hr>
+								<!-- 수정 확인 버튼 -->
+								<button type="button" 
+										class="btn-sub btn-primary text-uppercase"
+										id="updateSalary" 
+										style="float:right">
+										수정
+								</button>
+							</th:block>
+							</form>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</th:block>
+<th:block layout:fragment="customScript">
+
+<script th:inline="javascript">
+		
+	$('#spendSalaryPay').click(function() {
+		$('#spendSalaryPay').val('');
+		
+		$('#spendSalaryPay').blur(function() {
+			
+			var spendSalaryPay = $.trim($('#spendSalaryPay').val());
+			var spendSalaryOverpay = $.trim($('#spendSalaryOverpay').val());
+			var spendSalaryBonus = $.trim($('#spendSalaryBonus').val());
+			var spendSalaryFree = $.trim($('#spendSalaryFree').val());
+			
+			if($('#spendSalaryPay').val() == ''){
+				$('#spendSalaryPay').val('0');
+			} else if(spendSalaryPay == ''){
+				$('#spendSalaryPay').val('0');
+			}
+			
+			$('#spendSalaryTotal').val('0');
+			$('#spendSalaryTotal').val(Number(spendSalaryPay) + Number(spendSalaryOverpay) + Number(spendSalaryBonus) + Number(spendSalaryFree));
+		})
+	})
+	
+	$('#spendSalaryOverpay').click(function() {
+		$('#spendSalaryOverpay').val('');
+		
+		$('#spendSalaryOverpay').blur(function() {
+			
+			var spendSalaryPay = $.trim($('#spendSalaryPay').val());
+			var spendSalaryOverpay = $.trim($('#spendSalaryOverpay').val());
+			var spendSalaryBonus = $.trim($('#spendSalaryBonus').val());
+			var spendSalaryFree = $.trim($('#spendSalaryFree').val());
+			
+			if($('#spendSalaryOverpay').val() == ''){
+				$('#spendSalaryOverpay').val('0');
+			} else if(spendSalaryOverpay == ''){
+				$('#spendSalaryOverpay').val('0');
+			}
+			
+			$('#spendSalaryTotal').val('0');
+			$('#spendSalaryTotal').val(Number(spendSalaryPay) + Number(spendSalaryOverpay) + Number(spendSalaryBonus) + Number(spendSalaryFree));
+		})
+	})
+	
+	$('#spendSalaryBonus').click(function() {
+		$('#spendSalaryBonus').val('');
+		
+		$('#spendSalaryBonus').blur(function() {
+			
+			var spendSalaryPay = $.trim($('#spendSalaryPay').val());
+			var spendSalaryOverpay = $.trim($('#spendSalaryOverpay').val());
+			var spendSalaryBonus = $.trim($('#spendSalaryBonus').val());
+			var spendSalaryFree = $.trim($('#spendSalaryFree').val());
+			
+			if($('#spendSalaryBonus').val() == ''){
+				$('#spendSalaryBonus').val('0');
+			} else if(spendSalaryBonus == ''){
+				$('#spendSalaryBonus').val('0');
+			}
+			
+			$('#spendSalaryTotal').val('0');
+			$('#spendSalaryTotal').val(Number(spendSalaryPay) + Number(spendSalaryOverpay) + Number(spendSalaryBonus) + Number(spendSalaryFree));
+		})
+	})
+	
+	$('#spendSalaryFree').click(function() {
+		$('#spendSalaryFree').val('');
+		
+		$('#spendSalaryFree').blur(function() {
+			
+			var spendSalaryPay = $.trim($('#spendSalaryPay').val());
+			var spendSalaryOverpay = $.trim($('#spendSalaryOverpay').val());
+			var spendSalaryBonus = $.trim($('#spendSalaryBonus').val());
+			var spendSalaryFree = $.trim($('#spendSalaryFree').val());
+			
+			if($('#spendSalaryFree').val() == ''){
+				$('#spendSalaryFree').val('0');
+			} else if(spendSalaryFree == ''){
+				$('#spendSalaryFree').val('0');
+			}
+			
+			$('#spendSalaryTotal').val('0');
+			$('#spendSalaryTotal').val(Number(spendSalaryPay) + Number(spendSalaryOverpay) + Number(spendSalaryBonus) + Number(spendSalaryFree));
+		})
+	})
+	
+	$('#updateSalary').click(function() {
+		if($('#spendSalaryTotal').val() == 'NaN'){
+			alert('숫자만 입력해주세요');
+		} else if ($('#memberId').val() == '등록된 직원이 없습니다') {
+			alert('등록된 직원이 없습니다');	
+		} else {
+			$('#salaryUpdateForm').submit();
+		}
+	})
+
+</script>
+</th:block>
+</html>
+

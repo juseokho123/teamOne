@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html 
+	xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{layout/default}"
+>
+
+<th:block layout:fragment="customTitle">
+</th:block>
+<th:block layout:fragment="customContents">
+
+	<!-- MAIN -->
+	<div class="height-sub">
+		<!-- MAIN CONTENT -->
+		<div class="main-content">
+			<div class="container">
+				<div class="row">
+					<div class="col">
+						<p class="text-white mt-5 mb-5">
+							<b>지출/매출 > 지출 > 공과금/기타</b>
+						</p>
+						<p class="text-white mt-5 mb-5">
+							<b>※ 공과금/기타 지출 관리 페이지입니다. 등록, 수정, 삭제, 조회를 할 수 있으며 지출 현황에서는 월별 금액이 차트로 표시됩니다. ※</b>
+						</p>
+					</div>
+				</div>
+				
+				<th:block th:if="${session.SLEVEL eq '관리자'}">
+					<div class="row tm-content-row">
+						<div class="col-12 tm-block-col">
+							<div class="tm-bg-primary-dark tm-block-select">
+								<form action="/spendManagement" method="get" id="spendManagementForm">
+									<input type="hidden" name="selectShopCode" th:value="${contractShopCode}">
+									<span style="float: left" th:each="shop : ${shop}">
+										<strong class="tm-block-title text-center" th:text="${shop.shopName}"></strong>
+									</span> 
+									<span style="float: right"> 
+									<select
+										style="width: 800px;"
+										class="custom-select"
+										name="spendManagement"
+										id="spendManagement">
+										<option value="spendTotal" id="spendTotal">통합</option>
+										<option value="spendSalary" id="spendSalary">급여</option>
+										<option value="spendUtility" id="spendUtility">공과금/기타</option>
+									</select>
+									</span>
+								</form>
+							</div>
+						</div>
+					</div>
+				</th:block>
+				
+				<!-- 공과금 지출 현황 -->
+				<div class="row tm-content-row">
+					<div class="col-12 tm-block-col">
+						<div class="tm-bg-primary-dark tm-block-util">
+							<form action="/spendUtility" method="get" id="selectYearForm" name="selectYearForm">
+							<input type="hidden" name="selectShopCode" th:value="${contractShopCode}">
+								<span style="display: inline-block; float: left"> 
+									<strong class="tm-block-title">공과금/기타 지출 현황 </strong>
+								</span> 
+								<span style="display: inline-block; float: right"> 
+									<select
+										style="width: 100px;" 
+										class="custom-select" 
+										name="utilityYear"
+										id="utilityYear"
+										><option value="2019" id="2019">2019</option>
+									</select>
+								</span>
+							</form>
+
+							<!-- charts.js -->
+							<canvas id="utilityChart" height="100px;"></canvas>
+						</div>
+					</div>
+				</div>
+
+
+				<div class="row tm-content-row" >
+
+					<!-- 최근 등록된 공과금 내역 -->
+					<div class="col-sm-12 col-md-12 col-lg-6 col-xl-7 tm-block-col">
+						<div class="tm-bg-primary-dark tm-block-spend ">
+							<h4 class="tm-block-title">최근 지출 내역</h4>
+							<div style="min-height: 330px;">
+								<table class="table">
+									<thead>
+										<tr class="text-center">
+											<th>내역</th>
+											<th>금액</th>
+											<th>등록일자</th>
+											<th>상세</th>
+											<th>삭제</th>
+										</tr>
+									</thead>
+									<tbody class="text-center">
+										<tr th:each="list : ${utilityList}">
+											<td th:text="${list.subjectName}"></td>
+											<td th:text="${list.spendUtilityPay}"></td>
+											<td th:text="${list.spendUtilityDate}"></td>
+											
+											<!-- 상세 아이콘 -->
+											<td style="width: 10%">
+												<a 
+												class="tm-product-delete-link"
+												th:href="@{/spendUtilityDetails(spendUtilityCode=${list.spendUtilityCode})}"
+												><i class="fas fa-search" style="color: white"></i> 
+												</a>
+											</td>
+											
+											<!-- 삭제 아이콘 -->
+											<td style="width: 10%">
+												<a
+												class="tm-product-delete-link"
+												th:href="@{/spendUtilityDelete(spendUtilityCode=${list.spendUtilityCode}, selectShopCode=${param?.selectShopCode?.toString()})}"
+												onclick="return deleteUtility();"
+												>
+												<i class="far fa-trash-alt tm-product-delete-icon"
+													style="color: white;"
+												></i> 
+												</a>
+											</td>
+										</tr>
+										<th:block th:if="${result} ne null">
+											<tr class="text-center">
+												<td colspan="5" th:text="${result}"></td>
+											</tr>
+										</th:block>
+										<th:block th:if="${alert} ne null">
+											<tr class="text-center">
+												<td colspan="5" th:text="${alert}"></td>
+											</tr>
+										</th:block>
+									</tbody>
+								</table>
+							</div>
+
+							<!-- 페이징 페이지 번호 -->
+							<div>
+								<ul class="pagination pagination-sm justify-content-center"
+									style="margin: 20px 0">
+									<li class="page-item active">
+										<a 
+										class="page-link"
+										id="preBtn" 
+										th:onclick="|javascript:page('${currentPage-1}')|"
+										th:if="${currentPage > 1}"
+										> 이전 </a> 
+										<a class="page-link"
+										th:unless="${currentPage > 1}"
+										> 이전 </a>
+									</li>
+
+									<th:block th:each="num : ${#numbers.sequence(startPageNum,lastPageNum)}">
+										<li class="page-item active">
+											<span
+											th:if="${currentPage == num}" 
+											th:text="${num}"
+											class="text-center page-link"
+											></span> 
+												<a 
+												class="page-link"
+												th:unless="${currentPage == num}" 
+												th:text="${num}"
+												th:href="@{/spendUtility(currentPage=${num})}"
+												th:if="${session.SLEVEL eq '점주'}"
+												></a> 
+												<a 
+												class="page-link"
+												th:unless="${currentPage == num}" 
+												th:text="${num}"
+												th:href="@{/spendUtility(selectShopCode=${param?.selectShopCode?.toString()}, currentPage=${num})}"
+												th:if="${session.SLEVEL eq '관리자'}"
+												></a>
+										</li>
+									</th:block>
+
+									<li class="page-item active">
+										<a 
+										class="page-link"
+										id="nextBtn"
+										th:onclick="|javascript:page('${currentPage+1}')|"
+										th:if="${currentPage != lastPage}"
+										> 다음 </a> 
+										<a
+										class="page-link" 
+										th:if="${currentPage == lastPage}"
+										>다음</a>
+									</li>
+								</ul>
+							</div>
+						</div>
+					</div>
+
+					<!-- 공과금 지출 등록 폼 -->
+					<div class="col-sm-12 col-md-12 col-lg-6 col-xl-5 tm-block-col">
+						<div class="tm-bg-primary-dark tm-block-spend">
+							<h4 class="tm-block-title">지출 등록</h4>
+							<form action="utilityInsert" method="post" id="utilityInsertForm">
+								<input type="hidden" name="selectShopCode" th:value="${contractShopCode}">
+								<div class="form-group">
+									<label>내역</label> 
+									<select
+									class="custom-select tm-select-accounts" 
+									name="subjectCode">
+										<th:block th:each="subject : ${subjectSelectBox}">
+											<option 
+											th:text="${subject.subjectName}"
+											th:value="${subject.subjectCode}"
+											></option>
+										</th:block>
+									</select>
+								</div>
+								<div class="form-group">
+									<label>금액</label> 
+									<input
+									class="form-control validate"
+									name="spendUtilityPay"
+									id="spendUtilityPay"
+									>
+								</div>
+								<div class="form-group">
+									<label>내용</label> 
+									<input 
+									class="form-control validate"
+									name="spendUtilityContents"
+									>
+								</div>
+								<hr>
+								<th:block th:if="${session.SLEVEL eq '관리자'}">
+									<input type="hidden" name="masterShopCode"
+										th:value="${masterShopCode}">
+								</th:block>
+								<button type="button"
+									class="btn btn-primary btn-block text-uppercase"
+									id="insertUtility">확인</button>
+							</form>
+						</div>
+					</div>
+
+
+
+					<!-- 공과금 지출 검색 -->
+					<div class="col-12 tm-block-col">
+						<div class="tm-bg-primary-dark tm-block">
+
+							<!-- begin 검색 폼 -->
+							<form action="/spendUtilityList" class="tm-search-form row"
+								method="post">
+								<input type="hidden" name="selectShopCode" th:value="${param?.selectShopCode?.toString()}">
+								<div class="form-group col-3">
+									<select class="custom-select" name="searchDate">
+										<option value="spend_utility_date">등록일자</option>
+									</select>
+								</div>
+								<div class="form-group col-3">
+									<input id="beginDate" name="beginDate" type="text"
+										class="form-control validate"
+										style="background-color: #54657D" readonly />
+								</div>
+								<div class="form-group col-1 text-center">
+									<h2 class="tm-site-title mb-0">~</h2>
+								</div>
+								<div class="form-group col-3">
+									<input id="endDate" name="endDate" type="text"
+										class="form-control validate"
+										style="background-color: #54657D" readonly />
+								</div>
+								<div class="form-group col-2"></div>
+
+								<div class="form-group col-3">
+									<select class="custom-select" name="utilityKey">
+										<option value="subject_name">내역</option>
+										<option value="spend_utility_contents">내용</option>
+									</select>
+								</div>
+
+								<div class="form-group col-7">
+									<input id="subjectValue" name="utilityValue" type="text"
+										class="form-control validate" />
+								</div>
+								<div class="form-group col-2">
+									<button type="submit" id="searchButton" name="searchButton"
+										class="btn btn-primary btn-block">검색</button>
+								</div>
+							</form>
+							<!-- end 검색 폼 -->
+						</div>
+					</div>
+
+					<!-- 삭제모달 -->
+					<div class="modal fade" id="deleteModal">
+						<div class="modal-dialog">
+							<div class="modal-content">
+
+								<!-- Modal Header -->
+								<div class="modal-header">
+									<h4 class="modal-title">알림</h4>
+									<button type="button" class="close" data-dismiss="modal">&times;</button>
+								</div>
+
+								<!-- Modal body -->
+								<div class="modal-body text-center">
+								<br>
+									<p>정말로 삭제하시겠습니까?(작업중)</p>
+								</div>
+
+								<!-- Modal footer -->
+								<div class="modal-footer">
+									<button type="button" class="btn btn-primary">확인</button>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</th:block>
+<th:block layout:fragment="customScript">
+
+	<script th:inline="javascript">
+	
+	function deleteUtility(){
+		return confirm("정말로 삭제하시겠습니까?");
+	}
+	
+	
+	$('#spendManagement').change(function() {
+		$('#spendManagementForm').submit()
+	});
+	
+	$(function() {
+		var url = $(location).attr('pathname');
+		//console.log(url);
+		
+		if(url == '/spendUtility'){
+			$('#spendUtility').attr('selected', 'selected');
+		} else if(url == '/spendSalary'){
+			$('#spendSalary').attr('selected', 'selected');
+		} else if(url == '/spendUtilityList'){
+			$('#spendUtility').attr('selected', 'selected');
+		} else if(url == '/spendSalaryList'){
+			$('#spendSalary').attr('selected', 'selected');
+		} else {
+			$('#spendTotal').attr('selected', 'selected');
+		}
+	})
+	
+	
+	
+    <!-- charts.js script-->
+	var chartJanuary 	= [[${utility0}]];
+	var chartFebruary 	= [[${utility1}]];
+	var chartMarch 		= [[${utility2}]];
+	var chartApril 		= [[${utility3}]];
+	var chartMay 		= [[${utility4}]];
+	var chartJune		= [[${utility5}]];
+	var chartJuly		= [[${utility6}]];
+	var chartAugust		= [[${utility7}]];
+	var chartSeptember 	= [[${utility8}]];
+	var chartOctober 	= [[${utility9}]];
+	var chartNovember 	= [[${utility10}]];
+	var chartDecember 	= [[${utility11}]];
+
+	$(function() {
+		var ctx = document.getElementById('utilityChart').getContext('2d');
+		var utilityChart = new Chart(ctx, {
+			
+		    // The type of chart we want to create
+		    type: 'bar',
+		
+		    // The data for our dataset
+		    data: {
+		        labels: ['1월', '2월', '3월', '4월', '5월', '6월', '7월','8월','9월','10월','11월','12월'],
+		        datasets: [{
+		            label: '공과금/기타 총지출 금액',
+		            backgroundColor: 'rgb(245, 166, 35)',
+		            borderColor: 'rgb(245, 166, 35)',
+		            data: [chartJanuary,chartFebruary,chartMarch,chartApril,chartMay,chartJune,chartJuly,chartAugust,chartSeptember,chartOctober,chartNovember,chartDecember]
+		        }]
+		    },
+		
+		    // Configuration options
+		    options: {
+		    	legend: {
+		             labels: {
+		                  fontColor: 'white' // label color
+		                 }
+		              },
+			    scales: {
+			    	// y축
+			        yAxes: [{
+			            ticks: {
+			                fontColor:'white' // y축 폰트 color
+			            }
+			     	}],
+			     	// x축
+			     	xAxes: [{
+			            ticks: {
+			            	
+			                fontColor:'white' // x축 폰트 color
+			            }
+			     	}]
+			    }
+		    }
+		});
+	})
+	
+	<!-- datepicker -->
+	//시작 일자 텍스트상자 클릭시 달력 표기 
+	$('#beginDate').datepicker({
+	});
+	$('#beginDate').datepicker('option','dateFormat','yy-mm-dd'); // 기존 dd/mm/yy에서 yy-mm-dd로 format 변경   
+	
+	//종료 일자 텍스트상자 클릭시 달력 표기 
+	$('#endDate').datepicker({
+	});
+	$('#endDate').datepicker('option','dateFormat','yy-mm-dd'); // 기존 dd/mm/yy에서 yy-mm-dd로 format 변경 
+	
+	<!-- 페이징 -->
+	var scriptCurrentPage = [[${currentPage}]];
+	var scriptlastPage = [[${lastPage}]];
+	
+    function page(scriptCurrentPage) {
+    	location.href="/spendUtilityList?currentPage="+scriptCurrentPage; 
+    };
+    
+    $('#insertUtility').click(function() {
+    	var utilityPayCheck = $('#spendUtilityPay').val();
+    	
+    	if($('#spendUtilityPay').val().length == 0){
+    		alert('공백은 입력할 수 없습니다');
+    	} else if (isNaN(utilityPayCheck) == true) {
+    		alert('금액은 숫자만 입력하세요');
+		} else {
+			$('#utilityInsertForm').submit();
+		}
+	})
+    
+</script>
+</th:block>
+</html>
+

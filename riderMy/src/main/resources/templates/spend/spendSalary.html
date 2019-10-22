@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{layout/default}">
+
+<th:block layout:fragment="customTitle">
+</th:block>
+<th:block layout:fragment="customContents">
+
+	<!-- MAIN -->
+	<div class="main-height">
+		<!-- MAIN CONTENT -->
+		<div class="main-content">
+			<div class="container">
+				<div class="row">
+					<div class="col">
+						<p class="text-white mt-5 mb-5">
+							<b>지출/매출 > 지출 > 급여</b>
+						</p>
+						<p class="text-white mt-5 mb-5">
+							<b>※ 급여 지출 관리 페이지입니다. 등록, 수정, 조회를 할 수 있으며 지출 현황에서는 월별 금액이 차트로 표시됩니다. ※</b>
+						</p>
+					</div>
+				</div>
+				
+				<th:block th:if="${session.SLEVEL eq '관리자'}">
+					<div class="row tm-content-row">
+						<div class="col-12 tm-block-col">
+							<div class="tm-bg-primary-dark tm-block-select">
+								<form action="/spendManagement" method="get" id="spendManagementForm">
+									<input type="hidden" name="selectShopCode" th:value="${contractShopCode}">
+									<span style="float: left" th:each="shop : ${shop}">
+										<strong class="tm-block-title text-center" th:text="${shop.shopName}"></strong>
+									</span> 
+									<span style="float: right"> 
+									<select
+										style="width: 800px;"
+										class="custom-select"
+										name="spendManagement"
+										id="spendManagement">
+										<option value="spendTotal" id="spendTotal">통합</option>
+										<option value="spendSalary" id="spendSalary">급여</option>
+										<option value="spendUtility" id="spendUtility">공과금/기타</option>
+									</select>
+									</span>
+								</form>
+							</div>
+						</div>
+					</div>
+				</th:block>
+
+				<!-- 급여 지출 현황 -->
+				<div class="row tm-content-row">
+					<div class="col-12 tm-block-col">
+						<div class="tm-bg-primary-dark tm-block-util">
+							<form action="/spendSalary" method="get" id="selectYearForm" name="selectYearForm">
+								<span style="display: inline-block; float: left"> 
+									<strong class="tm-block-title">급여 지출 현황 </strong>
+								</span> 
+								<span style="display: inline-block; float: right"> 
+									<select
+										style="width: 100px;" 
+										class="custom-select" 
+										name="salaryYear"
+										id="salaryYear"
+										><option value="2019" id="2019">2019</option>
+									</select>
+								</span>
+							</form>
+
+							<!-- charts.js -->
+							<canvas id="salaryChart" height="100px;"></canvas>
+						</div>
+					</div>
+				</div>
+				
+				<div class="row tm-content-row">
+				
+					<!-- 급여 등록 내역 -->
+					<div class="col-sm-12 col-md-12 col-lg-6 col-xl-7 tm-block-col">
+						<div class="tm-bg-primary-dark tm-block-salary">
+							<h4 class="tm-block-title">최근 등록내역</h4>
+							<div style="min-height: 480px;">
+							<table class="table">
+								<thead>
+									<tr>
+										<th>직원명</th>
+										<th>금액</th>
+										<th>등록일자</th>
+										<th>상세보기</th>
+									</tr>
+								</thead>
+								<tbody>
+									<tr th:each="list : ${salaryList}">
+										<td th:text="${list.memberName}"></td>
+										<td th:text="${list.spendSalaryTotal}"></td>
+										<td th:text="${list.spendSalaryDate}"></td>
+										
+										<!-- 상세 아이콘 -->
+										<td>
+											<a 
+											class="tm-product-delete-link"
+											th:href="@{/spendSalaryDetails(spendSalaryCode=${list.spendSalaryCode}, selectShopCode=${list.contractShopCode})}"
+											><i class="fas fa-search" style="color: white"></i> 
+											</a>
+										</td>
+									</tr>
+									<th:block th:if="${result} ne null">
+										<tr class="text-center">
+											<td colspan="4" th:text="${result}"></td>
+										</tr>
+									</th:block>
+								</tbody>
+							</table>
+							</div>
+							
+							<!-- 페이징 페이지 번호 -->
+							<div>
+								<ul class="pagination pagination-sm justify-content-center"
+									style="margin: 20px 0">
+									<li class="page-item active">
+										<a 
+										class="page-link"
+										id="preBtn" 
+										th:onclick="|javascript:page('${currentPage-1}')|"
+										th:if="${currentPage > 1}"
+										> 이전 </a> 
+										<a class="page-link"
+										th:unless="${currentPage > 1}"
+										> 이전 </a>
+									</li>
+
+									<th:block th:each="num : ${#numbers.sequence(startPageNum,lastPageNum)}">
+										<li class="page-item active">
+											<span
+											th:if="${currentPage == num}" 
+											th:text="${num}"
+											class="text-center page-link"
+											></span> 
+												<a 
+												class="page-link"
+												th:unless="${currentPage == num}" 
+												th:text="${num}"
+												th:href="@{/spendSalary(currentPage=${num})}"
+												></a> 
+										</li>
+									</th:block>
+
+									<li class="page-item active">
+										<a 
+										class="page-link"
+										id="nextBtn"
+										th:onclick="|javascript:page('${currentPage+1}')|"
+										th:if="${currentPage != lastPage}"
+										> 다음 </a> 
+										<a
+										class="page-link" 
+										th:if="${currentPage == lastPage}"
+										>다음</a>
+									</li>
+								</ul>
+							</div>
+							
+						</div>
+
+					</div>
+				
+					<!-- 급여 등록 폼 -->
+					<div class="col-sm-12 col-md-12 col-lg-6 col-xl-5 tm-block-col">
+						<div class="tm-bg-primary-dark tm-block-salary">
+						<form action="/salaryInsert" method="post" id="salaryInsertForm">
+							<input type="hidden" name="masterShopCode" th:value="${param?.selectShopCode?.toString()}">
+							<h4 class="tm-block-title">급여 등록</h4>
+							<table class="table">
+								<tr>
+									<td class="text-center"><label>직원</label></td>
+									<td>
+										<select
+											class="custom-select tm-select-accounts" 
+											name="memberId"
+											id="memberId"
+										><th:block 
+											th:each="employee : ${employeeSelect}"
+										><option 
+											th:text="${employee.memberName}"
+											th:value="${employee.memberId}"
+										></option>
+										</th:block>
+										<th:block th:if="${alert} neq null">
+											<option th:text="${alert}"></option>
+										</th:block>
+										</select>
+									</td>
+								</tr>
+							</table>
+							
+							<hr>
+							
+							<table class="table">
+								<tr>
+									<td>
+										<label>기본급여</label>
+										<input 
+										class="form-control validate"
+										name="spendSalaryPay" 
+										id="spendSalaryPay"
+										value="0">
+									</td>
+									<td>
+										<label>시간외수당</label>
+										<input 
+										class="form-control validate"
+										name="spendSalaryOverpay" 
+										id="spendSalaryOverpay"
+										value="0">
+									</td>
+								</tr>
+								<tr>
+									<td>
+										<label>상여금</label> 
+										<input 
+										class="form-control validate"
+										name="spendSalaryBonus" 
+										id="spendSalaryBonus"
+										value="0">
+									</td>
+									<td>
+										<label>비과세액</label> 
+										<input 
+										class="form-control validate"
+										name="spendSalaryFree" 
+										id="spendSalaryFree"
+										value="0">
+									</td>
+								</tr>
+							</table>
+							
+							<hr>
+							
+							<table class="table">
+								<tr>
+									<td class="text-center"><label>총액</label></td>
+									<td>
+										<input 
+										class="form-control validate"
+										name="spendSalaryTotal" 
+										id="spendSalaryTotal"
+										readonly
+										style="background-color: #54657D;"
+										value="0">
+									</td>
+								</tr>
+							</table>
+								<hr>
+								<button type="button"
+									class="btn btn-primary btn-block text-uppercase"
+									id="insertSalary">등록</button>
+							</form>
+						</div>
+					</div>
+					</div>
+					
+					<!-- 급여 지출 검색 -->
+					<div class="row tm-content-row">
+					<div class="col-12 tm-block-col">
+						<div class="tm-bg-primary-dark tm-block">
+
+							<!-- begin 검색 폼 -->
+							<form action="/spendSalaryList" class="tm-search-form row"
+								method="post">
+								<input type="hidden" name="selectShopCode" th:value="${param?.selectShopCode?.toString()}">
+								<div class="form-group col-3">
+									<select class="custom-select" name="searchDate">
+										<option value="spend_salary_date">등록일자</option>
+									</select>
+								</div>
+								<div class="form-group col-3">
+									<input id="beginDate" name="beginDate" type="text"
+										class="form-control validate"
+										style="background-color: #54657D" readonly />
+								</div>
+								<div class="form-group col-1 text-center">
+									<h2 class="tm-site-title mb-0">~</h2>
+								</div>
+								<div class="form-group col-3">
+									<input id="endDate" name="endDate" type="text"
+										class="form-control validate"
+										style="background-color: #54657D" readonly />
+								</div>
+								<div class="form-group col-2"></div>
+
+								<div class="form-group col-3">
+									<select class="custom-select" name="searchKey">
+										<option value="member_name">직원명</option>
+									</select>
+								</div>
+
+								<div class="form-group col-7">
+									<input id="subjectValue" name="searchValue" type="text"
+										class="form-control validate" />
+								</div>
+								<div class="form-group col-2">
+									<button type="submit" id="searchButton" name="searchButton"
+										class="btn btn-primary btn-block">검색</button>
+								</div>
+							</form>
+							<!-- end 검색 폼 -->
+						</div>
+					</div>
+					</div>
+				</div>
+			</div>
+		</div>
+</th:block>
+<th:block layout:fragment="customScript">
+	<script th:inline="javascript">
+	
+	$('#spendManagement').change(function() {
+		$('#spendManagementForm').submit()
+	});
+	
+	$(function() {
+		var url = $(location).attr('pathname');
+		//console.log(url);
+		
+		if(url == '/spendUtility'){
+			$('#spendUtility').attr('selected', 'selected');
+		} else if(url == '/spendSalary'){
+			$('#spendSalary').attr('selected', 'selected');
+		} else if(url == '/spendUtilityList'){
+			$('#spendUtility').attr('selected', 'selected');
+		} else if(url == '/spendSalaryList'){
+			$('#spendSalary').attr('selected', 'selected');
+		} else {
+			$('#spendTotal').attr('selected', 'selected');
+		}
+	})
+	
+	
+	
+	
+	$('#spendSalaryPay').click(function() {
+		$('#spendSalaryPay').val('');
+		
+		$('#spendSalaryPay').blur(function() {
+			
+			var spendSalaryPay = $.trim($('#spendSalaryPay').val());
+			var spendSalaryOverpay = $.trim($('#spendSalaryOverpay').val());
+			var spendSalaryBonus = $.trim($('#spendSalaryBonus').val());
+			var spendSalaryFree = $.trim($('#spendSalaryFree').val());
+			
+			if($('#spendSalaryPay').val() == ''){
+				$('#spendSalaryPay').val('0');
+			} else if(spendSalaryPay == ''){
+				$('#spendSalaryPay').val('0');
+			}
+			
+			$('#spendSalaryTotal').val('0');
+			$('#spendSalaryTotal').val(Number(spendSalaryPay) + Number(spendSalaryOverpay) + Number(spendSalaryBonus) + Number(spendSalaryFree));
+		})
+	})
+	
+	$('#spendSalaryOverpay').click(function() {
+		$('#spendSalaryOverpay').val('');
+		
+		$('#spendSalaryOverpay').blur(function() {
+			
+			var spendSalaryPay = $.trim($('#spendSalaryPay').val());
+			var spendSalaryOverpay = $.trim($('#spendSalaryOverpay').val());
+			var spendSalaryBonus = $.trim($('#spendSalaryBonus').val());
+			var spendSalaryFree = $.trim($('#spendSalaryFree').val());
+			
+			if($('#spendSalaryOverpay').val() == ''){
+				$('#spendSalaryOverpay').val('0');
+			} else if(spendSalaryOverpay == ''){
+				$('#spendSalaryOverpay').val('0');
+			}
+			
+			$('#spendSalaryTotal').val('0');
+			$('#spendSalaryTotal').val(Number(spendSalaryPay) + Number(spendSalaryOverpay) + Number(spendSalaryBonus) + Number(spendSalaryFree));
+		})
+	})
+	
+	$('#spendSalaryBonus').click(function() {
+		$('#spendSalaryBonus').val('');
+		
+		$('#spendSalaryBonus').blur(function() {
+			
+			var spendSalaryPay = $.trim($('#spendSalaryPay').val());
+			var spendSalaryOverpay = $.trim($('#spendSalaryOverpay').val());
+			var spendSalaryBonus = $.trim($('#spendSalaryBonus').val());
+			var spendSalaryFree = $.trim($('#spendSalaryFree').val());
+			
+			if($('#spendSalaryBonus').val() == ''){
+				$('#spendSalaryBonus').val('0');
+			} else if(spendSalaryBonus == ''){
+				$('#spendSalaryBonus').val('0');
+			}
+			
+			$('#spendSalaryTotal').val('0');
+			$('#spendSalaryTotal').val(Number(spendSalaryPay) + Number(spendSalaryOverpay) + Number(spendSalaryBonus) + Number(spendSalaryFree));
+		})
+	})
+	
+	$('#spendSalaryFree').click(function() {
+		$('#spendSalaryFree').val('');
+		
+		$('#spendSalaryFree').blur(function() {
+			
+			var spendSalaryPay = $.trim($('#spendSalaryPay').val());
+			var spendSalaryOverpay = $.trim($('#spendSalaryOverpay').val());
+			var spendSalaryBonus = $.trim($('#spendSalaryBonus').val());
+			var spendSalaryFree = $.trim($('#spendSalaryFree').val());
+			
+			if($('#spendSalaryFree').val() == ''){
+				$('#spendSalaryFree').val('0');
+			} else if(spendSalaryFree == ''){
+				$('#spendSalaryFree').val('0');
+			}
+			
+			$('#spendSalaryTotal').val('0');
+			$('#spendSalaryTotal').val(Number(spendSalaryPay) + Number(spendSalaryOverpay) + Number(spendSalaryBonus) + Number(spendSalaryFree));
+		})
+	})
+	
+	$('#insertSalary').click(function() {
+		if($('#spendSalaryTotal').val() == 'NaN'){
+			alert('숫자만 입력해주세요');
+		} else if ($('#memberId').val() == '등록된 직원이 없습니다') {
+			alert('등록된 직원이 없습니다');	
+		} else {
+			$('#salaryInsertForm').submit();
+		}
+	})
+	
+	<!-- 페이징 -->
+	var scriptCurrentPage = [[${currentPage}]];
+	var scriptlastPage = [[${lastPage}]];
+	
+    function page(scriptCurrentPage) {
+    	location.href="/spendSalary?currentPage="+scriptCurrentPage; 
+    };
+	
+	
+	<!-- charts.js script-->
+	var chartJanuary 	= [[${salary0}]];
+	var chartFebruary 	= [[${salary1}]];
+	var chartMarch 		= [[${salary2}]];
+	var chartApril 		= [[${salary3}]];
+	var chartMay 		= [[${salary4}]];
+	var chartJune		= [[${salary5}]];
+	var chartJuly		= [[${salary6}]];
+	var chartAugust		= [[${salary7}]];
+	var chartSeptember 	= [[${salary8}]];
+	var chartOctober 	= [[${salary9}]];
+	var chartNovember 	= [[${salary10}]];
+	var chartDecember 	= [[${salary11}]];
+
+	$(function() {
+		var ctx = document.getElementById('salaryChart').getContext('2d');
+		var salaryChart = new Chart(ctx, {
+			
+		    // The type of chart we want to create
+		    type: 'bar',
+		
+		    // The data for our dataset
+		    data: {
+		        labels: ['1월', '2월', '3월', '4월', '5월', '6월', '7월','8월','9월','10월','11월','12월'],
+		        datasets: [{
+		            label: '급여 총지출 금액',
+		            backgroundColor: 'rgb(245, 166, 35)',
+		            borderColor: 'rgb(245, 166, 35)',
+		            data: [chartJanuary,chartFebruary,chartMarch,chartApril,chartMay,chartJune,chartJuly,chartAugust,chartSeptember,chartOctober,chartNovember,chartDecember]
+		        }]
+		    },
+		
+		    // Configuration options
+		    options: {
+		    	legend: {
+		             labels: {
+		                  fontColor: 'white' // label color
+		                 }
+		              },
+			    scales: {
+			    	// y축
+			        yAxes: [{
+			            ticks: {
+			                fontColor:'white' // y축 폰트 color
+			            }
+			     	}],
+			     	// x축
+			     	xAxes: [{
+			            ticks: {
+			            	
+			                fontColor:'white' // x축 폰트 color
+			            }
+			     	}]
+			    }
+		    }
+		});
+	})
+	
+	<!-- datepicker -->
+	//시작 일자 텍스트상자 클릭시 달력 표기 
+	$('#beginDate').datepicker({
+	});
+	$('#beginDate').datepicker('option','dateFormat','yy-mm-dd'); // 기존 dd/mm/yy에서 yy-mm-dd로 format 변경   
+	
+	//종료 일자 텍스트상자 클릭시 달력 표기 
+	$('#endDate').datepicker({
+	});
+	$('#endDate').datepicker('option','dateFormat','yy-mm-dd'); // 기존 dd/mm/yy에서 yy-mm-dd로 format 변경 
+	
+</script>
+</th:block>
+</html>

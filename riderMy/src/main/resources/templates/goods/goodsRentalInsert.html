@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{layout/default}">
+<th:block layout:fragment="customTitle">
+</th:block>
+<th:block layout:fragment="customContents">
+	<!-- MAIN -->
+	<div class="main">
+		<div class="container mt-6">
+		<h2 class="tm-block-title">대여상품 등록하기</h2>
+			<div class="row tm-content-row">				
+				<div class="col-sm-12 col-md-12  tm-block-col">				
+					<div class="tm-bg-primary-dark tm-block tm-block-products">
+						<form action="/goodsRentalInsert"  method="post">
+						<input type="hidden" id="goodsCode" name="goodsCode" th:value="${goodsCode.goodsCode}">						
+						<div class="tm-product-table-container">
+							
+							<table class="table table-hover tm-table-small tm-product-table">							
+								<thead>
+									
+									<tr>
+										<th scope="col">상품명</th>
+										<th th:text="${goodsCode.goodsDbName}"></th>
+									</tr>
+									<tr>
+										<th scope="col">상품카테고리</th>
+										<th th:text="${goodsCode.goodsDbCategory}" ></th>
+									</tr>									
+									<tr>
+										<th scope="col">상품번호</th>
+										<th th:text="${goodsCode.goodsDbNumber}"></th>
+									</tr>									
+									<tr>
+										<th scope="col">색상</th>
+										<th th:text="${goodsCode.goodsDbColor}"></th>
+									</tr>
+									<tr>
+										<th scope="col">중량</th>
+										<th th:text="${goodsCode.goodsDbWeight}"></th>
+									</tr>
+									<tr>
+										<th scope="col">최대속도</th>
+										<th th:text="${goodsCode.goodsDbSpeed}"></th>
+									</tr>
+									<tr>
+										<th scope="col">박퀴사이즈</th>
+										<th th:text="${goodsCode.goodsDbSize}"></th>
+									</tr>
+									<tr>	
+										<th scope="col">제조국가</th>
+										<th th:text="${goodsCode.goodsDbNation}"></th>
+									</tr>
+									<tr>	
+										<th scope="col">최대하중</th>
+										<th th:text="${goodsCode.goodsDbLoad}"></th>
+									</tr>
+									<tr>	
+										<th scope="col">주행가능거리</th>
+										<th th:text="${goodsCode.goodsDbDistance}"></th>
+									</tr>
+									<tr>	
+										<th scope="col">베터리용량</th>
+										<th th:text="${goodsCode.goodsDbBattery}"></th>
+									</tr>
+									<tr>	
+										<th scope="col">완충시간</th>
+										<th th:text="${goodsCode.goodsDbTime}"></th>
+									</tr>
+									<tr>	
+										<th scope="col">제조일자</th>
+										<th th:text="${goodsCode.goodsDbMade}"></th>
+									</tr>
+									<tr>	
+										<th scope="col">상품위치</th>
+										<th th:text="${goodsCode.goodsPosition}"></th>
+									</tr>
+									<tr>	
+										<th scope="col">상품상태</th>
+										<th th:text="${goodsCode.goodsState}"></th>
+									</tr>																
+									
+									<tr>	
+										<th scope="col">대여가능여부</th>
+										<th th:text="${goodsCode.goodsRental}"></th>
+									</tr>
+									<tr>	
+										<th scope="col">대여상태</th>
+										<th th:text="${goodsCode.goodsRentalState}"></th>
+									</tr>
+																								
+									<tr>	
+										<th scope="col">판매가격</th>
+										<th th:text="${goodsCode.goodsPay}"></th>
+									</tr>
+									<tr>	
+										<th scope="col">판매완료유무</th>
+										<th th:text="${goodsCode.goodsCompletionState}"></th>
+									</tr>						
+									<tr>	
+										<th scope="col">대여가격</th>										
+										<th>											
+											<textarea rows="2" id="goodsRentalPeriodPay"
+											name="goodsRentalPeriodPay"cols="70">하루 30000원 1주일 50000원  1개월 160000원 판매가격에따라 변동 
+											</textarea> 
+										</th>
+										
+									</tr>
+									<tr>	
+										<th scope="col">대여보증금</th>										
+										<th>
+											<input type="text" id="goodsRentalDeposit" name="goodsRentalDeposit" required="required">
+										</th>
+									</tr>
+									<tr>	
+										<th scope="col">대여품위치장소</th>										
+										<th>
+											<input type="text" id="goodsRentalPosition" name="goodsRentalPosition" required="required">
+										</th>
+									</tr>
+									<tr>	
+										<th scope="col">대여등록일</th>										
+										<th>
+											<input type="text" id="goodsRentalDate" name="goodsRentalDate">
+										</th>
+									</tr>
+									
+								</thead>	
+															
+							</table>
+									
+						</div>						
+						<!-- table container -->
+					<!-- 	<a th:href="@{/goodsUpdate(goodsCode=${goodsCode.goodsCode})}"
+							class="btn btn-primary btn-block text-uppercase mb-3">수정완료</a>		 -->
+							<button class="btn btn-primary btn-block text-uppercase" type="submit">
+							대여등록</button>	
+								
+						</form>
+						
+					</div>
+					
+				</div>
+		
+			</div>
+		</div>
+
+	</div>
+	<!-- END MAIN -->
+	
+</th:block>
+</th:block>
+<th:block layout:fragment="customScript">
+</th:block>
+</html>
+
+

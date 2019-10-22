@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{layout/default}">
+<th:block layout:fragment="customTitle">
+</th:block>
+<th:block layout:fragment="customContents">
+
+	<div class="main-height">
+		<div class="container">
+			<div class="row">
+				<div class="col">
+					<p class="text-white mt-5 mb-5">
+					<h2 class="tm-block-title">근태관리</h2>
+				</div>
+			</div>
+			<hr>
+			<div class="row tm-content-row">
+				<div class="col tm-block-col">
+					<div class="tm-bg-primary-dark tm-block tm-block-h-auto btn-group col">
+						<div class="btn-group col-6">
+						<button type="button" id="goInsert" class="btn btn-primary btn-block" 
+						onclick="window.open('/goInsert','출근등록','left='+(screen.availWidth-550)/2+',top='+(screen.availHeight-430)/10+',width=440,height=750,location=no,status=no,scrollbars=yes')">
+							출근 등록
+						</button>
+						</div>
+						<div class="btn-group col-6">
+						<button type="button" id="leaveInsert" class="btn btn-primary btn-block"
+						onclick="window.open('/leaveInsert','퇴근등록','left='+(screen.availWidth-550)/2+',top='+(screen.availHeight-430)/10+',width=440,height=750,location=no,status=no,scrollbars=yes')">
+							퇴근 등록
+						</button>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="row tm-content-row">
+				<div class="col tm-block-col">
+					<div class="tm-bg-primary-dark tm-block tm-block-h-auto-copy">
+						<form action="/searchWork" class="tm-search-form row" method="post">
+							<input type="hidden" id="contractShopCode" name="contractShopCode" th:value="${session.SCODE}">
+							<div class="form-group col-3">
+								<select class="custom-select" name="searchDate">
+									<option value="w.work_date">등록일자</option>
+								</select>
+							</div>
+							<div class="form-group col-3">
+								<input id="beginDate" name="beginDate" 
+									   type="text" class="form-control validate" style="background-color: #54657D" readonly/>
+							</div>
+							<div class="form-group col-1 text-center">
+								<h2 class="tm-site-title mb-0">~</h2>
+							</div>
+							<div class="form-group col-3">
+								<input id="endDate" name="endDate" 
+									   type="text" class="form-control validate" style="background-color: #54657D" readonly/>
+							</div>
+							<div class="form-group col-2">
+							</div>
+							
+							<div class="form-group col-3">
+								<select class="custom-select" name="select">
+									<option value="m.member_name">이름</option>
+								</select>
+							</div>
+							<div class="form-group col-7">
+								<input id="searchInput" name="searchInput" type="text" class="form-control validate" />
+							</div>
+							<div class="form-group col-2">
+								<button type="submit" id="searchButton" name="searchButton" class="btn btn-primary btn-block">
+									검색
+								</button>
+							</div>
+						</form>
+					</div>
+				</div>
+			</div>
+			
+			<div class="row tm-content-row">
+				
+				<!-------------------------------------------- 근태 리스트 ------------------------------------------------------->
+				<div class="col-8 tm-block-col">
+					<div class="col-lx tm-bg-primary-dark tm-block-sub tm-block-scroll">
+						<table class="table" id="tableWork">
+							<thead>
+								<tr>
+									<th scope="col">이름</th>
+									<th scope="col">등록일</th>
+									<th scope="col">출근시간</th>
+									<th scope="col">퇴근시간</th>
+									<th scope="col">일근무시간</th>
+								</tr>
+							</thead>
+							<tbody>
+								<tr th:each="workList : ${workList}">
+									<th th:text="${workList.memberName}"></th>
+									<th th:text="${workList.workDate}"></th>
+									<th th:text="${workList.workStart}"></th>
+									<th th:text="${workList.workFinish}"></th>
+									<th th:text="${workList.workToday}"></th>
+								</tr>
+							</tbody>
+						</table>
+						<!------------------------------------ 19.10.02 근태 페이지 --------------------------------->
+						<hr>
+						<div class="text-center">
+						<!-- 이전 -->
+						<a class="text-white" th:if="${currentPage > 1}" 
+						   th:href="@{/workList(currentPage=${currentPage - 1})}">[이전]</a>
+						<th:block th:each="num:${#numbers.sequence(startPageNum, lastPageNum)}">
+							<span class="text-info" th:if="${currentPage == num}" th:text="${'['+num+']'}"></span>
+							<a class="text-white" th:unless="${currentPage == num}" th:text="${'['+num+']'}"
+							   th:href="@{/workList(currentPage=${num})}"></a>
+						</th:block>
+						<!-- 다음 -->
+						<a class="text-white" th:if="${currentPage < lastPage}" 
+						   th:href="@{/memberList(currentPage=${currentPage + 1})}">[다음]</a>
+						</div>					
+					</div>
+				</div>
+				<div class="col-4 tm-block-col">
+					<div class="col-lx tm-bg-primary-dark tm-block-sub">
+						
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</th:block>
+<th:block layout:fragment="customScript">
+<script type="text/javascript">
+	//시작 일자 텍스트상자 클릭시 달력 표기 
+	$('#beginDate').datepicker({
+	});
+	$('#beginDate').datepicker('option','dateFormat','yy-mm-dd'); // 기존 dd/mm/yy에서 yy-mm-dd로 format 변경   
+	
+	//종료 일자 텍스트상자 클릭시 달력 표기 
+	$('#endDate').datepicker({
+	});
+	$('#endDate').datepicker('option','dateFormat','yy-mm-dd'); // 기존 dd/mm/yy에서 yy-mm-dd로 format 변경 
+</script>
+</th:block>
+</html>

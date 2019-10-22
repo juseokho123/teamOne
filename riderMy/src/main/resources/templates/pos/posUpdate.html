@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{layout/default}">
+<th:block layout:fragment="customTitle">
+</th:block>
+<th:block layout:fragment="customContents">
+	
+	<div class="container tm-mt-big tm-mb-big">
+		<div class="row">
+			<div class="col-xl-9 col-lg-10 col-md-12 col-sm-12 mx-auto">
+				<div class="tm-bg-primary-dark tm-block tm-block-h-auto">
+					<div class="row">
+						<div class="col-12">
+						 <h2 class="tm-block-title d-inline-block">POS 수정</h2>
+						</div>
+					</div>
+	            	
+            		<div class="row tm-edit-product-row">
+              			<div  class="col-xl-12 col-lg-6 col-md-12" style="float:right;" th:each="poslist : ${posList}">
+                			<form action="/posUpdate" class="tm-edit-product-form" method="post">
+                				<input type="hidden" name="posCode" id="posCode" th:value="${poslist.posCode}">
+				                  <div class="form-group mb-3">
+				                    <label
+				                      for="name"
+				                      style="float:right;"
+				                      >POS 이름
+				                    </label>
+				                    <input
+				                    	id="posName"
+				                      name="posName"
+				                      type="text"
+				                      th:value="${poslist.posName}"
+				                      class="form-control validate"
+				                      required
+				                    />
+				                  </div>
+				                   <div class="form-group mb-3">
+				                    <label
+				           
+				                      for="name"
+				                      style="float:right;"
+				                      >POS 번호
+				                    </label>
+				                    <select class="custom-select-sj tm-select-accounts" id="posNumber" name="posNumber" th:value="${poslist.posNumber}">
+				                   		<option selected th:text="${poslist.posNumber}" th:value="${poslist.posNumber}"></option>
+				                   		<option value="1">1</option>
+				                   		<option value="2">2</option>
+				                   		<option value="3">3</option>
+				                   		<option value="4">4</option>
+				                   		<option value="5">5</option>
+				                   		<option value="6">6</option>
+				                   		<option value="0">추가 원할 시 오프라인 문의</option>
+				                   	</select>
+									</div>
+				                    <div class="form-group mb-3" >
+				                    <label
+				                      for="name"
+				                      style="float:right;"
+				                      >매장이름
+				                    </label>
+				                    <!-- required : 입력란 설정  -->
+				                   	<select class="custom-select-sj tm-select-accounts" id="contractShopCode" name="contractShopCode">
+				                   		<option 
+				                   		th:text="${shopName}"
+				                   		th:value="${poslist.contractShopCode}"
+				                   		></option>
+				                   	</select>
+				                   	
+				                  </div>
+				                  <br/>
+				                   <div class="form-group mb-3">
+				                    <label
+				                      for="name"
+				                      style="float:right;"
+				                      >사용여부
+				                    </label>
+				                    <!-- required : 입력란 설정  -->
+				                   	<select class="custom-select tm-select-accounts" id="posUse" name="posUse" >
+				                   		<option selected th:text="${poslist.posUse}" th:value="${poslist.posUse}"></option>
+				                   		<option value="사용">사용</option>
+				                   		<option value="사용 안함">사용 안함</option>
+				                   	</select>
+				                   	
+				                  </div>
+                  					<br/>
+					         		<div style="float:right;">
+					              		<div class="col-12">
+					               		 <button type="submit" class="btn btn-primary btn-block text-uppercase">POS 수정</button>
+					              		</div>
+					              </div>
+            				</form>
+            			</div>
+          			</div>
+        		</div>
+      		</div>
+    	</div>
+	</div>	
+</th:block>
+<th:block layout:fragment="customScript">
+</th:block>
+</html>

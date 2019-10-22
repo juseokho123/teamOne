@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{layout/default}">
+<th:block layout:fragment="customTitle">
+</th:block>
+<th:block layout:fragment="customContents">
+	<!-- MAIN -->
+	<div class="main">
+		<div class="container mt-6">
+		<h2 class="tm-block-title">대여상품 삭제하기</h2>	
+			<div class="row tm-content-row">
+				<div class="col-sm-12 col-md-12  tm-block-col">
+					<div class="tm-bg-primary-dark tm-block tm-block-products">
+					<form action="/goodsRentalDelete"  method="post">
+						<input type="hidden" name="memberId" th:value="${session.SID}" readonly="readonly">
+						<input type="hidden" id="goodsRentalCode" name="goodsRentalCode" th:value="${goodsRentalCode.goodsRentalCode}">
+						<div class="tm-product-table-container">
+											
+							<table class="table table-hover tm-table-small tm-product-table">							
+								<thead>
+									<tr>
+										<th scope="col">상품명</th>
+										<th th:text="${goodsRentalCode.goodsDbName}"></th>
+									</tr>
+									<tr>
+										<th scope="col">상품카테고리</th>
+										<th th:text="${goodsRentalCode.goodsDbCategory}" ></th>
+									</tr>									
+									<tr>
+										<th scope="col">상품번호</th>
+										<th th:text="${goodsRentalCode.goodsDbNumber}"></th>
+									</tr>									
+									<tr>
+										<th scope="col">색상</th>
+										<th th:text="${goodsRentalCode.goodsDbColor}"></th>
+									</tr>
+									<tr>
+										<th scope="col">중량</th>
+										<th th:text="${goodsRentalCode.goodsDbWeight}"></th>
+									</tr>
+									<tr>
+										<th scope="col">최대속도</th>
+										<th th:text="${goodsRentalCode.goodsDbSpeed}"></th>
+									</tr>
+									<tr>
+										<th scope="col">박퀴사이즈</th>
+										<th th:text="${goodsRentalCode.goodsDbSize}"></th>
+									</tr>
+									<tr>	
+										<th scope="col">제조국가</th>
+										<th th:text="${goodsRentalCode.goodsDbNation}"></th>
+									</tr>
+									<tr>	
+										<th scope="col">최대하중</th>
+										<th th:text="${goodsRentalCode.goodsDbLoad}"></th>
+									</tr>
+									<tr>	
+										<th scope="col">주행가능거리</th>
+										<th th:text="${goodsRentalCode.goodsDbDistance}"></th>
+									</tr>
+									<tr>	
+										<th scope="col">베터리용량</th>
+										<th th:text="${goodsRentalCode.goodsDbBattery}"></th>
+									</tr>
+									<tr>	
+										<th scope="col">완충시간</th>
+										<th th:text="${goodsRentalCode.goodsDbTime}"></th>
+									</tr>
+									<tr>	
+										<th scope="col">제조일자</th>
+										<th th:text="${goodsRentalCode.goodsDbMade}"></th>
+									</tr>																	
+									<tr>	
+										<th scope="col">상품상태</th>
+										<th th:text="${goodsRentalCode.goodsState}"></th>
+									</tr>								
+									<tr>	
+										<th scope="col">대여상태</th>										
+										<th th:text="${goodsRentalCode.goodsRentalState}"></th>
+									</tr>
+									<tr>	
+										<th scope="col">대여가능여부</th>										
+										<th th:text="${goodsRentalCode.goodsRental}"></th>
+									</tr>
+									<tr>	
+										<th scope="col">판매완료유무</th>										
+										<th th:text="${goodsRentalCode.goodsCompletionState}"></th>
+									</tr>	
+									<tr>	
+										<th scope="col">대여보증금</th>										
+										<th th:text="${goodsRentalCode.goodsRentalDeposit}"></th>
+									</tr>
+									<tr>	
+										<th scope="col">대여가격</th>										
+										<th th:text="${goodsRentalCode.goodsRentalPeriodPay}"></th>
+									</tr>						
+									
+									<tr>	
+										<th scope="col">대여품위치장소</th>										
+										<th th:text="${goodsRentalCode.goodsRentalPosition}"></th>
+									</tr>	
+									<tr>	
+										<th scope="col">대여등록일</th>										
+										<th th:text="${goodsRentalCode.goodsRentalDate}"></th>
+									</tr>								
+									<tr>
+										
+										<td>비밀번호입력</td>
+										<td>
+										<input  class="text-lowercase mb-6" type="text" name="memberPw">
+										
+										</td>
+									</tr>
+									
+								</thead>	
+															
+							</table>
+								<div>
+								<label class="alert alert-danger col-xl" th:if="${result ne null}" th:text="${result}"></label>
+								</div>				
+						</div>						
+						<!-- table container -->
+				
+							<button class="btn btn-primary btn-block text-uppercase" type="submit">
+							대여삭제</button>	
+						</form>
+					</div>
+				</div>
+		
+			</div>
+		</div>
+
+	</div>
+	<!-- END MAIN -->
+	
+</th:block>
+</th:block>
+<th:block layout:fragment="customScript">
+</th:block>
+</html>
+
+

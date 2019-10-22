@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{layout/default}">
+
+<th:block layout:fragment="customTitle">
+</th:block>
+<th:block layout:fragment="customContents">
+
+	<!-- MAIN -->
+	<div class="height-sub">
+		<!-- MAIN CONTENT -->
+		<div class="main-content">
+			<div class="container">
+				<div class="row">
+					<div class="col">
+						<p class="text-white mt-5 mb-5">
+							<b> 지출/매출 > 지출관리(관리자 페이지) </b>
+						</p>
+						<p class="text-white mt-5 mb-5">
+							<b> ※ 각 매장의 리스트화면입니다. 상세보기에서 관리자 권한으로 각 매장의 지출을 관리할 수 있습니다 ※ </b>
+						</p>
+					</div>
+				</div>
+
+	 			<!-- 계약된 매장 -->
+				<div class="row tm-content-row">
+					<div class="col-12 tm-block-col">
+						<div class="tm-bg-primary-dark tm-block-spend-shop">
+							<h4 class="tm-block-title">계약된 매장</h4>
+							<div style="min-height: 780px;">
+							<table class="table">
+								<thead>
+									<tr>
+										<td>매장코드</td>
+										<td>매장명</td>
+										<td>아이디</td>
+										<td>계약상태</td>
+										<td>계약일</td>
+										<td>상세보기</td>
+									</tr>
+								</thead>
+								<tbody>
+									<tr th:each="list : ${shopList}">
+										<td th:text="${list.shopCode}"></td>
+										<td th:text="${list.shopName}"></td>
+										<td th:text="${list.memberId}"></td>
+										<td th:text="${list.contractManagementState}"></td>
+										<td th:text="${list.contractDate}"></td>
+										
+										<!-- 상세 아이콘 -->
+										<td>
+											<a 
+											class="tm-product-delete-link"
+											th:href="@{/spendShopDetails(contractShopCode=${list.contractShopCode})}"
+											><i class="fas fa-search" style="color: white"></i> 
+											</a>
+										</td>
+									</tr>
+									<th:block th:if="${result} ne null">
+										<tr class="text-center">
+											<td colspan="6" th:text="${result}"></td>
+										</tr>
+									</th:block>
+								</tbody>
+							</table>
+							</div>
+							
+							<!-- 페이징 페이지 번호 -->
+							<div>
+								<ul class="pagination pagination-sm justify-content-center"
+									style="margin: 20px 0">
+									<li class="page-item active">
+										<a 
+										class="page-link"
+										id="preBtn" 
+										th:onclick="|javascript:page('${currentPage-1}')|"
+										th:if="${currentPage > 1}"
+										> 이전 </a> 
+										<a class="page-link"
+										th:unless="${currentPage > 1}"
+										> 이전 </a>
+									</li>
+
+									<th:block th:each="num : ${#numbers.sequence(startPageNum,lastPageNum)}">
+										<li class="page-item active">
+											<span
+											th:if="${currentPage == num}" 
+											th:text="${num}"
+											class="text-center page-link"
+											></span> 
+												<a 
+												class="page-link"
+												th:unless="${currentPage == num}" 
+												th:text="${num}"
+												th:href="@{/spendShopList(currentPage=${num})}"
+												></a> 
+										</li>
+									</th:block>
+
+									<li class="page-item active">
+										<a 
+										class="page-link"
+										id="nextBtn"
+										th:onclick="|javascript:page('${currentPage+1}')|"
+										th:if="${currentPage != lastPage}"
+										> 다음 </a> 
+										<a
+										class="page-link" 
+										th:if="${currentPage == lastPage}"
+										>다음</a>
+									</li>
+								</ul>
+							</div>
+							</div>
+						</div>
+					</div>
+					
+					
+					<!-- 지출 관리자 페이지, 계약매장 검색 -->
+					<div class="row tm-content-row">
+					<div class="col-12 tm-block-col">
+						<div class="tm-bg-primary-dark tm-block">
+
+							<!-- begin 검색 폼 -->
+							<form action="/spendShopList" class="tm-search-form row" method="post">
+							
+								<div class="form-group col-3">
+									<select class="custom-select" name="searchDate">
+										<option value="contract_date">계약일자</option>
+									</select>
+								</div>
+								<div class="form-group col-3">
+									<input id="beginDate" name="beginDate" type="text"
+										class="form-control validate"
+										style="background-color: #54657D" readonly />
+								</div>
+								<div class="form-group col-1 text-center">
+									<h2 class="tm-site-title mb-0">~</h2>
+								</div>
+								<div class="form-group col-3">
+									<input id="endDate" name="endDate" type="text"
+										class="form-control validate"
+										style="background-color: #54657D" readonly />
+								</div>
+								<div class="form-group col-2"></div>
+
+								<div class="form-group col-3">
+									<select class="custom-select" name="searchKey">
+										<option value="member_id">아이디</option>
+										<option value="shop_name">매장명</option>
+									</select>
+								</div>
+
+								<div class="form-group col-7">
+									<input id="subjectValue" name="searchValue" type="text"
+										class="form-control validate" />
+								</div>
+								<div class="form-group col-2">
+									<button type="submit" id="searchButton" name="searchButton"
+										class="btn btn-primary btn-block">검색</button>
+								</div>
+							</form>
+							<!-- end 검색 폼 -->
+						</div>
+					</div>
+					</div>
+					
+					
+				</div>
+			</div>
+	</div>
+</th:block>
+<th:block layout:fragment="customScript">
+
+<script th:inline="javascript">
+	<!-- datepicker -->
+	//시작 일자 텍스트상자 클릭시 달력 표기 
+	$('#beginDate').datepicker({
+	});
+	$('#beginDate').datepicker('option','dateFormat','yy-mm-dd'); // 기존 dd/mm/yy에서 yy-mm-dd로 format 변경   
+	
+	//종료 일자 텍스트상자 클릭시 달력 표기 
+	$('#endDate').datepicker({
+	});
+	$('#endDate').datepicker('option','dateFormat','yy-mm-dd'); // 기존 dd/mm/yy에서 yy-mm-dd로 format 변경 
+
+</script>
+
+</th:block>

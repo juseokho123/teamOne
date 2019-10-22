@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{layout/default}">
+<th:block layout:fragment="customTitle">
+</th:block>
+<th:block layout:fragment="customContents">
+	<body>
+		<div class="container">
+			<div class="row">
+				<div class="col">
+					<p class="text-white mt-5 mb-5">
+						<b>매장관리 > 홈</b>
+					</p>
+
+					<h4 class="tm-block-title">POS상세보기 클릭시 수정,삭제를 할 수 있는 경로로
+						이동됩니다.</h4>
+				</div>
+			</div>
+			<div class="row tm-content-row">
+				<div class="col-sm-12 col-md-12 col-lg-5 col-xl-5 tm-block-col">
+					<div class="tm-bg-primary-dark tm-block-con tm-block-scroll">
+						<div>
+							<button th:if="${session.SLEVEL ne '직원'}"  class="btn btn-secondary btn-sm" style="float: right;"type="button" 
+							 		onclick="location.href='posInsert'" >
+							 		POS등록
+					 		</button>
+							<button class="btn btn-secondary btn-sm" style="float: right; margin-right: 20px;"
+									type="button" onclick="location.href='posList'">
+									상세조회
+							</button>
+						</div>
+						<h2 class="tm-block-title">POS관리</h2>
+						<br />
+						<table class="table">
+							<thead>
+								<tr>
+									<th scope="col">포스트기 번호</th>
+									<th scope="col">포스트기 사용현황</th>
+								</tr>
+							</thead>
+							<tbody>
+								<tr th:each="posList : ${posList}">
+									<th th:text="${posList.posNumber}"></th>
+									<th th:text="${posList.posUse}"></th>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+				<div class="col-sm-12 col-md-12 col-lg-7 col-xl-7 tm-block-col" th:if="${session.SLEVEL eq '관리자'}">
+					<div class="tm-bg-primary-dark tm-block-con tm-block-scroll">
+						<div>
+							<span style="float: right;"><button
+									class="btn btn-secondary btn-sm" type="button"
+									onclick="location.href='/relationList' ">계약매장코드 상세조회</button></span>
+						</div>
+						<h2 class="tm-block-title">매장릴레이션관리</h2>
+						<br />
+						<table class="table">
+							<thead>
+								<tr>
+									<th scope="col">매장코드</th>
+									<th scope="col">매장점주 아이디코드</th>
+								</tr>
+							</thead>
+							<tbody>
+								<tr th:each="srList : ${relationList}">
+									<td th:text="${srList.shopCode}"></td>
+									<td th:text="${srList.memberId}"></td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+				<div class="col-sm-12  tm-block-col"
+					th:if="${session.SLEVEL eq '관리자' || session.SLEVEL eq '점주'}">
+					<div class="tm-bg-primary-dark tm-block-big">
+						<div>
+							<button type="button" id="insertBtn"
+								onclick="location.href='shopInsert'" style="float: right"
+								class="btn btn-primary text-uppercase" th:if="${session.SLEVEL eq '관리자'}">매장등록</button>
+
+							<button type="button" id="shopListSerachBtn"
+								onclick="location.href='shopList'"
+								style="float: right; margin-right: 50px;"
+								class="btn btn-primary text-uppercase">매장상세조회</button>
+						</div>
+						<h2 class="tm-block-title">매장 조회</h2>
+						<h4 class="tm-block-title">매장상세조회 클릭시 검색,수정,삭제 로 할 수있는 경로로 이동합니다.</h4>
+						<br /><br />
+						<table class="table">
+							<thead>
+								<tr>
+									<th scope="col">점주 아이디</th>
+									<th scope="col">등록된 매장이름</th>
+									<th scope="col">매장주소</th>
+									<th scope="col">매장 전화번호</th>
+
+								</tr>
+							</thead>
+							<tbody>
+								<tr th:each="slist : ${shopList}">
+									<th th:text="${slist.memberId}"></th>
+									<th th:text="${slist.shopName}"></th>
+									<th th:text="${slist.shopAddress}"></th>
+									<th th:text="${slist.shopPhone}"></th>
+								</tr>
+							</tbody>
+						</table>
+						<br />
+						<ul class="pagination justify-content-center mt-3 mr-3" th:if="${session.SLEVEL eq '관리자'}">
+							<li class="page-item">
+								<a class="page-link btn-primary"style="color: white;" th:href="@{/shop}">맨처음</a>
+							</li>
+							<li class="page-item" th:if="${currentPage > 1}">
+								<a class="page-link btn-primary" style="color: white;" th:href="@{/shop(currentPage=${currentPage-1})}">이전</a>
+							</li>
+							<li class="page-item" th:if="${currentPage < lastPage}">
+								<a class="page-link btn-primary" style="color: white;" th:href="@{/shop(currentPage=${currentPage+1})}">다음</a>
+							</li>
+							<li class="page-item">
+								<a class="page-link btn-primary" style="color: white;" th:href="@{/shop(currentPage=${lastPage})}">마지막</a>
+							</li>
+						</ul>
+						<br /><br />
+					</div>
+				</div>
+				<div class="col-sm-12  tm-block-col">
+					<div class="tm-bg-primary-dark tm-block-taller tm-block-middle tm-block-scroll">
+						<div>
+							<h2 class="tm-block-title" style="float: left;">매장 인원</h2>
+							<button type="button" onclick="location.href='employeeInsert'"
+									style="float: right" class="btn btn-primary text-uppercase"
+									th:if="${session.SLEVEL eq '관리자' || session.SLEVEL eq '점주'}" >매장직원등록</button>
+							<span style="float: left; margin-left: 400px; color: white; font-size: 20px">
+									자세한 내용은 직원관리를 이용해주세요</span> 
+							<Br/>
+						</div>
+						<br/><br/>
+						<table class="table">
+							<thead>
+								<tr>
+									<th scope="col">직급</th>
+									<th scope="col">이름</th>
+									<th scope="col">생년월일</th>
+									<th scope="col">전화번호</th>
+									<th scope="col">주소</th>
+								</tr>
+							</thead>
+							<tbody>
+								<tr th:each="plist : ${personnelList}">
+									<th th:text="${plist.memberLevel}"></th>
+									<th th:text="${plist.memberName}"></th>
+									<th th:text="${plist.memberBirth}"></th>
+									<th th:text="${plist.memberPhone}"></th>
+									<th th:text="${plist.memberAddress}"></th>
+								</tr>
+							</tbody>
+						</table>
+						<br/><br/>
+					</div>
+				</div>
+			</div>
+		</div>
+</th:block>
+</th:block>
+<th:block layout:fragment="customScript">
+</th:block>
+</html>

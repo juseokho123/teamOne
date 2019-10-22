@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{layout/default}">
+<th:block layout:fragment="customTitle">
+</th:block>
+<th:block layout:fragment="customContents">
+	<div class="container mt-5">
+		<div class="row tm-content-row">
+			<div class="col-xl mx-auto tm-block-col tm-col-account-settings">
+				<div class="tm-bg-primary-dark tm-block tm-block-settings">
+					<!-- 19.09.23 작성 -->
+					<h2 class="tm-block-title">대여고객 정보</h2>
+					<form action="/customerUpdate" class="tm-signup-form row" method="post">
+					<input type="hidden" id="rentalCustomerCode" name="rentalCustomerCode" th:value="${customerList.rentalCustomerCode}">
+						<div class="form-group col-lg-6">
+							<label for="name">이름</label>
+							<input id="rentalCustomerName" name="rentalCustomerName" type="text" 
+								   th:value="${customerList.rentalCustomerName}" class="form-control validate" required="required"/>
+						</div>
+						<!-- 대여한 상품 상세보기 -->
+						<div class="form-group col-lg-6">
+							<label for="rentalGoods">대여상품</label>
+							<button class="btn btn-outline-info form-control validate" id="rentalGoods" type="button"
+									th:text="${customerList.goodsRentalCode}" onclick="goodsDetail()" >
+							</button>
+						</div>
+						<div class="form-group col-lg-6">
+							<label for="address">주소</label>
+							<input id="rentalCustomerAddress" name="rentalCustomerAddress" type="text" 
+								   th:value="${customerList.rentalCustomerAddress}" class="form-control validate" />
+						</div>
+						<div class="form-group col-lg-6">
+							<label for="phone">전화번호</label>
+							<input id="rentalCustomerPhone" name="rentalCustomerPhone" type="text" 
+								   th:value="${customerList.rentalCustomerPhone}" class="form-control validate" />
+						</div>
+						<div class="form-group col-lg-6">
+							<label for="start">대여시작일</label>
+							<input id="rentalCustomerStart" name="rentalCustomerStart" type="date" 
+								   th:value="${customerList.rentalCustomerStart}" class="form-control validate" required="required"/>
+						</div>
+						<div class="form-group col-lg-6">
+							<label for="finish">대여종료일</label>
+							<input id="rentalCustomerFinish" name="rentalCustomerFinish" type="date" 
+								   th:value="${customerList.rentalCustomerFinish}" class="form-control validate" required="required"/>
+						</div>
+						<div class="form-group col-lg-6">
+							<label for="date">대여고객등록일자</label>
+							<input id="rentalDate" name="rentalDate" type="date" style="background-color: #54657D"
+								   th:value="${customerList.rentalCustomerDate}" class="form-control validate" readonly="readonly"/>
+						</div>
+						<div class="form-group col-lg-6">
+							<label for="return">대여반납일자</label>
+							<input id="rentalCustomerReturn" name="rentalCustomerReturn" type="date" 
+								   th:value="${customerList.rentalCustomerReturn}" class="form-control validate"/>
+						</div>
+						<div class="form-group col-lg-6">
+							<label for="overdue">연체유무</label>
+							<input id="rentalCustomerOverdue" name="rentalCustomerOverdue" type="text" 
+								   th:value="${customerList.rentalCustomerOverdue}" class="form-control validate" />
+						</div>
+						<div class="form-group col-lg-6">
+							<label>&nbsp;</label>
+							<button type="submit" class="btn btn-primary btn-block text-uppercase">
+								대여고객 수정
+							</button>
+						</div>
+					</form>
+				</div>
+			</div>
+		</div>
+	</div>
+</th:block>
+<th:block layout:fragment="customScript">
+<script>
+function goodsDetail() {
+	var goodsRentalCode = $('#rentalGoods').text();
+	window.open('/rentalGoodsDetail?goodsRentalCode='+goodsRentalCode+'','대여상품','left='+(screen.availWidth-550)/4+',top='+(screen.availHeight-430)/28+',width=1050,height=770,location=no,status=no,scrollbars=yes')
+}
+</script>
+</th:block>
+</html>

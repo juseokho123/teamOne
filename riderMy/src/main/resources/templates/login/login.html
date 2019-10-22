@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	  layout:decorate="~{layout/default}">
+<th:block layout:fragment="customTitle">
+</th:block>
+<th:block layout:fragment="customContents">
+<head>
+	<style type="text/css">
+		#box {
+		    text-align: center;
+		}
+		#white {
+			color: white;
+		}
+	</style>
+</head>
+	<!-- MAIN -->
+	<div class="main">
+		<div class="container tm-mt-big tm-mb-big">
+			<div class="row">
+				<div class="col-12 mx-auto tm-login-col">
+					<div class="tm-bg-primary-dark tm-block tm-block-h-auto">
+						<div class="row">
+							<div class="col-12 text-center">
+								<h2 class="tm-block-title mb-4">Welcome to SMART RIDER</h2>
+							</div>
+						</div>
+						<div class="row mt-2">
+							<div class="col-12">
+								<form action="/loginProcess" method="post" class="tm-login-form" id="loginForm">
+									<div class="form-group">
+										<label for="username">ID</label> <input name="memberId"
+											type="text" class="form-control validate" id="memberId" 
+											placeholder="ID를 입력하세요" required/>
+									</div>
+									<div class="form-group mt-3">
+										<label for="password">Password</label> <input name="memberPw"
+											type="password" class="form-control validate" id="memberPw" 
+											placeholder="Password를 입력하세요" required/>
+									</div>
+									<h6 style="text-align: center" id="white">권한별 버튼 클릭시 자동 로그인</h6>
+									<br>
+									<div id="box">
+										<button 
+											type="button" 
+											class="btn btn-primary" 
+											style="float: left" 
+											id="adminButton"
+										>관리자</button>
+										<button 
+											type="button" 
+											class="btn btn-primary" 
+											id="ownerButton"
+										>점주</button>
+										<button 
+											type="button" 
+											class="btn btn-primary" 
+											style="float: right" 
+											id="employeeButton"
+										>직원</button>
+									</div>
+									<div class="form-group mt-4">
+										<button 
+											type="button" 
+											class="btn btn-primary btn-block text-uppercase"
+											id="loginButton">Login</button>
+									</div>
+								</form>
+								<hr>
+								<a href="/memberInsert" class="mt-4 btn btn-primary btn-block text-uppercase">회원가입</a>
+								<a href="#" class="mt-4 btn btn-primary btn-block text-uppercase">아이디/비밀번호 찾기</a>
+								<button 
+									type="button" 
+									id="modalButton" 
+									class="btn btn-primary" 
+									data-toggle="modal" 
+									data-target="#loginModal" 
+									style="display: none;"
+								></button>
+							</div>
+							
+						</div>
+					</div>
+					
+					<!-- The Modal -->
+					<div class="modal fade" id="loginModal">
+					    <div class="modal-dialog">
+					        <div class="modal-content">
+					            <!-- Modal Header -->
+					            <div class="modal-header">
+					                <h4 class="modal-title"> 알림! </h4>
+					                <button type="button" class="close" data-dismiss="modal">×</button>
+					            </div>
+					            <!-- Modal body -->
+					            <div class="modal-body text-center">
+									아이디 혹은 비밀번호가 일치하지않습니다
+					            </div>
+					            <!-- Modal footer -->
+					            <div class="modal-footer">
+					            </div>
+					        </div>
+					    </div>
+					</div>
+					
+				</div>
+			</div>
+		</div>
+	</div>
+	<!-- END MAIN -->
+</th:block>
+<th:block layout:fragment="customScript">
+
+	
+
+	<script type="text/javascript">
+	
+		$(function() {
+	        $('#loginButton').click(function() {
+	            
+	        	var memberId = $('#memberId').val();
+	        	var memberPw = $('#memberPw').val();
+	        	
+	            // ajax 호출을 위한 정보 기입
+	            var request = $.ajax({
+	              url: "/loginCheck", // 호출 url
+	              method: "POST", // 전송방식
+	              data: {memberId, memberPw}, // 파라미터
+	              dataType: "text" // 전송 받을 타입 ex) xml, html, text, json
+	            });
+	             
+	            // 호출 정상일 시 실행되는 메서드
+	            request.done(function( data ) {
+	            	if(data == 1){
+	            		$('#loginForm').submit();
+	            	} else {
+	            		//console.log(data);
+	            		//$('#loginModal').modal('show');
+	            		$('#modalButton').trigger('click');
+	            	}
+	            });
+	            
+	            // 호출 에러일 시 실행되는 메서드
+	            request.fail(function( jqXHR, textStatus ) {
+	              alert( "Request failed: " + textStatus );
+	            });
+	 
+	            // 호출 정상 또는 에러 상관없이 실행
+	            request.always(function() {
+	                //console.log('완료');
+	            });
+	        });
+	    });
+	
+	
+		$('#adminButton').click(function() {
+			$('#memberId').val('');
+			$('#memberPw').val('');
+			$('#memberId').val('id001');
+			$('#memberPw').val('pw001');
+			$('#loginForm').submit();
+		});
+		$('#ownerButton').click(function() {
+			$('#memberId').val('');
+			$('#memberPw').val('');
+			$('#memberId').val('id002');
+			$('#memberPw').val('pw002');
+			$('#loginForm').submit();
+		});
+		$('#employeeButton').click(function() {
+			$('#memberId').val('');
+			$('#memberPw').val('');
+			$('#memberId').val('id003');
+			$('#memberPw').val('pw003');
+			$('#loginForm').submit();
+		});
+		
+	</script>
+	
+	
+	
+</th:block>
+</html>
+

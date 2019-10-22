@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{layout/modal}">
+
+<th:block layout:fragment="customContents">	
+	<div th:each=" alist : ${getAgreementList}" style="font-size: 20px">
+		계약자 이름 : [[${alist.memberName}]]<Br/><Br/>
+		계약자 전화번호 : [[${alist.memberPhone}]]<br/><br/>
+		서비스 시작일자 : [[${alist.contractStart}]]<br/><br/>
+		서비스 종료일자 : [[${alist.contractFinish}]]<br/><br/>
+		서비스 보류일자 : [[${alist.contractValidDate}]]<br/><br/>
+		납입 금액 : [[${alist.contractManagementAmout}]]<br/><br/>
+		미납 금액 : [[${alist.contractManagementUnpaid}]]<br/><br/>
+		계약 상태 : [[${alist.contractManagementState}]]<br/><br/>
+		상태 사유 : [[${alist.contractManagementContents}]]<br/>
+	</div>
+</th:block>
+</html>

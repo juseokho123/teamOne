@@ -1,0 +1,293 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.smart.rider.goods.mapper.GoodsMapper">
+
+	<!-- 대여매출등록시 상품상태 변경  -->
+	<update id="goodsSalesRentalUpdate" parameterType="com.smart.rider.goods.dto.GoodsDTO">
+ 		UPDATE goods				
+				SET 
+ 				goods_state = '대여중'
+				,goods_rental = '대여중'		
+ 				,goods_completion_state='대여중'
+ 				,goods_rental_state = '대여불가'				
+ 		
+ 		WHERE goods_code=#{goodsCode}
+ 		
+	</update>
+
+	<!-- 판매매출등록시 상품 판매유무 상태 변경쿼리  -->
+	<update id="goodsSalesUpdate" parameterType="com.smart.rider.goods.dto.GoodsDTO">
+ 		 		UPDATE goods				
+				SET 
+ 				goods_state = '판매완료'
+				,goods_rental = '대여불가'		
+ 				,goods_completion_state='판매완료'
+ 				,goods_rental_state = '대여불가'
+				 		
+ 				
+ 		
+ 		WHERE goods_code=#{goodsCode}
+ 		
+	</update>
+
+	<!-- 삭제가능상품 상세보기  -->
+	<select id="yesGoodsList" resultMap="ASid">
+		SELECT	
+			 g.*
+			 ,gr.*
+			 ,gb.* 
+		FROM goods g LEFT JOIN goods_rental gr 
+		ON g.goods_code = gr.goods_code
+		LEFT JOIN goods_database gb
+		ON g.goods_database_code = gb.goods_database_code
+		WHERE gr.goods_code IS NULL 
+		AND g.goods_code = #{goodsCode}
+	</select>
+
+	<!-- 삭제불가능한 상품쿼리  -->
+	<select id="goodsNlist" resultMap="ASid" parameterType="String">
+		SELECT	
+				 g.*
+				 ,gr.*
+				 ,gb.*
+			FROM goods g , goods_rental gr , goods_database gb
+			where g.goods_code = gr.goods_code
+			AND gb.goods_database_code = g.goods_database_code
+			<if test="searchInput neq null and searchInput neq ''.toString()">
+			AND
+			${select} LIKE CONCAT('%',#{searchInput},'%')
+		</if>
+		<if test="beginDate neq ''.toString() and endDate eq ''.toString()">
+			AND
+			g.goods_date between #{beginDate} and NOW()
+		</if>
+		<if test="beginDate eq ''.toString() and endDate neq ''.toString()">
+			AND
+			g.goods_date  between '2000-01-01' and #{endDate}
+		</if>
+		<if
+			test="beginDate neq ''.toString() and endDate neq ''.toString()">
+			AND
+			g.goods_date between #{beginDate} and #{endDate}
+		</if>
+	 	<if test="SCODE neq 'A'.toString()">
+        	AND 
+        		g.contract_shop_code  = #{SCODE}
+        </if> 
+		
+		
+	</select>
+	<!-- 삭제가능한 상품쿼리 -->
+	<select id="goodsYlist" resultMap="ASid" parameterType="String">
+		SELECT	
+			 g.*
+			 ,gr.*
+			 ,gb.* 
+		FROM goods g LEFT JOIN goods_rental gr 
+		ON g.goods_code = gr.goods_code
+		LEFT JOIN goods_database gb
+		ON g.goods_database_code = gb.goods_database_code
+		WHERE gr.goods_code IS NULL 
+		<if test="searchInput neq null and searchInput neq ''.toString()">
+			AND
+			${select} LIKE CONCAT('%',#{searchInput},'%')
+		</if>
+		<if test="beginDate neq ''.toString() and endDate eq ''.toString()">
+			AND
+			g.goods_date between #{beginDate} and NOW()
+		</if>
+		<if test="beginDate eq ''.toString() and endDate neq ''.toString()">
+			AND
+			g.goods_date  between '2000-01-01' and #{endDate}
+		</if>
+		<if
+			test="beginDate neq ''.toString() and endDate neq ''.toString()">
+			AND
+			g.goods_date between #{beginDate} and #{endDate}
+		</if> 
+		<if test="SCODE neq 'A'.toString()">
+        	AND 
+        		g.contract_shop_code  = #{SCODE}
+        </if>
+		
+	</select>
+	<!-- 상품검색  -->
+	<select id="goodsSearchList" resultMap="ASid" parameterType="String">
+			SELECT 
+			*
+			FROM
+			goods g
+			INNER JOIN
+			purchase p			 
+			INNER JOIN 
+			goods_database gb
+			ON 
+			g.goods_database_code = p.goods_database_code			
+			and gb.goods_database_code = p.goods_database_code
+			AND g.purchase_code = p.purchase_code
+		<if test="searchInput != null and searchInput neq ''.toString()">
+			WHERE 
+				${select} Like CONCAT('%',#{searchInput},'%')
+		</if>
+		<if test="beginDate neq ''.toString() and endDate eq ''.toString()">
+        	AND 
+        		g.goods_date between #{beginDate} and NOW()		
+        </if>
+        <if test="beginDate eq ''.toString() and endDate neq ''.toString()">
+        	AND 
+        		g.goods_date between '2000-01-01' and #{endDate}
+        </if>
+        <if test="beginDate neq ''.toString() and endDate neq ''.toString()">
+        	AND 
+        		g.goods_date between #{beginDate} and #{endDate}
+        </if>
+	
+	</select>
+	<!-- 판매상품삭제  -->
+	<delete id="goodsDelete" parameterType="String">
+		DELETE
+			g
+			FROM
+			goods g
+			INNER JOIN 	
+			member m					
+			WHERE 
+		 	g.goods_code=#{goodsCode}
+		  	AND m.member_id = #{memberId}
+			AND m.member_pw = #{memberPw}
+	</delete>
+	<!-- 판매상품수정 -->
+	<update id="goodsUpdate" parameterType="com.smart.rider.goods.dto.GoodsDTO">
+ 		UPDATE goods				
+				SET 
+ 				goods_pay=#{goodsPay}, 			
+ 				goods_position=#{goodsPosition},				
+ 				goods_state=#{goodsState},
+ 				goods_rental=#{goodsRental},			
+ 				goods_completion_state=#{goodsCompletionState}, 		
+ 				goods_rental_state=#{goodsRentalState}
+ 		
+ 		WHERE goods_code=#{goodsCode}
+	</update>
+	
+	<!-- 상품상세조회  -->
+	<select id="getGoodsList" resultMap="ASid" parameterType="String">
+		SELECT 
+				*
+				FROM
+				goods g
+				INNER JOIN
+				purchase p			 
+				INNER JOIN 
+				goods_database gb
+				ON 
+				g.goods_database_code = p.goods_database_code			
+				AND gb.goods_database_code = p.goods_database_code
+				AND g.purchase_code = p.purchase_code
+					WHERE 
+			g.goods_code=#{goodsCode}
+			
+	</select>
+	
+	
+	<!-- 상품등록  -->
+	<insert id="goodsInsert" parameterType="com.smart.rider.goods.dto.GoodsDTO" >		
+		INSERT INTO
+			 goods
+			(goods_code
+			, goods_database_code
+			, purchase_code
+			, contract_shop_code
+			, goods_pay
+			, goods_position
+			, goods_rental
+			, goods_state
+			, goods_completion_state
+			, goods_rental_state
+			, goods_inventory_date
+			, goods_date)
+		VALUES
+		 (#{goodsCode}
+		 , #{goodsDbCode}
+		 , #{purchaseCode}
+		 , #{contractShopCode}
+		 , #{goodsPay}
+		 , #{goodsPosition}
+		 , #{goodsRental}
+		 , #{goodsState}
+		 , #{goodsCompletionState}
+		 , #{goodsRentalState}
+		 , #{goodsInventoryDate}
+		 , NOW())
+	</insert>
+	<!-- 코드자동증가쿼리  -->
+	<select id="goodsCodeCount" resultType="String">
+		SELECT 
+			MAX(LPAD(RIGHT(goods_code, 4)+1, '4' , '0')) 
+		FROM goods;
+	</select>
+			
+	<!-- 상품리스트 -->
+	<select id="goodsList"	resultMap="ASid" parameterType="String">
+		SELECT 
+			*
+			FROM
+			goods g
+			INNER JOIN
+			purchase p			 
+			INNER JOIN 
+			goods_database gb
+			ON 
+			g.goods_database_code = p.goods_database_code			
+			and gb.goods_database_code = p.goods_database_code
+			AND g.purchase_code = p.purchase_code
+		
+	</select>
+	
+	<resultMap type="com.smart.rider.goods.dto.GoodsHapDTO" id="ASid">
+    	<result column="purchase_code"     property="purchaseCode"/>
+    	<result column="account_code"     property="accountCode"/>
+    	<result column="contract_shop_code"     		property="contractShopCode"/>
+    	<result column="goods_database_code"    	property="goodsDbCode"/>
+    	<result column="purchase_pay" 		property="purchasePay"/>
+    	<result column="purchase_state"     property="purchaseState"/>
+    	<result column="purchase_date"	 	property="purchaseDate"/>
+    	<result column="goods_database_name"	 	property="goodsDbName"/>
+    	<result column="goods_database_category"     property="goodsDbCategory"/>
+    	<result column="goods_database_number"     property="goodsDbNumber"/>
+    	<result column="goods_database_color"     		property="goodsDbColor"/>
+    	<result column="goods_database_speed"     		property="goodsDbSpeed"/>
+    	<result column="goods_database_weight"    	property="goodsDbWeight"/>
+    	<result column="goods_database_size" 		property="goodsDbSize"/>
+    	<result column="goods_database_nation"     property="goodsDbNation"/>
+    	<result column="goods_database_load"	 	property="goodsDbLoad"/>
+    	<result column="goods_database_distance"	 	property="goodsDbDistance"/>
+    	<result column="goods_database_battery"     property="goodsDbBattery"/>
+    	<result column="goods_database_time"     property="goodsDbTime"/>
+    	<result column="goods_database_made"     		property="goodsDbMade"/>
+    	<result column="goods_database_description"    	property="goodsDbDescription"/>
+    	<result column="account_market"    	property="accountMarket"/>
+    	<result column="shop_code"     property="shopCode"/>
+    	<result column="shop_name"     		property="shopName"/>
+    	<result column="shop_address"    	property="shopAddress"/>
+    	<result column="shop_phone"    	property="shopPhone"/>
+    	<result column="goods_code"	 	property="goodsCode"/>
+    	<result column="goods_pay"	 	property="goodsPay"/>
+    	<result column="goods_position"     property="goodsPosition"/>
+    	<result column="goods_rental"     property="goodsRental"/>
+    	<result column="goods_state"     		property="goodsState"/>
+    	<result column="goods_completion_state"    	property="goodsCompletionState"/>
+    	<result column="goods_rental_state"    	property="goodsRentalState"/>
+    	<result column="goods_inventory_date"     property="goodsInventoryDate"/>
+    	<result column="goods_date"     		property="goodsDate"/>    	
+    	<result column="goods_rental_code"     		property="goodsRentalCode"/>
+    	<result column="goods_rental_period_pay"    	property="goodsRentalPeriodPay"/>
+    	<result column="goods_rental_deposit"    	property="goodsRentalDeposit"/>
+    	<result column="goods_rental_position"     property="goodsRentalPosition"/>
+    	<result column="goods_rental_date"     		property="goodsRentalDate"/>   
+    	
+	</resultMap>
+	
+</mapper>

@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{layout/default}">
+<th:block layout:fragment="customTitle">
+</th:block>
+<th:block layout:fragment="customContents">
+	<!-- MAIN -->
+	<div class="main">
+		<div class="container mt-5">
+			<div class="row tm-content-row">
+				<div class="col-sm-12 col-md-12 col-lg-8 col-xl-8 tm-block-col">
+					<div class="tm-bg-primary-dark tm-block tm-block-products">
+						<div class="tm-product-table-container">
+							<form action="/goodsDbDelete" method="post">
+								<input type="hidden" name="memberId" th:value="${session.SID}">
+								<table border="1">
+									<tr>
+										<td>DB넘버</td>
+										<td><input type="text" name="goodsDbCode"
+											th:value="${goodsDbCode}" readonly="readonly"></td>
+									</tr>
+													
+									<tr>
+										<td>비밀번호</td>
+										<td><input type="text" name="memberPw"></td>
+									</tr>
+									<tr style="text-align: center;">
+										<td colspan="2">
+											<button type="submit" class="btn btn-primary btn-block text-uppercase mb-3">
+											상품삭제</button>
+										</td>
+									</tr>
+								</table>
+								<label th:if="${result ne null}" th:text="${result}"></label>
+							</form>
+						</div>
+						<!-- table container -->
+						
+					</div>
+				</div>
+				<div class="col-sm-12 col-md-12 col-lg-4 col-xl-4 tm-block-col">
+					<div
+						class="tm-bg-primary-dark tm-block tm-block-product-categories">
+						<h2 class="tm-block-title">상품 카테고리</h2>
+						<div class="tm-product-table-container">
+							<table class="table tm-table-small tm-product-table">
+								<tbody>
+									<tr>
+										<td class="tm-product-name">전동 킥보드</td>
+										<td class="text-center"><a href="#"
+											class="tm-product-delete-link"> <i
+												class="fas fa-check tm-product-check-icon"></i>
+
+										</a></td>
+									</tr>
+									<tr>
+										<td class="tm-product-name">전동 휠</td>
+										<td class="text-center"><a href="#"
+											class="tm-product-delete-link"> <i
+												class="fas fa-check tm-product-check-icon"></i>
+										</a></td>
+									</tr>
+									<tr>
+										<td class="tm-product-name">전동 자전거</td>
+										<td class="text-center"><a href="#"
+											class="tm-product-delete-link"> <i
+												class="fas fa-check tm-product-check-icon"></i>
+										</a></td>
+									</tr>
+									<tr>
+										<td class="tm-product-name">전동 바이크</td>
+										<td class="text-center"><a href="#"
+											class="tm-product-delete-link"> <i
+												class="fas fa-check tm-product-check-icon"></i>
+										</a></td>
+									</tr>
+
+								</tbody>
+							</table>
+						</div>
+						<!-- table container -->
+						<button class="btn btn-primary btn-block text-uppercase mb-3">
+							카테고리추가하기</button>
+					</div>
+				</div>
+			</div>
+		</div>
+
+	</div>
+	<!-- END MAIN -->
+	<script>
+		$(function() {
+			$(".tm-product-name").on("click", function() {
+				window.location.href = "edit-product.html";
+			});
+		});
+	</script>
+</th:block>
+</th:block>
+<th:block layout:fragment="customScript">
+</th:block>
+</html>
+
+

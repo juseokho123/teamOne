@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+	PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.smart.rider.inventory.mapper.InventoryMapper">
+	
+	<insert id="inventoryInsert" parameterType="com.smart.rider.inventory.dto.InventoryDTO">
+		INSERT INTO inventory
+			(inventory_code
+			, goods_code
+			, purchase_code
+			, contract_shop_code
+			, inventory_state
+			, inventory_date)
+			VALUES 
+			(#{inventoryCode}
+			, #{inventoryCode}
+			, #{inventoryCode}
+			, #{inventoryCode}
+			, #{inventoryCode}
+			, NOW()
+		)
+	</insert>
+
+	<!-- 인벤토리테이블 코드자동증가쿼리  -->
+	<select id="inventoryCodeCount" resultType="String">
+		SELECT 
+			MAX(LPAD(RIGHT(inventory_code, 4)+1, '4' , '0')) 
+		FROM inventory;
+	</select>
+	
+	<!-- 재고 리스트  -->
+	<select id="inventoryList" resultMap="ASid" parameterType="String">
+			SELECT
+			 *
+		FROM
+		  purchase p
+		  LEFT JOIN goods_database gb
+		  ON p.goods_database_code = gb.goods_database_code
+			LEFT JOIN goods g
+			ON p.purchase_code = g.purchase_code 
+		
+			
+			
+			
+			AND g.goods_completion_state = '무'  AND g.goods_rental_state = '무'
+
+		
+	</select>
+	
+	
+	
+	
+	
+	
+	
+	<resultMap type="com.smart.rider.goods.dto.GoodsHapDTO" id="ASid">
+    	<result column="purchase_code"     property="purchaseCode"/>
+    	<result column="account_code"     property="accountCode"/>
+    	<result column="contract_shop_code"     		property="contractShopCode"/>
+    	<result column="goods_database_code"    	property="goodsDbCode"/>
+    	<result column="purchase_pay" 		property="purchasePay"/>
+    	<result column="purchase_state"     property="purchaseState"/>
+    	<result column="purchase_date"	 	property="purchaseDate"/>
+    	<result column="goods_database_name"	 	property="goodsDbName"/>
+    	<result column="goods_database_category"     property="goodsDbCategory"/>
+    	<result column="goods_database_number"     property="goodsDbNumber"/>
+    	<result column="goods_database_color"     		property="goodsDbColor"/>
+    	<result column="goods_database_speed"     		property="goodsDbSpeed"/>
+    	<result column="goods_database_weight"    	property="goodsDbWeight"/>
+    	<result column="goods_database_size" 		property="goodsDbSize"/>
+    	<result column="goods_database_nation"     property="goodsDbNation"/>
+    	<result column="goods_database_load"	 	property="goodsDbLoad"/>
+    	<result column="goods_database_distance"	 	property="goodsDbDistance"/>
+    	<result column="goods_database_battery"     property="goodsDbBattery"/>
+    	<result column="goods_database_time"     property="goodsDbTime"/>
+    	<result column="goods_database_made"     		property="goodsDbMade"/>
+    	<result column="goods_database_description"    	property="goodsDbDescription"/>
+    	<result column="account_market"    	property="accountMarket"/>
+    	<result column="shop_code"     property="shopCode"/>
+    	<result column="shop_name"     		property="shopName"/>
+    	<result column="shop_address"    	property="shopAddress"/>
+    	<result column="shop_phone"    	property="shopPhone"/>
+    	<result column="goods_code"	 	property="goodsCode"/>
+    	<result column="goods_pay"	 	property="goodsPay"/>
+    	<result column="goods_position"     property="goodsPosition"/>
+    	<result column="goods_rental"     property="goodsRental"/>
+    	<result column="goods_state"     		property="goodsState"/>
+    	<result column="goods_completion_state"    	property="goodsCompletionState"/>
+    	<result column="goods_rental_state"    	property="goodsRentalState"/>
+    	<result column="goods_inventory_date"     property="goodsInventoryDate"/>
+    	<result column="goods_date"     		property="goodsDate"/>    	
+    	<result column="goods_rental_code"     		property="goodsRentalCode"/>
+    	<result column="goods_rental_period_pay"    	property="goodsRentalPeriodPay"/>
+    	<result column="goods_rental_deposit"    	property="goodsRentalDeposit"/>
+    	<result column="goods_rental_position"     property="goodsRentalPosition"/>
+    	<result column="goods_rental_date"     		property="goodsRentalDate"/>
+    	<result column="inventory_state"     property="inventoryState"/>
+    	<result column="inventory_date"     		property="inventoryDate"/>
+    	
+    </resultMap>
+
+</mapper>

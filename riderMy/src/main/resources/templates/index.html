@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{layout/default}">
+<th:block layout:fragment="customTitle">
+</th:block>
+<th:block layout:fragment="customContents">
+	<!-- MAIN -->
+	<div class="main-height">
+		<!-- MAIN CONTENT -->
+		<div class="main-content">
+			<div class="container">
+				<div class="row">
+					<div class="col">
+						<p class="text-white mt-5 mb-5">
+							<b th:if="${session.SLEVEL eq '관리자'}">관리자로 로그인중</b> <b
+								th:if="${session.SLEVEL eq '점주'}">점주로 로그인중</b> <b
+								th:if="${session.SLEVEL eq '직원'}">직원으로 로그인중</b>
+						</p>
+						<div class="tm-bg-primary-dark tm-block-sh">
+							<h4 class="text-white">자기소개</h4>
+							<hr>
+							<div class="row">
+								<div class="col-sm-3">
+									<img src="../resources/img/myself.jpg" width="120" style="left;">
+								</div>
+								<div class="text-white col-sm-8">
+									<b>● 생년월일 : 1996.06.28 (나이 : 24살)</b>
+									<br/>
+									<b>● 전화번호 : 010-6239-8101</b>
+									<br/>
+									<b>● 이메일    : juseokho123@naver.com</b>
+									<br/>
+									<b>● 전북기계공업고등학교 졸업(2012.03 ~ 2015.02)</b>
+									<br/>
+									<b>● 군대(2016.03 ~ 2017.12)</b>
+									<br/>
+									<b>● 한국스마트정보교육원(2019.05 ~ 2010.11)</b>
+									<br/>
+									<b>● 보유자격증 : 정보처리기능사</b>
+								</div>
+							</div>
+							<hr>							
+						</div>
+						<div class="tm-bg-primary-dark tm-block-shl" style="margin-top:50px; ">
+							<h4 class="text-white">실무형 팀프로젝트</h4>
+							<hr>
+							<div class="row">
+								<div class="text-white" style="margin-left: 15px;">
+									<span style="font-weight:bolder; font-size: large;">주제</span> &nbsp; : 전동킥보드, 전기자전거 등 스마트 모빌리티 판매 및 대여 업체를 대상으로한 전사적 자원 관리 시스템(ERP)
+								</div>
+								<div class="text-white" style="margin-left: 15px;">
+									<span style="font-weight:bolder; font-size: large;">목적</span> &nbsp; : 소규모 매장 운영을 위해 상품 매입, 재고, 매출, 지출, 직원 관리 등을 제공하여 매장의 전반적인 관리를 문서화 하지 않고<br/>
+																			<span style="margin-left:54px;">데이터화 시켜 매장을 쉽게 관리한다</span>																
+								</div>
+								<div class="text-white" style="margin-left: 15px;">
+									<span style="font-weight:bolder; font-size: large;">효과</span> &nbsp; : ◎수기 및 엑셀과 같은 비효율적인 방식이 아닌 스마트 모빌리티 전문 업체를 대상으로 효율적인 매장 운영 기대<br/>
+																			<span style="margin-left:56px;">◎기초적인 상품의 데이터를 제공함으로써 상품의 매입, 판매, 대여에 관한 편의성과 정확한 상품관리 제공<br/></span>
+																			<span style="margin-left:56px;">◎매장에 축적된 데이터(수익,지출,마진)를 기반으로 자금의 흐름을 원할하게 확인 가능 및 매장 직원의 근태 관리를 제공<br/></span>															
+								</div>
+							</div>
+							<br/>
+							<h4 class="text-white">맡은 업무</h4>
+							<hr>
+							<div class=" text-white">
+								<button type="button" onclick="location.href='contract'" class="btn btn-primary text-uppercase">계약관리</button>
+									&nbsp; → &nbsp;계약단가표 최신목록,그래프로 년 계약건수 확인,점주의 계약 및 계약 내용을 확인 할 수 있다.(권한이 관리자일 경우)<br/><br/>
+								<button type="button" onclick="location.href='agreement'" class="btn btn-primary text-uppercase">계약 및 계약내용</button>
+									&nbsp; → &nbsp;계약하기 및 계약한 내용 볼 수 있다. 점주 계정은 계약권한이 1회 있으며 해당되는 자기의 계약내용만 볼 수 있다.<br/><br/>
+								<button type="button" onclick="location.href='managementList'" class="btn btn-primary text-uppercase">계약납부 관리</button>
+									&nbsp; → &nbsp;계약한 점주의 납입정보를 조회 할 수 있고 납입 상태 및 상태 사유를 확인 할 수 있다.(권한이 관리자일경우)<br/><br/>
+								<button type="button" onclick="location.href='shop'" class="btn btn-primary text-uppercase">매장관리</button>
+									&nbsp; → &nbsp;POS,매장,매장릴레이션 등의 매장에 관련된 기능들을 사용 할 수 있다. 또한 권한에 따라 사용 할 수 있는 기능이 나눠지는데<br/>
+									<span style="margin-left:154px;">관리자는 모든 권한이 있지만 점주는 해당되는 매장의 정보 수정 및 조회 POS관리 및 매장인원을 확인할 수 있다.</span>
+									<span style="margin-left:154px;">직원은 POS 조회 및 매장 인원만 볼 수 있다.</span><br/></br>
+								<button type="button" onclick="location.href='accountList'" class="btn btn-primary text-uppercase">거래처관리</button>
+									&nbsp; → &nbsp; 거래처관리는 관리자일 경우 전체 조회가 가능하며 점주는 해당 매장의 거래처 조회와 수정 및 삭제를 할 수 있습니다.
+									<span style="margin-left:154px;">직원 수정 및 삭제 권한 권한이 없으며 조회만 해당 매장의 거래처 조회만 가능합니다.</span><br/>
+							</div>
+
+						</div>
+						<div class="tm-bg-primary-dark tm-block-shl" style="margin-top:50px; ">
+						<h4 class="text-white">업무 흐름도</h4>
+						<hr>
+						<img src="../resources/img/flowchart.png">
+						</div>
+					
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</th:block>
+</th:block>
+<th:block layout:fragment="customScript">
+
+<script th:inline="javascript">
+
+</script>
+
+</th:block>
+</html>

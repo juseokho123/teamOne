@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{layout/default}">
+<th:block layout:fragment="customTitle">
+</th:block>
+<th:block layout:fragment="customContents">
+	<!-- MAIN -->
+	<div class="main">
+		<div class="container mt-6">
+			<div class="row tm-content-row">				
+				<div class="col-sm-12 col-md-12  tm-block-col">				
+					<div class="tm-bg-primary-dark tm-block tm-block-products">
+						<form action="/salesDelete"  method="post">
+						<input type="hidden" name="memberId" th:value="${session.SID}" readonly="readonly">
+						<input type="hidden" id="salesCode" name="salesCode" th:value="${salesCode.salesCode}">
+						<div class="tm-product-table-container">
+							
+							<table class="table table-hover tm-table-small tm-product-table">							
+								<thead>
+									<tr>	
+										<th scope="col">판매/대여</th>										
+										<th th:text="${salesCode.salesType}"></th>
+									</tr>															
+								
+									<tr>	
+										<th scope="col">대여보증금</th>										
+										<th th:text="${salesCode. goodsRentalDeposit}"></th>
+									</tr>
+									<tr>	
+										<th scope="col">대여표</th>										
+										<th th:text="${salesCode.goodsRentalPeriodPay}"></th>
+									</tr>
+									
+									<tr>	
+										<th scope="col">판매금액</th>										
+										<th th:text="${salesCode.goodsPay}"></th>
+									</tr>
+									<tr>	
+										<th scope="col">결제수단</th>										
+										<th th:text="${salesCode.salesPayType}"></th>
+									</tr>											
+									<tr>	
+										<th scope="col">매출액</th>										
+										<th th:text="${salesCode.salesAmount}"></th>
+									</tr>
+									<tr>	
+										<th scope="col">매출등록일</th>										
+										<th th:text="${salesCode.salesDate}"></th>
+									</tr>
+									<tr>
+										
+										<td>비밀번호입력</td>
+										<td>
+										<input  class="text-lowercase mb-6" type="text" name="memberPw">
+										
+										</td>
+									</tr>
+									
+									
+									
+								</thead>	
+															
+							</table>
+							<div>
+								<label class="alert alert-danger col-xl" th:if="${result ne null}" th:text="${result}"></label>
+							</div>			
+						</div>						
+						<!-- table container -->				
+
+							<button class="btn btn-primary btn-block text-uppercase" type="submit">
+							매출삭제</button>	
+								
+						</form>
+						
+					</div>
+					
+				</div>
+		
+			</div>
+		</div>
+
+	</div>
+	<!-- END MAIN -->
+	
+</th:block>
+</th:block>
+<th:block layout:fragment="customScript">
+</th:block>
+</html>
+
+

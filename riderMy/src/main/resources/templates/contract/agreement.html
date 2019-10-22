@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{layout/default}">
+<th:block layout:fragment="customTitle">
+</th:block>
+<th:block layout:fragment="customContents">
+	<body>
+		<div class="container main-height">
+			<div class="row">
+				<div class="col">
+					<p class="text-white mt-5 mb-5">
+						<b>계약 관리 >계약 및 계약내용</b>
+					</p>
+					<div class="tm-block-col ">
+						<div class="tm-bg-primary-dark tm-block-big tm-block-scroll ">
+							<div>
+								<h3 style="color: white">계약은 계정당 한번입니다. 재계약 및 기타 문의사항은
+									오프라인으로 연락해주세요</h3>
+								<img src="./resources/img/contra.jpg" width="750" style="float: left;"> 
+								<input type="button" class="btn btn-primary" style="float: right; line-height: 50pt; 
+									   WIDTH: 150pt; margin-top: 75pt;" id="contractBtn" value="계약하기" /> 
+								<input type="button" class="btn btn-primary" th:if="${session.SLEVEL eq '관리자'}"
+									   style="float: right; line-height: 50pt; WIDTH: 150pt; margin-top: 75pt;"
+									   onclick="location.href='contractList' " value="계약자 명단 조회" />
+							</div>
+						</div>
+					</div>
+					<div class=" tm-block-col ">
+						<h2 class="tm-block-title">계약 내용</h2>
+						<div class="tm-bg-primary-dark tm-block-big">
+							<table class="table">
+								<thead>
+									<tr>
+										<th scope="col">계약자 아이디</th>
+										<th scope="col">계약자 이름</th>
+										<th scope="col">계약자 전화번호</th>
+										<th scope="col">서비스 시작일자</th>
+										<th scope="col">서비스 종료일자</th>
+										<th scope="col">서비스 보류일자</th>
+										<th scope="col">더보기</th>
+									</tr>
+								</thead>
+								<tbody>
+									<tr th:each="agreement : ${agreement}">
+										<th th:text="${agreement.memberId}"></th>
+										<th th:text="${agreement.memberName}"></th>
+										<th th:text="${agreement.memberPhone}"></th>
+										<th th:text="${agreement.contractStart}"></th>
+										<th th:text="${agreement.contractFinish}"></th>
+										<th th:text="${agreement.contractValidDate}"></th>
+										<td class="text-center">
+											<!-- th:data-contractCode 전송 되는 데이터 class : 이름 지정(listOpen)--> 
+											<!-- 모델 실행하는 id 값 입력해주기 --> 
+											<a href="#" data-toggle="modal" data-target="#listOpenModal"
+											   th:data-contractCode="${agreement.contractCode}"
+											   class="tm-product-delete-link listOpen"> 
+											   <i class="fas fa-search-plus tm-product-check-icon" style="color: white"></i>
+											</a>
+										</td>
+									</tr>
+								</tbody>
+							</table>
+							<div class="modal fade" id="listOpenModal" tabindex="-1"
+								 role="dialog" aria-labelledby="myFullsizeModalLabel">
+								<div class="modal-dialog modal-fullsize" role="document">
+									<div class="modal-content modal-fullsize">
+										<div class="modal-header">
+											<button type="button" class="close" data-dismiss="modal"></button>
+											<h4 class="modal-title">상세 보기</h4>
+										</div>
+										<div class="modal-body" id="listOpenBody"></div>
+										<div class="modal-footer">
+											<button type="button" class="btn btn-secondary" data-dismiss="modal">닫기</button>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</body>
+</th:block>
+</th:block>
+<th:block layout:fragment="customScript">
+	<script type="text/javascript">
+		$('#contractBtn').click(function(){
+			var level = '[[${SLEVEL}]]' ;
+			var list = [[${size}]];
+			if(list != 0 && level != '관리자'){
+				alert('더이상 계약하실 수 없습니다.');
+			}else{
+				location.href='/contractInsert'
+			}
+		});	
+		$(function(){
+			//기능 실행 , class가  listOpen이면 클릭시 기능 실행
+			$('.listOpen').click(function(){
+				//contractCode에  this(메소드지칭), 속성이(data-contractCode)인 값을 담는다.
+				var contractCode = $(this).attr('data-contractCode');
+				//contactCode 가 undefinde가 아닐경우 body의 속성에 contractCode에 담아준다.
+				if(contractCode != undefined) $('body').attr('contractCode', contractCode);
+			});			
+		});
+		$('#listOpenModal').on('show.bs.modal', function (e) {
+			var contractCode = $('body').attr('contractCode');
+			//console.log(contractCode);
+			/* ajax
+			 	url : 경로
+				,method : 전송방식
+				,data : 전송되는 데이터  이름 : 값
+				,datat Type : 정해주 기 html,json 등등
+			*/
+			var request = $.ajax({
+				url: "/agreementList",
+				method: "GET",
+				data: { contractCode : contractCode },
+				dataType: "html"
+			});
+			 /* 전송되는 데이터 */
+			request.done(function( data ) {
+			  $( "#listOpenBody" ).html( data );
+			});
+			 /*에러 나오는 경우 */
+			request.fail(function( jqXHR, textStatus ) {
+			  alert( "error: " + textStatus );
+			});
+		});
+	</script>
+</th:block>
+</html>

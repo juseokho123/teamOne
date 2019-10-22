@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" 
+	  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" 
+	  layout:decorate="~{layout/default}">
+
+<th:block layout:fragment="customTitle">
+</th:block>
+
+<!-- 계정과목관리 -->
+<th:block layout:fragment="customContents">
+	<!-- MAIN -->
+	<div class="main height-spend">
+		<!-- MAIN CONTENT -->
+		<div class="main-content">
+			<div class="container">
+				<div class="row">
+					<div class="col">
+						<p class="text-white mt-5 mb-5">
+							<b>관리자 > 계정과목관리</b>
+						</p>
+						<p class="text-white mt-5 mb-5">
+							<b>※ 계정과목관리 페이지입니다. 공과금/기타 지출과 연결되며 등록, 수정, 삭제, 조회를 할 수 있습니다 ※</b>
+						</p>
+					</div>
+				</div>
+
+				<h2 class="tm-block-title">계정과목관리</h2>
+				<hr>
+				
+				<!-- 계정과목 검색 -->
+				<div class="row tm-content-row">
+				<div class="col-12 tm-block-col">
+					<div class="tm-bg-primary-dark tm-block tm-block-h-auto-copy">
+					
+						<!-- begin 검색 폼 -->
+						<form action="/subjectList" class="tm-search-form row" method="post">
+							<div class="form-group col-3">
+								<select class="custom-select" name="searchDate">
+									<option value="subject_date">등록일자</option>
+								</select>
+							</div>
+							<div class="form-group col-3">
+								<input id="beginDate" name="beginDate" 
+									   type="text" class="form-control validate" style="background-color: #54657D" readonly/>
+							</div>
+							<div class="form-group col-1 text-center">
+								<h2 class="tm-site-title mb-0">~</h2>
+							</div>
+							<div class="form-group col-3">
+								<input id="endDate" name="endDate" 
+									   type="text" class="form-control validate" style="background-color: #54657D" readonly/>
+							</div>
+							<div class="form-group col-2">
+							</div>
+							
+							<div class="form-group col-3">
+								<select class="custom-select" name="subjectKey">
+									<option value="subject_number">계정과목코드</option>
+									<option value="subject_name">계정과목명</option>
+								</select>
+							</div>
+	
+							<div class="form-group col-7">
+								<input id="subjectValue" name="subjectValue" 
+									   type="text" class="form-control validate"/>
+							</div>
+							<div class="form-group col-2">
+								<button type="submit" id="searchButton" 
+										name="searchButton" class="btn btn-primary btn-block">
+										검색
+								</button>
+							</div>
+						</form>
+						<!-- end 검색 폼 -->
+						
+					</div>
+				</div>
+			</div>
+				
+				<!-- 계정과목 리스트 -->
+				<div class="row tm-content-row">
+					<div class="col-12 tm-block-col">
+						<div class="tm-bg-primary-dark tm-block-scroll tm-block-sub">
+							<table class="table">
+								<thead>
+									<tr>
+										<th scope="col">no</th>
+										<th scope="col">계정과목코드</th>
+										<th scope="col">계정과목명</th>
+										<th scope="col">등록자ID</th>
+										<th scope="col">등록일자</th>
+										<th scope="col" style="width: 8%" class="text-center">수정</th>
+										<th scope="col" style="width: 8%" class="text-center">삭제</th>
+									</tr>
+								</thead>
+								<tbody>
+									<!-- 삭제 불가능한 계정과목 리스트 -->
+									<tr th:each="impossible : ${deleteImpossible}">
+										<td th:text="${impossible.subjectCode}"></td>
+										<td th:text="${impossible.subjectNumber}"></td>
+										<td th:text="${impossible.subjectName}"></td>
+										<td th:text="${impossible.memberId}"></td>
+										<td th:text="${impossible.subjectDate}"></td>
+										<td class="text-center">
+											<a th:href="@{/subjectUpdate(subjectCode=${impossible.subjectCode})}"
+											   class="tm-product-delete-link"> 
+											   <i class="fas fa-check" style="color: white"></i>
+											</a>
+										</td>
+										
+										<!-- 삭제 불가능 모달 알림 -->
+										<td class="text-center">
+											<a class="tm-product-delete-link impossible" 
+											   data-toggle="modal" href="#myModal">
+												<i class="far fa-trash-alt tm-product-delete-icon" 
+												   style="color: black">
+												</i>
+											</a>
+										</td>
+									</tr>
+
+									<!-- 삭제 가능한 계정과목 리스트 -->
+									<tr th:each="possible : ${deletePossible}">
+										<td th:text="${possible.subjectCode}"></td>
+										<td th:text="${possible.subjectNumber}"></td>
+										<td th:text="${possible.subjectName}"></td>
+										<td th:text="${possible.memberId}"></td>
+										<td th:text="${possible.subjectDate}"></td>
+										<td class="text-center">
+										
+											<a th:href="@{/subjectUpdate(subjectCode=${possible.subjectCode})}"
+											   class="tm-product-delete-link"> 
+											   <i class="fas fa-check" style="color: white"></i>
+											</a>
+										</td>
+										<td class="text-center">
+											<a th:href="@{/subjectDelete(subjectCode=${possible.subjectCode})}"
+											   class="tm-product-delete-link possibleButton"
+											   onclick="return deleteSubject();"> 
+											   <i class="far fa-trash-alt tm-product-delete-icon" style="color: white;"></i>
+											</a>
+										</td>
+									</tr>
+									<th:block th:if="${alert} neq null">
+										<tr class="text-center">
+											<td colspan="7" th:text="${alert}"></td>
+										</tr>
+									</th:block>
+								</tbody>
+							</table>
+						</div>
+					</div>
+				</div>
+				<hr>
+				<!-- 전체목록으로 이동 버튼 -->
+				<button type="button" 
+						onclick="location.href='subjectList'" 
+						style="float: left"
+						class="btn btn-primary text-uppercase">
+						전체목록으로
+				</button>
+				
+				<!-- 계정과목등록 버튼 -->
+				<button type="button"
+						onclick="location.href='subjectInsert'" 
+						style="float: right"
+						class="btn btn-primary text-uppercase">
+						계정과목등록
+				</button>
+					
+				<!-- 모달 -->
+				<div class="modal fade" id="myModal">
+					<div class="modal-dialog">
+						<div class="modal-content">
+				      
+						<!-- Modal Header -->
+						<div class="modal-header">
+							<h4 class="modal-title">알림</h4>
+							<button type="button" class="close" data-dismiss="modal">&times;</button>
+						</div>
+				        
+						<!-- Modal body -->
+						<div class="modal-body">
+							현재 사용중인 계정과목은 삭제할 수 없습니다
+						</div>				        
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</th:block>
+</th:block>
+
+<th:block layout:fragment="customScript">
+<script type="text/javascript">
+
+	function deleteSubject(){
+		return confirm("정말로 삭제하시겠습니까?");
+	}
+
+	//시작 일자 텍스트상자 클릭시 달력 표기 
+	$('#beginDate').datepicker({
+	});
+	$('#beginDate').datepicker('option','dateFormat','yy-mm-dd'); // 기존 dd/mm/yy에서 yy-mm-dd로 format 변경   
+	
+	//종료 일자 텍스트상자 클릭시 달력 표기 
+	$('#endDate').datepicker({
+	});
+	$('#endDate').datepicker('option','dateFormat','yy-mm-dd'); // 기존 dd/mm/yy에서 yy-mm-dd로 format 변경 
+	
+</script>
+</th:block>
+</html>

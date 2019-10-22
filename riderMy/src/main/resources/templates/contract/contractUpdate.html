@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{layout/default}">
+<th:block layout:fragment="customTitle">
+</th:block>
+<th:block layout:fragment="customContents">
+	<form action="/contractUpdate" id="form" method="post" class="tm-edit-product-form">
+		<div class="container tm-mt-big tm-mb-big">
+			<div class="row">
+				<div>
+					<div class="tm-bg-primary-dark tm-block tm-block-h-auto" th:each="clist : ${contractList}">
+						<div class="row">
+							<div class="col-12">
+								<h2 class="tm-block-title d-inline-block">계약서 수정하기(등록)</h2>
+							</div>
+						</div>
+						<div class="row tm-edit-product-row">
+							<div class="col-xl-6 col-lg-6 col-md-12">
+								<input type="hidden" name="memberId" id="memberId" th:value="${clist.memberId}">
+								<input type="hidden" name="contractCode" id="contractCode" th:value="${clist.contractCode}">
+								<!-- 계약금 납입방식 -->
+								<div class="form-group mb-3">
+									<label>계약금 납입방식</label> 
+									<select id="contractMethod" class="custom-select tm-select-accounts" name="contractMethod">
+										<option value="월 납부">월 납부</option>
+										<option value="1년 일시불">1년 일시불</option>
+										<option value="2년 일시불">2년 일시불</option>
+									</select> 
+									<br /><br /><br />
+									<!-- 계약금 납입방식이 월일 경우만 -->
+									<label>월 납부만 입력하세요(개월)</label> 
+									<input type="text" id="monthPay" class="form-control validate" placeholder="사용할 월 수를 입력해주세요(ex)3,5,7">
+								</div>
+								<!-- 계약 금액 -->
+								<div class="form-group mb-3">
+									<label for="name">계약 금액 </label>
+									<input id="contractPay" readonly style="color: #0000ff;" placeholder="납입방식을 입력해주세요"
+										   name="contractPay" type="text" th:value="${clist.contractPay}"
+										   class="form-control validate" required />
+								</div>
+								<!-- 서비스 시작일자 -->
+								<div class="form-group mb-3">
+									<label for="name">서비스 시작일자 </label> 
+									<input id="contractStart" th:value="${clist.contractStart}" name="contractStart"
+										   type="date" class="form-control validate" required />
+								</div>
+								<!-- 서비스 종료일자(시작일자와 계약금납입방식 선택시 바뀜) -->
+								<div class="form-group mb-3">
+									<label for="name">서비스 종료일자 </label> 
+									<input id="contractFinish" th:value="${clist.contractFinish}" name="contractFinish"
+										type="date" class="form-control validate" style="color: #0000ff;" readonly required />
+								</div>
+								<!-- 유효기간 : 종료일자  +10DAY-->
+								<div class="form-group mb-3">
+									<label for="name">계약 유효기간 </label> 
+									<input id="contractValidDate" th:value="${clist.contractValidDate}" 
+										   name="contractValidDate" type="date" style="color: #0000ff;"
+										   class="form-control validate" readonly required />
+								</div>
+								<!--계약내용  아니오나 선택 안할시 페이지 안넘어감  -->
+								<div class="form-group mb-3">
+									<label for="name">계약내용 </label>
+									<textarea cols="80" rows="8" id="textareaId"></textarea>
+									<input type="radio" name="agree" value="Y" /> <span class="up">예</span>&nbsp;&nbsp;
+									<input type="radio" name="agree" value="N" /> <span class="up">아니오</span>
+								</div>
+								<!-- 사용자 등록번호  -->
+								<div class="form-group mb-3">
+									<label for="name">계약자사업자 등록번호 </label> 
+									<input id="contractInformation" style="color: #0000ff;" readonly 
+										   th:value="${clist.contractInformation}" placeholder="사업자등록번호를 입력해주세요" name="contractInformation"
+										   type="text" class="form-control validate" required />
+								</div>
+							</div>
+							<!-- 월계약금액   -->
+							<div
+								class="col-xl-6 col-lg-6 col-md-12 mx-auto mb-4 form-group mb-3">
+								<label>계약금 코드 선택</label> 
+								<select id="contractUnitCode" name="contractUnitCode" class="custom-select tm-select-accounts">
+									<option th:each="uList : ${uList}" th:text="${uList.contractUnitCode}"></option>
+								</select> 
+								<br /><br /><br />
+								<table class="table">
+									<thead>
+										<tr>
+											<th scope="col">월 계약금액</th>
+											<th scope="col">1년 일시불 금액</th>
+											<th scope="col">2년 일시불 금액</th>
+										</tr>
+									</thead>
+									<tbody>
+										<tr th:each="unitList : ${unitList}">
+											<th id="unitMonth"		th:text="${unitList.contractUnitMonth}"></th>
+											<th id="unitOneYear" 	th:text="${unitList.contractUnitOneyear}"></th>
+											<th id="unitTweYear" 	th:text="${unitList.contractUnitTwoyear}"></th>
+										</tr>
+									</tbody>
+								</table>
+							</div>
+							<div class="col-12">
+								<button type="button" onclick="javascript:btn()"
+										class="btn btn-primary btn-block texst-uppercase">
+										계약서 수정
+								</button>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</form>
+</th:block>
+</th:block>
+<th:block layout:fragment="customScript">
+	<script>
+		//모델에 담겨 있는 단가표 코드
+		var unitCode = '[[${contractUnitCode}]]';
+		//id가 contractUnitCode인 값을 대입
+		var cuCode = $('#contractUnitCode').val()
+		//id가 contractCode인 값을 대입
+		var contractCode = $('#contractCode').val()
+		//console.log(contractCode);
+		//console.log(unitCode);
+		//console.log($('#contractUnitCode').val());
+		//id가 contractUnitCode 값에 unitCode값을 대입
+		$('#contractUnitCode').val(unitCode);
+		//id가 contractUnitCode 값이 변경 되면 기능 실행 (경로 이동)
+		$('#contractUnitCode').change(function() {
+			location.href = '/getContractList?contractUnitCode='
+					+ $('#contractUnitCode').val() + '&contractCode='
+					+ contractCode;
+		});
+		/* 모델에 담겨 있는 납부 방식을 가져와서 납부 방식이 값이 같을 경우에 넣는다. */
+		var test = '[[${contractMethod}]]';
+		//console.log(test);
+		if (test == '1년 일시불' || test == '2년 일시불' || test == '월 납부') {
+			$('#contractMethod').val(test);
+		}
+		//textarea 담기는 내용
+		$('#textareaId')
+				.val('1.상태변경은 오프라인 문의 \n\n 2.서비스종료일자 + D10, 유효기간시 까지 서비스 제공, 유효기간 지날시 계약종료 \n\n 3.30일 연체시 이용 중지  \n\n 4.중도 해지시 남은 기간에 따른 금액의 60% 환불')
+		//계약내용에 동의 안할 시 안넘어감 
+		function btn() {
+			var a = $('input[name="agree"]:checked').val();
+			a = "Y";
+			if (a == "N" || a == "" || a == null) {
+				alert("계약내용에 동의해주세요");
+			} else {
+
+				$('#form').submit();
+			}
+		}
+		//납부 타입을 선택하면 자동으로 값 설정
+		$("select#contractMethod").bind("change", function() {
+
+			var seloption = $("#contractMethod option:selected").val();
+			var month = $('#unitMonth').text();
+			var oneYear = $('#unitOneYear').text();
+			var twoYear = $('#unitTweYear').text();
+			//id="unitMonth"
+			if (seloption == '월 납부') {
+				$('#contractPay').val(month);
+			} else if (seloption == '1년 일시불') {
+				$('#contractPay').val(oneYear);
+			} else if (seloption == '2년 일시불') {
+				$('#contractPay').val(twoYear);
+			}
+
+		});
+		//개월 값 입력시 값 곱해서 나옴
+		$('#monthPay').change(function() {
+			var way = $('#contractMethod').val();
+			var monthPay = $('#monthPay').val();
+			var takepay = $('#unitMonth').text();
+			var rob = takepay * monthPay;
+			if (way == '월 납부') {
+				$('#contractPay').val(rob);
+			}
+		});
+
+		//날짜 계산
+		$('#contractStart').change(function() {
+
+			//월 납부 방법 
+			var method = $('#contractMethod').val();
+			//납부 개월 
+			var monthPay = $('#monthPay').val();
+			console.log(monthPay);
+			//시작일자
+			var start = $('#contractStart').val();
+			var finish = null;
+			var valid = null;
+			//날짜 계산
+			var validDate = new Date(start);
+			var finishDate = new Date(start);
+			var monthDate = new Date(start);
+			//일자에  10일 더함
+			validDate.setDate(validDate.getDate() + 10);
+			//개월에 따라 일자 변환
+			//확인
+			monthDate.setMonth(monthDate.getMonth() + parseInt(monthPay));
+			console.log(monthDate.getFullYear());
+			console.log(monthDate.getMonth());
+			console.log(monthDate.getDate());
+			//보류기간을 구하기 위한 값들
+			var validYear = validDate.getFullYear() + 1;
+			var validYear2 = validDate.getFullYear() + 2;
+			var validMonth = validDate.getMonth() + 1;
+			var validDay = validDate.getDate();
+
+			//계약 종료기간 구하기
+			var finishYear = finishDate.getFullYear() + 1;
+			var finishYear2 = finishDate.getFullYear() + 2;
+			var finishMonth = finishDate.getMonth() + 1;
+			var finishDay = finishDate.getDate();
+
+			//월 계약시에 보류기간 및 종료기간 구하기
+			var MonthYear = monthDate.getFullYear();
+			var MonthMonth = monthDate.getMonth() + 1;
+			var MonthDay = monthDate.getDate();
+			var MonthDay2 = monthDate.getDate() + 10;
+
+			//일 수가 10보다 적을경우 0 붙여서 나온다.
+			if (validMonth < 10) {
+				validMonth = "0" + validMonth;
+			}
+			if (validDay < 10) {
+				validDay = "0" + validDay;
+			}
+			if (finishMonth < 10) {
+				finishMonth = "0" + finishMonth;
+			}
+			if (finishDay < 10) {
+				finishDay = "0" + finishDay;
+			}
+			if (MonthMonth < 10) {
+				MonthMonth = "0" + MonthMonth;
+			}
+			if (MonthDay < 10) {
+				MonthDay = "0" + MonthDay;
+			}
+			if (MonthDay2 < 10) {
+				MonthDay = "0" + MonthDay;
+			}
+
+			//월 납입시 날짜 계산
+			if (start != null && method == "월 납부") {
+				finish = MonthYear + "-" + MonthMonth + "-" + MonthDay;
+				valid = MonthYear + "-" + MonthMonth + "-" + MonthDay2;
+
+				$('#contractFinish').val(finish);
+				$('#contractValidDate').val(valid);
+			}
+
+			//납입방식이 1년 일시불일 경우 날짜 계산
+			if (start != null && method == '1년 일시불') {
+				finish = finishYear + "-" + finishMonth + "-" + finishDay;
+				valid = validYear + "-" + validMonth + "-" + validDay;
+
+				$('#contractFinish').val(finish);
+				$('#contractValidDate').val(valid);
+			}
+			//납입방식이 2년 일시불일 경우 날짜 계산
+			else if (start != null && method == '2년 일시불') {
+				finish = finishYear2 + "-" + finishMonth + "-" + finishDay;
+				valid = validYear2 + "-" + validMonth + "-" + validDay;
+
+				$('#contractFinish').val(finish);
+				$('#contractValidDate').val(valid);
+			}
+
+		});
+	</script>
+</th:block>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

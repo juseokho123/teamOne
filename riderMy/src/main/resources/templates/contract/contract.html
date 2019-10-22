@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{layout/default}">
+<th:block layout:fragment="customTitle">
+</th:block>
+<th:block layout:fragment="customContents">
+	<body>
+		<div class="container">
+			<div class="row">
+				<div class="col">
+					<p class="text-white mt-5 mb-5">
+						<b>계약관리 > 계약관리</b>
+					</p>
+				</div>
+			</div>
+			<div class="row tm-content-row main-height">
+				<div class="col-sm-12 col-md-12 col-lg-6 col-xl-6 tm-block-col">
+					<div class="tm-bg-primary-dark tm-block-con">
+						<h2 class="tm-block-title">계약단가표 -최신-</h2>
+						<table class="table">
+							<thead>
+								<tr>
+									<th scope="col">월 계약금액</th>
+									<th scope="col">1년 일시불 금액</th>
+									<th scope="col">2년 일시불 금액</th>
+								</tr>
+							</thead>
+							<tbody>
+								<tr th:each="unitNew : ${unitNew}">
+									<th th:text="${unitNew.contractUnitMonth}"></th>
+									<th th:text="${unitNew.contractUnitOneyear}"></th>
+									<th th:text="${unitNew.contractUnitTwoyear}"></th>
+								</tr>
+							</tbody>
+						</table>
+						<div>
+							<br /> <br />
+							<button class="btn btn-secondary btn-sm" type="button"
+								    onclick="location.href='unitList.html'">계약단가표 조회</button>
+							<span style="float: right;">
+								<button class="btn btn-secondary btn-sm" type="button"
+									  	onclick="location.href='unitInsert.html' ">계약단가표 등록</button>
+							</span>
+						</div>
+					</div>
+				</div>
+				<div class="col-sm-12 col-md-12 col-lg-6 col-xl-6 tm-block-col">
+					<div class="tm-bg-primary-dark tm-block-con">
+						<h2 class="tm-block-title">년 계약건 수</h2>
+						<canvas id="contractChart" style="max-width: 500px;"></canvas>
+					</div>
+				</div>
+				<div class="col-12 tm-block-col">
+					<h2 class="tm-block-title">계약 내용</h2>
+					<div class="tm-bg-primary-dark tm-block-middle tm-block-taller tm-block-scroll">
+						<button class="btn btn-primary" type="button" style="float: right;" 
+						 	 	onclick="location.href='contractList' ">상세보기</button>
+						<br /><br /><br />
+						<table class="table">
+							<thead>
+								<tr>
+									<th scope="col">계약자</th>
+									<th scope="col">서비스 시작일자</th>
+									<th scope="col">서비스 종료일자</th>
+									<th scope="col">계약상태</th>
+									<th scope="col">계약금액</th>
+								</tr>
+							</thead>
+							<tbody>
+								<tr th:each="clist : ${contractList}">
+									<td th:text="${clist.memberId}"></td>
+									<td th:text="${clist.contractStart}"></td>
+									<td th:text="${clist.contractFinish}"></td>
+									<td th:text="${clist.contractManagementState}"><div
+											class="tm-status-circle moving"></div></td>
+									<td th:text="${clist.contractPay}"></td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+			</div>
+		</div>
+</th:block>
+</th:block>
+<th:block layout:fragment="customScript">
+	<script>
+		/* 차트에 필요한 값 설정 */
+		//2030년 까지는 값을 받으면 정상적으로 처리된다.
+		var a 		= [[${contract2016}]]
+		var b 		= [[${contract2017}]]
+		var c 		= [[${contract2018}]]
+		var d 		= [[${contract2019}]]
+		var e 		= [[${contract2020}]]
+		//console.log(2016);
+		var ctx = document.getElementById("contractChart").getContext('2d');
+		var contractChart = new Chart(ctx, {
+		  type: 'bar',
+		  data: {
+		    labels: [2016, 2017, 2018, 2019, 2020],
+		    datasets: [{
+		      label: '계약건수',
+		      data: [a, b, c, d, e],
+	          backgroundColor: 'rgb(245, 166, 35)',
+	          borderColor: 'rgb(245, 166, 35)',
+		      borderWidth: 1
+		    }]
+		  },
+	      options: {
+	    	legend: {
+	             labels: {
+	                  fontColor: 'white' // label color
+	                 }
+	              },
+		    scales: {
+		    	// y축
+		        yAxes: [{
+		            ticks: {
+		                fontColor:'white' // y축 폰트 color
+		            }
+		     	}],
+		     	// x축
+		     	xAxes: [{
+		            ticks: {
+		            	
+		                fontColor:'white' // x축 폰트 color
+		            }
+		     	}]
+		    }
+	      }
+		});
+	</script>
+</th:block>
+</html>

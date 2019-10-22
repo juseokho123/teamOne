@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{layout/default}">
+<th:block layout:fragment="customTitle">
+</th:block>
+<th:block layout:fragment="customContents">
+ <body>
+  <div class="main-height">
+		<!-- MAIN CONTENT -->
+		<div class="main-content">
+			<div class="container">
+				<div class="row">
+					<div class="col">
+						<p class="text-white mt-5 mb-5">
+							<b>매장관리 >상세보기 및 검색 </b>
+						</p>
+					</div>
+				</div>
+				<div class="tm-bg-primary-dark tm-block tm-block-h-auto-copy">
+						<form action="shopSearchList" class="tm-search-form row" method="post">
+							<div class="form-group col-3">
+								<select class="custom-select-sj">
+									<option selected="selected">매장등록일자</option>
+								</select>
+							</div>
+							<div class="form-group col-3">
+								<input id="beginDate" name="beginDate" 
+									   type="text" class="form-control validate"/>
+							</div>
+							<div class="form-group col-1 text-center">
+								<h2 class="tm-site-title mb-0">~</h2>
+							</div>
+							<div class="form-group col-3">
+								<input id="endDate" name="endDate" 
+									   type="text" class="form-control validate"/>
+							</div>
+							<div class="form-group col-2">
+							</div>
+							
+							<div class="form-group col-3">
+								
+								<select class="custom-select-sj" >
+									<option selected="selected">매장명</option>					
+								</select>
+							</div>
+							
+							
+							<div class="form-group col-7">
+								
+								<input id="searchInput" name="searchValue" type="text" placeholder="검색 할 매장을 입력해주세요" class="form-control validate" />
+							</div>
+							<div class="form-group col-2">
+								
+								<button type="submit"  class="btn btn-primary btn-block">
+									검색
+								</button>
+							</div>
+						</form>
+					</div>
+			
+				<br/><br/><br/>
+				<!-- row -->
+				<div class="row tm-content-row ">
+					<div class="col-12 tm-block-col">
+						<div class="tm-bg-primary-dark tm-block-big tm-block-scroll table-responsive">
+
+							<table class="table">
+								<thead>
+									<tr>
+										<th scope="col">점주 아이디</th>
+										<th scope="col">매장명</th>
+										<th scope="col">매장 전화번호</th>
+										<th scope="col">매장 주소</th>
+										<th scope="col">매장 등록일자</th>
+										<th scope="col" style="width: 8%" class="text-center" >수정</th>
+										<th scope="col" style="width: 8%" class="text-center" th:if="${session.SLEVEL eq '관리자'}">삭제</th>
+									</tr>
+								</thead>
+								<tbody>
+								<!-- 삭제 가능 -->
+									<tr th:each="syeslist : ${shopListYes}">
+										<td th:text="${syeslist.memberId}"></td>
+										<td th:text="${syeslist.shopName}"></td>
+										<td th:text="${syeslist.shopPhone}"></td>
+										<td th:text="${syeslist.shopAddress}"></td>
+										<td th:text="${syeslist.shopDate}"></td>
+										<td class="text-center"><a
+											th:href="@{/shopUpdate(shopCode=${syeslist.shopCode})}"
+											class="tm-product-delete-link"> <i
+												class="fas fa-check tm-product-check-icon"
+												style="color: white"></i>
+										</a></td>
+										<td class="text-center"><a
+											th:if="${session.SLEVEL eq '관리자'}"
+											th:href="@{#}"
+											class="tm-product-delete-link"> <i
+												class="far fa-trash-alt tm-product-delete-icon"></i>
+										</a></td>
+									</tr>
+									<!-- 삭제 불가능  -->
+									<tr th:each="snolist : ${shopListNo}">
+										<td th:text="${snolist.memberId}"></td>
+										<td th:text="${snolist.shopName}"></td>
+										<td th:text="${snolist.shopPhone}"></td>
+										<td th:text="${snolist.shopAddress}"></td>
+										<td th:text="${snolist.shopDate}"></td>
+										<td class="text-center"><a
+											th:href="@{/shopUpdate(shopCode=${snolist.shopCode})}"
+											class="tm-product-delete-link"> <i
+												class="fas fa-check tm-product-check-icon"
+												style="color: white"></i>
+										</a></td>
+										
+										<!--삭제 할 수 없는 데이터 클릭시 모달  -->
+										<td class="text-center"><a
+											th:if="${session.SLEVEL eq '관리자'}"
+											href="#myModal"
+											class="tm-product-delete-link"
+											data-toggle="modal"> <i
+												class="far fa-trash-alt tm-product-delete-icon"
+												style="color: black"></i>
+										</a></td>
+									</tr>
+								</tbody>		
+								<th:block th:if="${alert} neq null">
+										<tr class="text-center">
+											<td colspan="7" th:text="${alert}"></td>
+										</tr>
+								</th:block>								
+							</table>
+							
+						</div>
+					</div>			
+				</div>
+       				<button type="button" id="insertBtn"
+       				  		th:if="${session.SLEVEL eq '관리자'  or session.SLEVEL eq '점주'}"
+					 		onclick="location.href='shop'" style="float: right"
+							class="btn btn-primary text-uppercase">매장관리돌아가기</button>
+
+			</div>
+			<br/><br/><br/>
+			<!-- 모달 -->
+				<div class="modal fade" id="myModal">
+					<div class="modal-dialog">
+						<div class="modal-content">
+				      
+						<!-- Modal Header -->
+						<div class="modal-header">
+							<h4 class="modal-title">알림</h4>
+							<button type="button" class="close" data-dismiss="modal">&times;</button>
+						</div>
+				        
+						<!-- Modal body -->
+						<div class="modal-body">
+							계약 중인 매장은 삭제할 수 없습니다
+						</div>				        
+						</div>
+					</div>
+				</div>
+		</div>
+	</div>
+</body>
+</th:block>
+</th:block>
+<th:block layout:fragment="customScript">
+
+<script type="text/javascript">
+$(function() {
+	$(".tm-product-name").on("click", function() {
+		window.location.href = "#";
+	});
+});
+//시작 일자 텍스트상자 클릭시 달력 표기 
+$('#beginDate').datepicker({
+});
+$('#beginDate').datepicker('option','dateFormat','yy-mm-dd'); // 기존 dd/mm/yy에서 yy-mm-dd로 format 변경   
+
+//종료 일자 텍스트상자 클릭시 달력 표기 
+$('#endDate').datepicker({
+});
+$('#endDate').datepicker('option','dateFormat','yy-mm-dd'); // 기존 dd/mm/yy에서 yy-mm-dd로 format 변경 
+
+</script>
+
+
+
+	
+</th:block>
+</html>

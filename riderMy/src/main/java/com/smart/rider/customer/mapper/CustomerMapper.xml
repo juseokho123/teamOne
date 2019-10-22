@@ -1,0 +1,206 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.smart.rider.customer.mapper.CustomerMapper">
+
+	<!-- 대여고객리스트  -->
+	<select id="customerList" resultType="com.smart.rider.customer.dto.CustomerDTO">
+		SELECT 	 rental_customer_code 		AS rentalCustomerCode
+				,contract_shop_code 		AS contractShopCode
+				,goods_rental_code 			AS goodsRentalCode
+				,rental_customer_name 		AS rentalCustomerName
+				,rental_customer_address 	AS rentalCustomerAddress
+				,rental_customer_phone 		AS rentalCustomerPhone
+				,rental_customer_start 		AS rentalCustomerStart
+				,rental_customer_finish 	AS rentalCustomerFinish
+				,rental_customer_overdue 	AS rentalCustomerOverdue
+				,rental_customer_date 		AS rentalCustomerDate
+				,rental_customer_return 	AS rentalCustomerReturn
+		FROM 
+			rental_customer
+		<trim prefix="where" prefixOverrides="AND|OR">
+			<if test="contractShopCode neq null and contractShopCode neq ''.toString()">
+				AND contract_shop_code = #{contractShopCode}
+			</if>
+		</trim>
+		ORDER BY rental_customer_code DESC 
+		LIMIT #{startRow},#{rowPerPage}
+	</select>
+	
+	<!-- 대여고객 상세보기  -->
+	<select id="getCustomerList" parameterType="String" resultType="com.smart.rider.customer.dto.CustomerDTO">
+		SELECT 	 rental_customer_code 		AS rentalCustomerCode
+				,contract_shop_code 		AS contractShopCode
+				,goods_rental_code 			AS goodsRentalCode
+				,rental_customer_name 		AS rentalCustomerName
+				,rental_customer_address 	AS rentalCustomerAddress
+				,rental_customer_phone 		AS rentalCustomerPhone
+				,rental_customer_start 		AS rentalCustomerStart
+				,rental_customer_finish 	AS rentalCustomerFinish
+				,rental_customer_overdue 	AS rentalCustomerOverdue
+				,rental_customer_date 		AS rentalCustomerDate
+				,rental_customer_return 	AS rentalCustomerReturn
+		FROM 
+			rental_customer
+		WHERE
+			rental_customer_code = #{rentalCustomerCode}
+	</select>
+	
+	<!-- 19.10.02페이지작업위한작성  -->
+	<select id="getCustomerAllCount" resultType="int">
+		SELECT
+			COUNT(*)
+		FROM rental_customer
+		<trim prefix="where" prefixOverrides="AND|OR">
+			<if test="contractShopCode neq null and contractShopCode neq ''.toString()">
+				AND contract_shop_code = #{contractShopCode}
+			</if>
+		</trim>
+	</select>
+	
+	<!-- 코드 자동증가 -->
+	<select id="customerCodeCount" resultType="String">
+		SELECT 
+			MAX(LPAD(RIGHT(rental_customer_code, 4)+1, '4' , '0')) 
+		FROM rental_customer;
+	</select>
+	
+	<!-- 대여고객 등록  -->
+	<insert id="customerInsert" parameterType="com.smart.rider.customer.dto.CustomerDTO">
+		INSERT INTO rental_customer(
+			 rental_customer_code
+			,contract_shop_code
+			,goods_rental_code
+			,rental_customer_name
+			,rental_customer_address
+			,rental_customer_phone
+			,rental_customer_start
+			,rental_customer_finish
+			,rental_customer_overdue
+			,rental_customer_date
+			,rental_customer_return
+		)VALUES (
+			 #{rentalCustomerCode}
+			,#{contractShopCode}
+			,#{goodsRentalCode}
+			,#{rentalCustomerName}
+			,#{rentalCustomerAddress}
+			,#{rentalCustomerPhone}
+			,#{rentalCustomerStart}
+			,#{rentalCustomerFinish}
+			,'무'
+			,CURDATE()
+			,0)
+	</insert>
+	
+	<!-- 대여고객수정  -->
+	<update id="customerUpdate" parameterType="com.smart.rider.customer.dto.CustomerDTO">
+		UPDATE rental_customer
+			<trim prefix="SET" suffixOverrides=",">
+				<if test="rentalCustomerName neq null and rentalCustomerName neq ''.toString()">
+					rental_customer_name = #{rentalCustomerName},
+				</if>
+				<if test="rentalCustomerAddress neq null and rentalCustomerAddress neq ''.toString()">
+					rental_customer_address = #{rentalCustomerAddress},
+				</if>
+				<if test="rentalCustomerPhone neq null and rentalCustomerPhone neq ''.toString()">
+					rental_customer_phone = #{rentalCustomerPhone},
+				</if>
+				<if test="rentalCustomerStart neq null and rentalCustomerStart neq ''.toString()">
+					rental_customer_start = #{rentalCustomerStart},
+				</if>
+				<if test="rentalCustomerFinish neq null and rentalCustomerFinish neq ''.toString()">
+					rental_customer_finish = #{rentalCustomerFinish},
+				</if>
+				<if test="rentalCustomerOverdue neq null and rentalCustomerOverdue neq ''.toString()">
+					rental_customer_overdue = #{rentalCustomerOverdue},
+				</if>
+				<if test="rentalCustomerReturn neq null and rentalCustomerReturn neq ''.toString()">
+					rental_customer_return = #{rentalCustomerReturn},
+				</if>
+			</trim>
+		WHERE
+			rental_customer_code = #{rentalCustomerCode} 
+	</update>
+	
+	<!-- 대여고객리스트에서 반납버튼클릭 반납처리  -->
+	<update id="returnButton" parameterType="com.smart.rider.customer.dto.CustomerDTO">
+		UPDATE rental_customer
+		SET
+			rental_customer_return  = CURDATE(),
+			rental_customer_overdue = IF(CURDATE()<![CDATA[ <= ]]>rental_customer_finish, '무', '유')
+		WHERE 
+			rental_customer_code = #{rentalCustomerCode}
+	</update>
+	
+	<!-- 대여고객검색결과 카운팅 -->
+	<select id="getSearchAllCount" resultType="int">
+		SELECT
+			COUNT(*)
+		FROM rental_customer
+		<trim prefix="where" prefixOverrides="AND|OR">
+			<if test="returnNo neq null and returnNo neq ''.toString()">
+				AND rental_customer_return = #{returnNo}
+			</if>
+			<if test="overdueYes neq null and overdueYes neq ''.toString()">
+				AND rental_customer_overdue = #{overdueYes}
+			</if>
+			<if test="searchInput neq null and searchInput neq ''.toString()">
+				AND ${select} Like CONCAT('%',#{searchInput},'%')
+			</if>
+			<if test="beginDate neq ''.toString() and endDate neq ''.toString()">
+				AND ${selectDate} between #{beginDate} and #{endDate}
+			</if>
+			<if test="beginDate eq ''.toString() and endDate neq ''.toString()">
+				AND ${selectDate} between '2000-01-01' and #{endDate}
+			</if>
+			<if test="beginDate neq ''.toString() and endDate eq ''.toString()">
+				AND ${selectDate} between #{beginDate} and NOW()
+			</if>
+			<if test="contractShopCode neq null and contractShopCode neq ''.toString()">
+				AND contract_shop_code = #{contractShopCode}
+			</if>
+		</trim>
+	</select>
+	
+	<!-- 대여고객검색  -->
+	<select id="searchCustomer" parameterType="String" resultType="com.smart.rider.customer.dto.CustomerDTO">
+		SELECT 	 rental_customer_code 		AS rentalCustomerCode
+				,contract_shop_code 		AS contractShopCode
+				,goods_rental_code 			AS goodsRentalCode
+				,rental_customer_name 		AS rentalCustomerName
+				,rental_customer_address 	AS rentalCustomerAddress
+				,rental_customer_phone 		AS rentalCustomerPhone
+				,rental_customer_start 		AS rentalCustomerStart
+				,rental_customer_finish 	AS rentalCustomerFinish
+				,rental_customer_overdue 	AS rentalCustomerOverdue
+				,rental_customer_date 		AS rentalCustomerDate
+				,rental_customer_return 	AS rentalCustomerReturn
+		FROM 
+			rental_customer
+		<trim prefix="where" prefixOverrides="AND|OR">
+			<if test="returnNo neq null and returnNo neq ''.toString()">
+				AND rental_customer_return = #{returnNo}
+			</if>
+			<if test="overdueYes neq null and overdueYes neq ''.toString()">
+				AND rental_customer_overdue = #{overdueYes}
+			</if>
+			<if test="searchInput neq null and searchInput neq ''.toString()">
+				AND ${select} Like CONCAT('%',#{searchInput},'%')
+			</if>
+			<if test="beginDate neq ''.toString() and endDate neq ''.toString()">
+				AND ${selectDate} between #{beginDate} and #{endDate}
+			</if>
+			<if test="beginDate eq ''.toString() and endDate neq ''.toString()">
+				AND ${selectDate} between '2000-01-01' and #{endDate}
+			</if>
+			<if test="beginDate neq ''.toString() and endDate eq ''.toString()">
+				AND ${selectDate} between #{beginDate} and NOW()
+			</if>
+			<if test="contractShopCode neq null and contractShopCode neq ''.toString()">
+				AND contract_shop_code = #{contractShopCode}
+			</if>
+		</trim>
+		ORDER BY rental_customer_code DESC 
+		LIMIT #{startRow},#{rowPerPage}
+	</select>
+</mapper>

@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{layout/default}">
+<th:block layout:fragment="customTitle">
+</th:block>
+<th:block layout:fragment="customContents">
+<div class="main-height">
+	<div class="container mt-5">
+		<div class="row tm-content-row">
+			<div class="col-xl mx-auto tm-block-col tm-col-account-settings">
+				<div class="tm-bg-primary-dark tm-block tm-block-settings">
+					<h2 class="tm-block-title">대여고객 등록</h2>
+					
+					<form action="/customerInsert" class="tm-signup-form row" method="post">
+						<input type="hidden" id="contractShopCode" name="contractShopCode" th:value="${session.SCODE}">
+						<div class="form-group input-group col-lg-12">
+							<input id="goodsRentalCode" name="goodsRentalCode" type="text" class="form-control bg-light text-dark" placeholder="대여상품입력" required="required"/>
+							<div class="input-group-append">
+								<button class="btn btn-primary btn-block text-uppercase" type="button" id="rentalButton"
+										onclick="window.open('/rentalGoodsList','대여상품','left='+(screen.availWidth-550)/4+',top='+(screen.availHeight-430)/28+',width=1050,height=770,location=no,status=no,scrollbars=yes')">
+									검색
+								</button>
+							</div>
+						</div>
+						<div class="form-group col-lg-6">
+							<label for="name">고객 이름</label>
+							<input id="rentalCustomerName" name="rentalCustomerName" type="text" class="form-control validate" required="required"/>
+						</div>
+						<div class="form-group col-lg-6">
+							<label for="address">주소</label>
+							<input id="rentalCustomerAddress" name="rentalCustomerAddress" type="text" class="form-control validate" />
+						</div>
+						<div class="form-group col-lg-6">
+							<label for="rentalStart">대여시작일자</label>
+							<input id="rentalCustomerStart" name="rentalCustomerStart" type="date" class="form-control validate" required="required"/>
+						</div>
+						<div class="form-group col-lg-6">
+							<label for="phone">전화번호('-' 없이 번호만 입력해주세요)</label>
+							<input id="rentalCustomerPhone" name="rentalCustomerPhone" type="text" class="form-control validate" />
+						</div>
+						<div class="form-group col-lg-6">
+							<label for="rentalFinish">대여종료일자</label>
+							<input id="rentalCustomerFinish" name="rentalCustomerFinish" type="date" class="form-control validate" required="required"/>
+						</div>
+						<div class="form-group col-lg-6">
+							<label>&nbsp;</label>
+							<button type="submit" class="btn btn-primary btn-block text-uppercase">
+								대여고객 등록
+							</button>
+						</div>
+					</form>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+</th:block>
+<th:block layout:fragment="customScript">
+</th:block>
+</html>

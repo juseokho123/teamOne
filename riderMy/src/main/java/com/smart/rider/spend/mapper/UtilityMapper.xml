@@ -1,0 +1,171 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.smart.rider.spend.mapper.UtilityMapper">
+
+	<!-- 계약된 매장 정보 불러오기 SsrHapDTO resultMap -->
+	<resultMap type="com.smart.rider.shop.dto.SsrHapDTO" id="shopMap">
+		<result column="shop_code"			property="shopCode"/>
+		<result column="contract_shop_code"	property="contractShopCode"/>
+		<result column="member_id"			property="memberId"/>
+		<result column="shop_name"			property="shopName"/>
+	</resultMap>
+	
+	<!-- JoinUtilityDTO resultMap -->
+	<resultMap type="com.smart.rider.spend.dto.JoinUtilityDTO" id="joinUtilityMap">
+    	<result column="spend_utility_code"     property="spendUtilityCode"/>
+    	<result column="contract_shop_code"     property="contractShopCode"/>
+    	<result column="subject_code"     		property="subjectCode"/>
+    	<result column="spend_utility_pay"     	property="spendUtilityPay"/>
+    	<result column="spend_utility_contents" property="spendUtilityContents"/>
+    	<result column="spend_utility_date"     property="spendUtilityDate"/>
+    	<result column="subject_number"	 		property="subjectNumber"/>
+    	<result column="subject_name"     		property="subjectName"/>
+    	<result column="shop_code"     			property="shopCode"/>
+    	<result column="member_id"         		property="memberId"/>
+	</resultMap>
+	
+	<!-- SubjectDTO resultMap -->
+	<resultMap type="com.smart.rider.subject.dto.SubjectDTO" id="subjectMap">
+		<result column="subject_code" 	property="subjectCode"/>
+		<result column="member_id" 		property="memberId"/>
+		<result column="subject_number" property="subjectNumber"/>
+		<result column="subject_name" 	property="subjectName"/>
+		<result column="subject_date" 	property="subjectDate"/>
+	</resultMap>
+	
+	<!-- 190926 재욱, 관리자 권한으로 계약된 매장 내역 -->
+	<select id="utilityShop" resultMap="shopMap">
+		SELECT 
+			 s.shop_code
+			,s.shop_name
+			,sr.contract_shop_code
+			,sr.member_id
+		FROM shop s, shop_relation sr
+		WHERE s.shop_code = sr.shop_code
+	</select>
+	
+	<!-- 190926 재욱, 지출_공과금 등록 내역 수정 프로세스 -->
+	<update id="utilityUpdate" parameterType="com.smart.rider.spend.dto.UtilityDTO">
+		UPDATE spend_utility 
+			SET
+			  spend_utility_pay=#{spendUtilityPay}
+			, spend_utility_contents=#{spendUtilityContents}
+		WHERE spend_utility_code = #{spendUtilityCode};
+	</update>
+	
+	<!-- 190926 재욱, 지출_공과금 등록 내역 삭제 프로세스 -->
+	<delete id="utilityDelete" parameterType="String">
+		DELETE FROM spend_utility WHERE spend_utility_code= #{spendUtilityCode}; 
+	</delete>
+	
+	<!-- 지출_공과금 등록 내역 상세보기 -->
+	<select id="utilityDetails" parameterType="String" resultMap="joinUtilityMap">
+		SELECT 
+			 su.spend_utility_code
+			,su.contract_shop_code
+			,su.subject_code
+			,su.contract_shop_code
+			,su.spend_utility_pay
+			,su.spend_utility_contents
+			,su.spend_utility_date
+			,sub.subject_name
+		FROM spend_utility su, subject sub
+		WHERE su.subject_code = sub.subject_code AND spend_utility_code = #{spendUtilityCode}; 
+	</select>
+	
+	<!-- 지출_공과금 코드 카운트 -->
+	<select id="utilityCodeCount" resultType="String">
+		SELECT 
+			MAX(LPAD(RIGHT(spend_utility_code, 4)+1, '4' , '0')) 
+		FROM spend_utility;
+	</select>
+	
+	<!-- 지출_공과금 등록 -->
+	<insert id="utilityInsert" parameterType="com.smart.rider.spend.dto.UtilityDTO">
+		INSERT INTO spend_utility(
+			 spend_utility_code
+			,subject_code
+			,contract_shop_code
+			,spend_utility_pay
+			,spend_utility_contents
+			,spend_utility_date)
+		VALUES (
+			 #{spendUtilityCode}
+			,#{subjectCode}
+			,#{contractShopCode}
+			,#{spendUtilityPay}
+			,#{spendUtilityContents}
+			,NOW())
+	</insert>
+	
+	<!-- 지출_공과금 등록 계정과목 selectBox -->
+	<select id="subjectSelectBox" resultMap="subjectMap">
+		SELECT 
+			 subject_code
+			,member_id
+			,subject_number
+			,subject_name
+			,subject_date
+		FROM subject
+		
+	</select>
+	
+	<!-- 지출_공과금 등록 내역 페이징 AllCount -->
+	<select id="utilityAllCount" resultType="int" parameterType="String">
+		SELECT 
+			 COUNT(*)
+		FROM spend_utility su, subject sub
+		WHERE su.subject_code = sub.subject_code AND contract_shop_code = #{contractShopCode}
+		ORDER BY spend_utility_date DESC;
+	</select>
+	
+	<!-- 지출_공과금 검색 내역 페이징 Count -->
+	<select id="utilitySearchCount" resultType="int" parameterType="java.util.Map">
+		SELECT 
+			 COUNT(*)
+		FROM spend_utility su, subject sub
+		WHERE su.subject_code = sub.subject_code AND contract_shop_code = #{contractShopCode}
+		ORDER BY spend_utility_date DESC;
+		
+	</select>
+	
+	<!-- 지출_공과금 최근 등록 목록 -->
+	<select id="utilityList" resultMap="joinUtilityMap" parameterType="java.util.Map">
+		SELECT 
+			 su.spend_utility_code
+			,su.subject_code
+			,su.contract_shop_code
+			,su.spend_utility_pay
+			,su.spend_utility_contents
+			,su.spend_utility_date
+			,sub.subject_name
+		FROM spend_utility su, subject sub
+		WHERE su.subject_code = sub.subject_code AND su.contract_shop_code = #{contractShopCode} 
+        
+        <!-- 지출_공과금 검색 조건문 -->
+        <if test="utilityKey neq null and utilityValue neq ''.toString()">
+            AND
+                sub.${utilityKey} LIKE CONCAT('%',#{utilityValue},'%')
+        </if>
+        <if test="beginDate neq ''.toString() and endDate eq ''.toString()">
+        	AND 
+        		su.spend_utility_date between #{beginDate} and NOW()		
+        </if>
+        <if test="beginDate eq ''.toString() and endDate neq ''.toString()">
+        	AND 
+        		su.spend_utility_date  between '2000-01-01' and #{endDate}
+        </if>
+        <if test="beginDate neq ''.toString() and endDate neq ''.toString()">
+        	AND 
+        		su.spend_utility_date  between #{beginDate} and #{endDate}
+        </if>
+        
+		ORDER BY su.spend_utility_date DESC
+		
+        <!-- 다른 메서드 호출시 반영되지 않기위해 걸어놓은 조건문 -->
+        <if test="startRow neq lastPage"> 
+            LIMIT #{startRow},#{rowPerPage};
+        </if>
+        
+	</select>
+</mapper>

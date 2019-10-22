@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{layout/default}">
+<th:block layout:fragment="customTitle">
+</th:block>
+<th:block layout:fragment="customContents">
+	
+	<div class="container tm-mt-big tm-mb-big">
+		<div class="row">
+			<div class="col-xl-9 col-lg-10 col-md-12 col-sm-12 mx-auto">
+				<div class="tm-bg-primary-dark tm-block tm-block-h-auto">
+					<div class="row">
+						<div class="col-12">
+						 <h2 class="tm-block-title d-inline-block">POS 등록</h2>
+						</div>
+					</div>
+	            	
+            		<div class="row tm-edit-product-row">
+              			<div  class="col-xl-12 col-lg-6 col-md-12" style="float:right;">
+                			<form action="/posInsert" class="tm-edit-product-form" method="post">
+                				<input type="hidden" id=SID name=SID  th:value= "${session.SID} ">
+				                  <div class="form-group mb-3">
+				                    <label
+				                      for="name"
+				                      style="float:right;"
+				                      >POS 이름
+				                    </label>
+				                    <input
+				                    	id="posName"
+				                      name="posName"
+				                      type="text"
+				                      placeholder="POS이름을 입력해주세요"
+				                      class="form-control validate"
+				                      required
+				                    />
+				                  </div>
+				                   <div class="form-group mb-3">
+				                    <label
+				           
+				                      for="name"
+				                      style="float:right;"
+				                      >POS 번호
+				                    </label>
+				                    <input
+				                      id="posNumber"
+				                      name="posNumber"
+				                      type="text"
+				                      placeholder="POS번호를 입력해주세요"
+				                      class="form-control validate"
+				                      required
+				                    />
+				                  </div>
+				                    <div class="form-group mb-3">
+				                    <label
+				                      for="name"
+				                      style="float:right;"
+				                      >매장이름 선택 
+				                    </label>
+				                    <!-- required : 입력란 설정  -->
+				                   	<select class="custom-select-sj tm-select-accounts" id="contractShopCode" name="contractShopCode">
+				                   		<option th:each="ssrlist : ${ssrHapList}"
+				                   		th:text="${ssrlist.shopName}"
+				                   		th:value="${ssrlist.contractShopCode}"
+				                   		></option>
+				                   	</select>
+				                   	
+				                  </div>
+				                  <br/>
+				                   <div class="form-group mb-3">
+				                    <label
+				                      for="name"
+				                      style="float:right;"
+				                      >사용여부
+				                    </label>
+				                    <!-- required : 입력란 설정  -->
+				                   	<select class="custom-select tm-select-accounts" id="posUse" name="posUse">
+				                   		<option selected>선택해주세요</option>
+				                   		<option value="사용">사용</option>
+				                   		<option value="사용 안함">사용 안함</option>
+				                   	</select>
+				                   	
+				                  </div>
+                  					<br/>
+					         		<div style="float:right;">
+					              		<div class="col-12">
+					               		 <button type="submit" class="btn btn-primary btn-block text-uppercase">POS 등록</button>
+					              		</div>
+					              </div>
+            				</form>
+            			</div>
+          			</div>
+        		</div>
+      		</div>
+    	</div>
+	</div>	
+</th:block>
+<th:block layout:fragment="customScript">
+</th:block>
+</html>

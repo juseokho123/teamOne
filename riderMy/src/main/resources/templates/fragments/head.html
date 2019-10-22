@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+
+<!-- head부분 -->
+<head th:fragment="headFrament">
+	<meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title> SMART RIDER </title>
+    
+    <!-- https://fonts.google.com/specimen/Roboto -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:400,700">
+    
+    <!-- https://fontawesome.com/ -->
+    <link rel="stylesheet" href="resources/css/fontawesome.min.css">
+    
+    <!-- https://getbootstrap.com/ -->
+    <link rel="stylesheet" href="resources/css/bootstrap.min.css">
+    
+    <!--Product Admin CSS Template https://templatemo.com/tm-524-product-admin -->
+    <link rel="stylesheet" href="resources/css/templatemo-style.css">
+    
+    <!--19.09.24 재욱 추가 jqueryUi date picker -->
+    <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+
+	<script src="resources/js/jquery-3.3.1.min.js"></script>
+	<!-- https://jquery.com/download/ -->
+	<script src="resources/js/moment.min.js"></script>
+	<!-- https://momentjs.com/ -->
+    <script src="resources/js/Chart.min.js"></script>
+    <!-- http://www.chartjs.org/docs/latest/ -->
+    <script src="resources/js/bootstrap.min.js"></script>
+    <!-- https://getbootstrap.com/ -->
+    <script src="resources/js/tooplate-scripts.js"></script>
+    
+    <!-- 19.09.16 건영 추가 -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <!-- 19.09.23 재욱 추가, charts.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@2.8.0"></script>
+    
+    <!-- 19.09.24 재욱 추가 jqueryUi date picker -->
+	<script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+	<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+	
+	<!--19.09.24 재욱 추가 bootstrapcdn -->
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/js/bootstrap.min.js"></script>
+	
+	<!--191002 재욱, 관리자 일때 헤더 색 변경 -->
+	<style type="text/css" th:if="${session.SLEVEL eq '관리자'}"> 
+		.navbar {
+			height: 100px;
+		  	background-color: #f5a623;
+		  	padding: 0;
+		}
+		
+		.navbar-nav a:hover,
+		.navbar-nav a:hover i {
+  			color: #ffffff;
+		}
+	</style>
+	
+</head>
+
+
+	<!-- 사용자 css -->
+	<th:block layout:fragment="customCss"></th:block>
+	
+	<!-- 사용자 title -->
+	<th:block layout:fragment="customTitle"></th:block>
+	
+</head>
+<body id="reportsPage">
+
+</body>
+</html>

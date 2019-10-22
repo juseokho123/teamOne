@@ -1,0 +1,213 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+	PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- namespace가 인터페이스와 일치해야 연결된다 -->
+<mapper namespace="com.smart.rider.contract.mapper.ContractMapper">
+
+	<!--계약단가표 최신조회 -->
+	<select id="unitNew" resultType="com.smart.rider.contract.dto.UnitDTO">
+		SELECT 
+			 contract_unit_code 	AS contractUnitCode
+			,member_id 				AS memberId
+			,contract_unit_month 	AS contractUnitMonth
+			,contract_unit_oneyear 	AS contractUnitOneyear
+			,contract_unit_twoyear 	AS contractUnitTwoyear
+			,contract_unit_date 	AS contractUnitDate
+ 		FROM contract_unit ORDER by contract_unit_date DESC LIMIT 1 
+	</select>
+	
+	<!-- 계약 관리 -->
+	<select id="contractList" resultType="com.smart.rider.contract.dto.ContractDTO">
+		SELECT 
+			 contract_code 			AS contractCode
+			,contract_unit_code 	AS contractUnitCode
+			,member_id 				AS memberId
+			,contract_start 		AS contractStart
+			,contract_finish 		AS contractFinish
+			,contract_valid_date 	AS contractValidDate
+			,contract_pay 			AS contractPay
+			,contract_method		AS contractMethod
+			,contract_information 	AS contractInformation
+			,contract_date 			AS contractDate
+ 		FROM contract
+	</select>
+
+	<!--  계약금 납부 관리  검색-->
+	<select id="contractSearchList" parameterType="com.smart.rider.main.dto.SearchDTO" resultType="com.smart.rider.contract.dto.ContractDTO">
+		SELECT 
+			 contract_code 			AS contractCode
+			,contract_unit_code 	AS contractUnitCode
+			,member_id 				AS memberId
+			,contract_start 		AS contractStart
+			,contract_finish 		AS contractFinish
+			,contract_valid_date 	AS contractValidDate
+			,contract_pay 			AS contractPay
+			,contract_method 		AS contractMethod
+			,contract_information 	AS contractInformation
+			,contract_date 			AS contractDate
+ 		FROM contract
+ 		<where>
+			<if test="searchKey neq null and searchKey neq ''.toString()">
+	            AND
+	                contract_method LIKE CONCAT('%',#{searchKey},'%')
+	        </if>
+	       	<if test="searchValue neq null and searchValue neq ''.toString()">
+	            AND
+	                member_id LIKE CONCAT('%',#{searchValue},'%')
+	        </if>
+	        <if test="beginDate neq ''.toString() and endDate eq ''.toString()">
+	        	AND 
+	        		contract_date between #{beginDate} and NOW()		
+	        </if>
+	        <if test="beginDate eq ''.toString() and endDate neq ''.toString()">
+	        	AND 
+	        		contract_date between '1990-01-01' and #{endDate}
+	        </if>
+	        <if test="beginDate neq ''.toString() and endDate neq ''.toString()">
+	        	AND 
+	        		contract_date between #{beginDate} and #{endDate}
+	        </if>	
+        </where>
+	</select>
+
+	<!-- 계약코드 자동증가 -->
+	<select id="contractCodeMax" resultType="String">
+		SELECT 
+			MAX(LPAD(RIGHT(contract_code, 4)+1, '4' , '0')) 
+		FROM contract;
+	</select>
+		
+	<insert id="contractInsert" parameterType="com.smart.rider.contract.dto.ContractDTO">
+		INSERT INTO contract(	 
+				contract_code
+				,contract_unit_code
+				,member_id
+				,contract_start
+				,contract_finish
+				,contract_valid_date
+				,contract_method
+				,contract_pay
+				,contract_information
+				,contract_date)
+		VALUES ( 				
+				 #{contractCode}
+				,#{contractUnitCode}
+			 	,#{memberId}
+			 	,#{contractStart}
+		 	  	,#{contractFinish}
+		 	  	,#{contractValidDate}
+		 	  	,#{contractMethod}
+		 	  	,#{contractPay}
+		 	  	,#{contractInformation}
+		 	    ,NOW()) 	    
+	</insert>
+	
+	<!-- 계약 내용 -->
+	<select id="agreementList" parameterType="String" resultType="com.smart.rider.contract.dto.AgreementDTO">
+		SELECT 
+			 c.member_id 						AS memberId
+			,c.contract_code 					AS contractCode
+			,c.contract_start 					AS contractStart
+			,c.contract_finish 					AS contractFinish
+			,c.contract_valid_date 				AS contractValidDate
+			,m.member_id 						AS memberId
+			,m.member_phone 					AS memberPhone
+			,m.member_name 						AS memberName
+			,cm.contract_code 					AS contractCode
+			,cm.contract_management_amout 		AS contractManagementAmout
+			,cm.contract_management_unpaid 		AS contractManagementUnpaid
+			,cm.contract_management_state 		AS contractManagementState
+			,cm.contract_management_contents 	AS contractManagementContents
+		from contract c inner join member m INNER JOIN contract_management cm
+		ON c.member_id = m.member_id
+		and c.contract_code = cm.contract_code
+		<if test="memberLevel neq '관리자'.toString()">
+			WHERE 
+					c.member_id = #{memberId}
+		</if>
+	</select>
+	
+	<!-- 계약 내용 및 납부 현황 -->
+	<select id="getAgreementList" parameterType="String" resultType="com.smart.rider.contract.dto.AgreementDTO">
+		SELECT 
+			 c.member_id 						AS memberId
+			,c.contract_code					AS contractCode
+			,c.contract_start 					AS contractStart
+			,c.contract_finish 					AS contractFinish
+			,c.contract_valid_date	 			AS contractValidDate
+			,m.member_id 						AS memberId
+			,m.member_phone 					AS memberPhone
+			,m.member_name 						AS memberName
+			,cm.contract_code 					AS contractCode
+			,cm.contract_management_amout 		AS contractManagementAmout
+			,cm.contract_management_unpaid 		AS contractManagementUnpaid
+			,cm.contract_management_state 		AS contractManagementState
+			,cm.contract_management_contents 	AS contractManagementContents
+		from contract c inner join member m INNER JOIN contract_management cm
+		ON c.member_id = m.member_id
+		and c.contract_code = cm.contract_code
+		WHERE c.contract_code = #{agreementCode};
+	</select>
+	
+	<!-- 계약 내용 목록 보기-->
+	<select id="getAllList" resultType="com.smart.rider.contract.dto.AgreementDTO">
+			SELECT 
+				 c.member_id 						AS memberId
+				,c.contract_code					AS contractCode
+				,c.contract_start 					AS contractStart
+				,c.contract_finish 					AS contractFinish
+				,c.contract_valid_date	 			AS contractValidDate
+				,c.contract_pay 					AS contractPay
+				,m.member_id 						AS memberId
+				,m.member_phone 					AS memberPhone
+				,m.member_name 						AS memberName
+				,cm.contract_code 					AS contractCode
+				,cm.contract_management_amout 		AS contractManagementAmout
+				,cm.contract_management_unpaid 		AS contractManagementUnpaid
+				,cm.contract_management_state 		AS contractManagementState
+				,cm.contract_management_contents 	AS contractManagementContents
+			from contract c inner join member m INNER JOIN contract_management cm
+			ON c.member_id = m.member_id
+			and c.contract_code = cm.contract_code
+	</select>
+	
+	<!--특정 계약코드로 조회 -->
+	<select id="getContractList" parameterType="String" resultType="com.smart.rider.contract.dto.ContractDTO">
+		SELECT 
+			contract_code 			AS contractCode
+			,contract_unit_code 	AS contractUnitCode
+			,member_id 				AS memberId
+			,contract_start 		AS contractStart
+			,contract_finish 		AS contractFinish
+			,contract_valid_date 	AS contractValidDate
+			,contract_pay 			AS contractPay
+			,contract_method 		AS contractMethod
+			,contract_information 	AS contractInformation
+			,contract_date 			AS contractDate
+ 		FROM contract
+ 		Where contract_code = #{contratCode};
+	</select>
+	
+	<!--특정 계약코드로 조회 -->
+	<select id="getUnitList" parameterType="String" resultType="com.smart.rider.contract.dto.UnitDTO">
+		SELECT 
+			contract_unit_code 		AS contractUnitCode
+			,member_id 				AS memberId
+			,contract_unit_month 	AS contractUnitMonth
+			,contract_unit_oneyear 	AS contractUnitOneyear
+			,contract_unit_twoyear	AS contractUnitTwoyear
+			,contract_unit_date 	AS contractUnitDate
+ 		FROM contract_unit
+ 		Where contract_unit_code = #{contractUnitCode};
+	</select>
+	
+	<!-- 년도로 조회시 건수 조회 -->
+	<select id="contractYear" parameterType="String" resultType="int">
+		SELECT COUNT(*) AS contractCount
+		FROM contract 
+		WHERE LEFT(contract_Date,4)=#{year};
+	</select>
+</mapper>
+

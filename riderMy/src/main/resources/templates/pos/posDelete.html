@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{layout/default}">
+<th:block layout:fragment="customTitle">
+</th:block>
+<th:block layout:fragment="customContents">
+	<!-- MAIN -->
+	<div class="main">
+		<div class="container mt-6">
+			<div class="row tm-content-row">
+				<div class="col-sm-12 col-md-12 ">
+					<br/><br/><Br/>
+					<div class="tm-bg-primary-dark tm-block tm-block-products">
+					<h2 class="tm-block-title d-inline-block">POS 삭제</h2>
+					<form action="/posDelete" method="post">
+						<div class="tm-product-table-container" th:each="poslist : ${posDelete}" >
+						<br/><br/><br/>
+							<input type="hidden" name="posCode" th:value="${poslist.posCode}">
+							<input type="hidden" name="contractShopCode" th:value="${poslist.contractShopCode}">
+							<table class="table table-hover tm-table-small tm-product-table"  >	
+									
+								<thead>							
+									<tr>
+										<th scope="col">POS 이름</th>
+										<th th:text="${poslist.posName}"></th>
+									</tr>
+									<tr>
+										<th scope="col">POS 번호</th>
+										<th th:text="${poslist.posNumber}"></th>
+									</tr>								
+									
+									<tr>
+										<th scope="col">사용 유무</th>
+										<th th:text="${poslist.posUse}"></th>
+									</tr>
+									<tr>
+										<td>비밀번호입력</td>
+										<td>
+										<input class="text-lowercase mb-6" type="password" name="memberPw">
+										</td>
+									</tr>
+								</thead>					
+							</table>
+								<div>
+								<label class="alert alert-danger col-xl" th:if="${result ne null}" th:text="${result}"></label>
+								</div>
+											
+						</div>												
+						<!-- table container -->	
+
+							<button type="submit" class="btn btn-primary btn-block text-uppercase mb-3">
+											 삭제</button>			
+						
+						</form>
+						
+					</div>
+				</div>
+		
+			</div>
+		</div>
+
+	</div>
+	<!-- END MAIN -->
+	
+</th:block>
+</th:block>
+<th:block layout:fragment="customScript">
+</th:block>
+</html>
+
+

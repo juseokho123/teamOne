@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+	PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- namespace가 인터페이스와 일치해야 연결된다 -->
+<mapper namespace="com.smart.rider.contract.mapper.ManagementMapper">
+
+	<!-- 거래처 resultMap -->
+	<resultMap type="com.smart.rider.contract.dto.ContractManagementDTO" id="ContractManagementMap">
+		<result column="member_id" 						property="memberId"/>
+		<result column="contract_method" 				property="contractMethod"/>
+		<result column="contract_pay" 					property="contractPay"/>
+		<result column="contract_code" 					property="contractCode"/>
+		<result column="contract_management_code" 		property="contractManagementCode"/>
+		<result column="contract_management_amout" 		property="contractManagementAmout"/>
+		<result column="contract_management_unpaid" 	property="contractManagementUnpaid"/>
+		<result column="contract_management_state" 		property="contractManagementState"/>
+		<result column="contract_management_contents" 	property="contractManagementContents"/>
+		<result column="contract_management_date" 		property="contractManagementDate"/>
+	</resultMap> 
+
+
+	<!--  계약금 납부 관리 -->
+	<select id="managementList"	resultMap="ContractManagementMap">
+		SELECT 
+		contract.
+			 contract_code					
+			,member_id 						
+			,contract_method 				
+			,contract_pay 					
+		,contract_management.
+			 contract_code 					
+			,contract_management_code 		
+			,contract_management_amout 		
+			,contract_management_unpaid 	
+			,contract_management_state 		
+			,contract_management_contents 
+			,contract_management_date 		
+		from contract_management inner join contract
+		on contract_management.contract_code = contract.contract_code
+		ORDER BY contract.contract_code 
+		DESC LIMIT #{currentPage}, #{rowPerPage}	
+	</select>
+	
+	<!--  계약금 납부 관리  검색-->
+	<select id="managementSearchList" parameterType="com.smart.rider.main.dto.SearchDTO" resultMap="ContractManagementMap">
+		SELECT 
+		c.
+			 contract_code					
+			,member_id 						
+			,contract_method 				
+			,contract_pay 					
+		,cm.
+			 contract_code 					
+			,contract_management_code 		
+			,contract_management_amout 		
+			,contract_management_unpaid 	
+			,contract_management_state 		
+			,contract_management_contents 
+			,contract_management_date 		
+		from contract_management cm inner join contract c
+		on cm.contract_code = c.contract_code
+		<if test="searchKey neq null and searchKey neq ''.toString()">
+            AND
+                c.contract_method LIKE CONCAT('%',#{searchKey},'%')
+        </if>
+       	<if test="searchValue neq null and searchValue neq ''.toString()">
+            AND
+                c.member_id LIKE CONCAT('%',#{searchValue},'%')
+        </if>
+        <if test="beginDate neq ''.toString() and endDate eq ''.toString()">
+        	AND 
+        		cm.contract_management_date between #{beginDate} and NOW()		
+        </if>
+        <if test="beginDate eq ''.toString() and endDate neq ''.toString()">
+        	AND 
+        		cm.contract_management_date between '1990-01-01' and #{endDate}
+        </if>
+        <if test="beginDate neq ''.toString() and endDate neq ''.toString()">
+        	AND 
+        		cm.contract_management_date between #{beginDate} and #{endDate}
+        </if>	
+	</select>
+
+	<!-- 페이징 처리를 위한 전체행의 갯수 -->
+	<select id="selectManagementCount" resultType="int">
+		SELECT 
+			COUNT(*) 
+		FROM contract_management
+	</select>
+	
+	<!--계약금 코드 자동증가 -->
+	<select id="managementCodeMax" resultType="String">
+		SELECT 
+			MAX(LPAD(RIGHT(contract_management_code, 4)+1, '4' , '0')) 
+		FROM contract_management;
+	</select>
+	
+	<!--계약금  생성 -->
+	<insert id="managementInsert" parameterType="com.smart.rider.contract.dto.ManagementDTO">
+		INSERT INTO contract_management
+			( contract_management_code
+			 ,contract_code
+			 ,contract_management_amout
+			 ,contract_management_unpaid
+			 ,contract_management_state
+			 ,contract_management_contents
+			 ,contract_management_date)
+		VALUES ( 				
+			  #{contractManagementCode}
+			 ,#{contractCode}
+		 	 ,#{contractManagementAmout}
+		 	 ,#{contractManagementUnpaid}
+	 	  	 ,#{contractManagementState}
+	 	  	 ,#{contractManagementContents}
+	 	     ,NOW()
+	 	    )	 	    
+	</insert>
+	
+	<!-- 계약금 목록(계약코드 수정시 사용)  -->
+	<select id="managementUseList" resultType="com.smart.rider.contract.dto.ManagementDTO">
+		SELECT 
+			 contract_management_code 		AS contractManagementCode
+			,contract_management_amout 		AS contractManagementAmout
+			,contract_management_unpaid 	AS contractManagementUnpaid
+			,contract_management_state 		AS contractManagementState
+			,contract_management_contents 	AS contractManagementContents
+		FROM contract_management
+		WHERE contract_management_code = #{contractManagementCode}
+	</select>
+	
+	
+	<!-- 계약금 상세 조회 -->
+	<select id="getManagementList" parameterType="String"  resultType="com.smart.rider.contract.dto.ManagementDTO">
+		SELECT 
+			 contract_management_code 		AS contractManagementCode
+			,contract_management_amout 		AS contractManagementAmout
+			,contract_management_unpaid 	AS contractManagementUnpaid
+			,contract_management_state 		AS contractManagementState
+			,contract_management_contents 	AS contractManagementContents
+		FROM contract_management
+		WHERE contract_management_code = #{contractManagementCode}
+	</select>
+	
+	<!-- 계약금 수정하기 -->
+	<update id="managementUpdate" parameterType="com.smart.rider.contract.dto.ManagementDTO">
+		UPDATE contract_management
+			SET
+				 contract_management_amout=#{contractManagementAmout}
+				,contract_management_unpaid=#{contractManagementUnpaid}
+				,contract_management_state=#{contractManagementState}
+				,contract_management_contents=#{contractManagementContents}
+				,contract_management_date=NOW()
+		WHERE contract_management_code=#{contractManagementCode}
+	</update>
+</mapper>

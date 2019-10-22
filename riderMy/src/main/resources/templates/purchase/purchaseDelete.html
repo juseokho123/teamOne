@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{layout/default}">
+<th:block layout:fragment="customTitle">
+</th:block>
+<th:block layout:fragment="customContents">
+	<!-- MAIN -->
+	<div class="main">
+		<div class="container mt-6">
+			<div class="row tm-content-row">
+				<div class="col-sm-12 col-md-12  tm-block-col">
+					<div class="tm-bg-primary-dark tm-block tm-block-products">
+					<form action="/purchaseDelete" method="post">
+						<div class="tm-product-table-container">											
+							<table class="table table-hover tm-table-small tm-product-table">	
+											
+								<thead>
+									<tr>
+										<td></td>
+										<td><input type="hidden" name="memberId"
+											th:value="${session.SID}" readonly="readonly"></td>
+									</tr>
+									<tr>
+										<th scope="col">상품명</th>
+										<th th:text="${pList.goodsDbName}"></th>
+									</tr>
+									<tr>
+										<th scope="col">상품카테고리</th>
+										<th th:text="${pList.goodsDbCategory}" ></th>
+									</tr>									
+									<tr>
+										<th scope="col">상품번호</th>
+										<th th:text="${pList.goodsDbNumber}"></th>
+									</tr>									
+									
+									<tr>
+										<th scope="col">최대속도</th>
+										<th th:text="${pList.goodsDbSpeed}"></th>
+									</tr>
+									<tr>
+										<th scope="col">박퀴사이즈</th>
+										<th th:text="${pList.goodsDbSize}"></th>
+									</tr>
+									<tr>	
+										<th scope="col">제조국가</th>
+										<th th:text="${pList.goodsDbNation}"></th>
+									</tr>
+									
+									<tr>	
+										<th scope="col">제조일자</th>
+										<th th:text="${pList.goodsDbMade}"></th>
+									</tr>
+									<tr>	
+										<th scope="col">매입가격</th>
+										<th th:text="${pList.purchasePay}"></th>
+									</tr>
+									<tr>	
+										<th scope="col">거래처</th>
+										<th th:text="${pList.accountMarket}"></th>
+									</tr>
+									<tr>
+										<td></td>
+										<td><input type="hidden" name="purchaseCode"
+											th:value="${pList.purchaseCode}" readonly="readonly"></td>
+									</tr>
+									<tr>
+										
+										<td>비밀번호입력</td>
+										<td>
+										<input  class="text-lowercase mb-6" type="text" name="memberPw">
+										
+										</td>
+									</tr>
+								</thead>												
+							</table>
+								<div>
+								<label class="alert alert-danger col-xl" th:if="${result ne null}" th:text="${result}"></label>
+								</div>
+											
+						</div>												
+						<!-- table container -->	
+							<!-- <a th:href="@{/purchaseDelete(purchaseCode=${pList.purchaseCode})}"
+								class="btn btn-primary btn-block text-uppercase mb-3">상품삭제</a> -->
+							<button type="submit" class="btn btn-primary btn-block text-uppercase mb-3">
+											상품삭제</button>			
+						
+						</form>
+						
+					</div>
+				</div>
+		
+			</div>
+		</div>
+
+	</div>
+	<!-- END MAIN -->
+	
+</th:block>
+</th:block>
+<th:block layout:fragment="customScript">
+</th:block>
+</html>
+
+

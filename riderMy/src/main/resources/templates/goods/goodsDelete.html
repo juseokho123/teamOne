@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{layout/default}">
+<th:block layout:fragment="customTitle">
+</th:block>
+<th:block layout:fragment="customContents">
+	<!-- MAIN -->
+	<div class="main">
+		<div class="container mt-6">
+			<div class="row tm-content-row">
+				<div class="col-sm-12 col-md-12  tm-block-col">
+					<div class="tm-bg-primary-dark tm-block tm-block-products">
+					<form action="/goodsDelete" method="post">
+					<input type="hidden" name="memberId" th:value="${session.SID}" readonly="readonly">
+						<div class="tm-product-table-container">											
+							<table class="table table-hover tm-table-small tm-product-table">	
+											
+								<thead>
+																		<tr>
+										<th scope="col">상품명</th>
+										<th th:text="${goodsCode.goodsDbName}"></th>
+									</tr>
+									<tr>
+										<th scope="col">상품카테고리</th>
+										<th th:text="${goodsCode.goodsDbCategory}" ></th>
+									</tr>									
+									<tr>
+										<th scope="col">상품번호</th>
+										<th th:text="${goodsCode.goodsDbNumber}"></th>
+									</tr>									
+									<tr>
+										<th scope="col">색상</th>
+										<th th:text="${goodsCode.goodsDbColor}"></th>
+									</tr>
+									<tr>
+										<th scope="col">중량</th>
+										<th th:text="${goodsCode.goodsDbWeight}"></th>
+									</tr>
+									<tr>
+										<th scope="col">최대속도</th>
+										<th th:text="${goodsCode.goodsDbSpeed}"></th>
+									</tr>
+									<tr>
+										<th scope="col">박퀴사이즈</th>
+										<th th:text="${goodsCode.goodsDbSize}"></th>
+									</tr>
+									<tr>	
+										<th scope="col">제조국가</th>
+										<th th:text="${goodsCode.goodsDbNation}"></th>
+									</tr>
+									<tr>	
+										<th scope="col">최대하중</th>
+										<th th:text="${goodsCode.goodsDbLoad}"></th>
+									</tr>
+									<tr>	
+										<th scope="col">주행가능거리</th>
+										<th th:text="${goodsCode.goodsDbDistance}"></th>
+									</tr>
+									<tr>	
+										<th scope="col">베터리용량</th>
+										<th th:text="${goodsCode.goodsDbBattery}"></th>
+									</tr>
+									<tr>	
+										<th scope="col">완충시간</th>
+										<th th:text="${goodsCode.goodsDbTime}"></th>
+									</tr>
+									<tr>	
+										<th scope="col">제조일자</th>
+										<th th:text="${goodsCode.goodsDbMade}"></th>
+									</tr>																	
+									<tr>	
+										<th scope="col">상품상태</th>
+										<th th:text="${goodsCode.goodsState}"></th>
+									</tr>
+									<tr>	
+										<th scope="col">대여가능여부</th>
+										<th th:text="${goodsCode.goodsRental}"></th>
+									</tr>
+									<tr>	
+										<th scope="col">대여상태</th>
+										<th th:text="${goodsCode.goodsRentalState}"></th>
+									</tr>
+									<tr>	
+										<th scope="col">판매완료유무</th>
+										<th th:text="${goodsCode.goodsCompletionState}"></th>
+									</tr>
+									<tr>	
+										<th scope="col">판매가격</th>
+										<th th:text="${goodsCode.goodsPay}"></th>
+									</tr>
+									<tr>
+										<td></td>
+										<td><input type="hidden" name="goodsCode"
+											th:value="${goodsCode.goodsCode}" readonly="readonly"></td>
+									</tr>
+									<tr>
+										
+										<td>비밀번호입력</td>
+										<td>
+										<input  class="text-lowercase mb-6" type="text" name="memberPw">
+										
+										</td>
+									</tr>
+									
+								</thead>												
+							</table>
+								<div>
+								<label class="alert alert-danger col-xl" th:if="${result ne null}" th:text="${result}"></label>
+								</div>
+											
+						</div>												
+						<!-- table container -->	
+							<!-- <a th:href="@{/purchaseDelete(purchaseCode=${pList.purchaseCode})}"
+								class="btn btn-primary btn-block text-uppercase mb-3">상품삭제</a> -->
+							<button type="submit" class="btn btn-primary btn-block text-uppercase mb-3">
+											상품삭제</button>			
+						
+						</form>
+						
+					</div>
+				</div>
+		
+			</div>
+		</div>
+
+	</div>
+	<!-- END MAIN -->
+	
+</th:block>
+</th:block>
+<th:block layout:fragment="customScript">
+</th:block>
+</html>
+
+

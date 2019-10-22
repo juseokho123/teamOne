@@ -1,0 +1,212 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+	PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- namespace가 인터페이스와 일치해야 연결된다 -->
+<mapper namespace="com.smart.rider.account.mapper.AccountMapper">
+
+	<!-- 거래처 resultMap -->
+	<resultMap type="com.smart.rider.account.dto.AccountDTO" id="accountMap">
+		<result column="account_code" 			property="accountCode"/>
+		<result column="contract_shop_code" 	property="contractShopCode"/>
+		<result column="account_market" 		property="accountMarket"/>
+		<result column="account_name" 			property="accountName"/>
+		<result column="account_phone" 			property="accountPhone"/>
+		<result column="account_address" 		property="accountAddress"/>
+		<result column="account_category" 		property="accountCategory"/>
+		<result column="account_date" 			property="accountDate"/>
+	</resultMap>
+	
+	<!-- 거래처 목록 -->
+	<!-- 삭제 가능 -->
+	<select id="accountListYes" parameterType="String" resultMap="accountMap">
+		SELECT 
+			 ac.account_code
+			,ac.contract_shop_code 
+			,ac.account_market
+			,ac.account_name
+			,ac.account_phone
+			,ac.account_address
+			,ac.account_category
+			,ac.account_date
+		FROM account ac LEFT JOIN purchase pu
+		ON ac.account_code = pu.account_code
+		WHERE pu.account_code IS null	
+	</select>	
+	<!-- 삭제 불가능  -->
+	<select id="accountListNo" parameterType="String" resultMap="accountMap">
+		SELECT DISTINCT 
+			 ac.account_code
+			,ac.contract_shop_code
+			,ac.account_market
+			,ac.account_name
+			,ac.account_phone
+			,ac.account_address
+			,ac.account_category
+			,ac.account_date
+		FROM account ac, purchase pu
+		WHERE ac.account_code = pu.account_code
+	 	<if test="sCode neq 'A'.toString()">
+        	AND 
+        		ac.contract_shop_code  = #{sCode}
+        </if>
+	</select>
+	
+	<!-- 거래처코드 자동증가 -->
+	<select id="accountMaxCode" resultType="String">
+		SELECT 
+			MAX(LPAD(RIGHT(account_code, 4)+1, '4' , '0')) 
+		FROM account;
+	</select>
+	
+	<!--매입거래처 생성  -->
+	<insert id="accountInsert" parameterType="com.smart.rider.account.dto.AccountDTO">
+		INSERT INTO account(
+			 account_code
+			,contract_shop_code
+			,account_market, account_name
+			,account_phone, account_address
+			,account_category
+			,account_date)
+	VALUES (
+			 #{accountCode}
+			,#{contractShopCode}
+			,#{accountMarket}
+			,#{accountName}
+			,#{accountPhone}
+			,#{accountAddress}
+			,#{accountCategory}
+			, NOW())
+	</insert>
+	
+	<!--세션 아이디를 이용해서 계약매장코드 가져오기  -->
+	<select id="getShopRelationCode" parameterType="String" resultType="com.smart.rider.shop.dto.SsrHapDTO">
+		SELECT DISTINCT
+			 sr.contract_shop_code 	AS contractShopCode 
+			,s.shop_name 			AS shopName
+		FROM shop_relation sr, shop s
+		WHERE sr.shop_code =s.shop_code AND sr.member_id =#{SID}
+	</select>
+	
+	<!-- 삭제 불가 검색시 조회 결과-->
+	<select id="accountSearchListNo" parameterType="String" resultMap="accountMap">
+		SELECT DISTINCT 
+			 ac.account_code
+			,ac.contract_shop_code
+			,ac.account_market
+			,ac.account_name
+			,ac.account_phone
+			,ac.account_address
+			,ac.account_category
+			,ac.account_date
+		FROM account ac, purchase pu
+		WHERE ac.account_code = pu.account_code
+		<if test="select neq null and select neq ''.toString()">
+            AND
+                account_category LIKE CONCAT('%',#{select},'%')
+        </if>
+        <if test="searchName neq null and searchName neq ''.toString()">
+            AND
+                account_market LIKE CONCAT('%',#{searchName},'%')
+        </if>
+        <if test="beginDate neq ''.toString() and endDate eq ''.toString()">
+        	AND 
+        		account_date between #{beginDate} and NOW()		
+        </if>
+        <if test="beginDate eq ''.toString() and endDate neq ''.toString()">
+        	AND 
+        		account_date between '1990-01-01' and #{endDate}
+        </if>
+        <if test="beginDate neq ''.toString() and endDate neq ''.toString()">
+        	AND 
+        		account_date between #{beginDate} and #{endDate}
+        </if>
+       	<if test="sCode neq 'A'.toString()">
+        	AND 
+        		ac.contract_shop_code  = #{sCode}
+        </if>
+	</select>
+	
+	<!-- 삭제 가능 검색시 조회 결과-->
+	<select id="accountSearchListYes" parameterType="String" resultMap="accountMap">
+		SELECT 
+			 ac.account_code
+			,ac.contract_shop_code 
+			,ac.account_market
+			,ac.account_name
+			,ac.account_phone
+			,ac.account_address
+			,ac.account_category
+			,ac.account_date
+		FROM account ac LEFT JOIN purchase pu
+		ON ac.account_code = pu.account_code
+		WHERE pu.account_code IS null
+		<if test="select neq null and select neq ''.toString()">
+            AND
+                account_category LIKE CONCAT('%',#{select},'%')
+        </if>
+        <if test="searchName neq null and searchName neq ''.toString()">
+            AND
+                account_market LIKE CONCAT('%',#{searchName},'%')
+        </if>
+        <if test="beginDate neq ''.toString() and endDate eq ''.toString()">
+        	AND 
+        		account_date between #{beginDate} and NOW()		
+        </if>
+        <if test="beginDate eq ''.toString() and endDate neq ''.toString()">
+        	AND 
+        		account_date between '1990-01-01' and #{endDate}
+        </if>
+        <if test="beginDate neq ''.toString() and endDate neq ''.toString()">
+        	AND 
+        		account_date between #{beginDate} and #{endDate}
+        </if>
+       	<if test="sCode neq 'A'.toString()">
+        	AND 
+        		ac.contract_shop_code  = #{sCode}
+        </if>
+	</select>
+	
+	<!-- 거래처 목록 code로 조회 -->
+	<select id="accountUpdate" parameterType="String" resultMap="accountMap">
+		SELECT 
+			 account_code
+			,contract_shop_code
+			,account_market
+			,account_name
+			,account_phone
+			,account_address
+			,account_category
+			,account_date
+		FROM account
+		WHERE account_code = #{acCode}
+	</select>
+	
+	<!-- 거래처 수정  -->
+	<update id="accountUpdateSet" parameterType="com.smart.rider.account.dto.AccountDTO" >
+		UPDATE account
+		SET
+			account_market			=	#{accountMarket}
+			,account_name			=	#{accountName}
+			,account_phone			=	#{accountPhone}
+			,account_address		=	#{accountAddress}
+			,account_category		=	#{accountCategory}
+			,account_date= NOW()
+		WHERE account_code=#{accountCode}
+	</update>
+	
+	<!-- 세션의 아이디 값으로 비밀번호 사용 -->
+	<select id="getPw" parameterType="String" resultType="com.smart.rider.member.dto.MemberDTO">
+		SELECT
+			member_pw AS memberPw
+		FROM member
+		WHERE member_id	= #{SID};
+	</select>
+	
+	<!-- 삭제 퀄리문 -->
+	<delete id="accountDelete" parameterType="String">
+		DELETE 
+		FROM account 
+		WHERE account_code	=	#{accountCode}
+	</delete>
+</mapper>

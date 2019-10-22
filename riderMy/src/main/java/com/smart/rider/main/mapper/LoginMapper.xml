@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.smart.rider.main.mapper.LoginMapper">
+
+	<!-- 191007 재욱, 로그인 ajax 호출용 카운트 -->
+	<select id="loginCount" parameterType="String" resultType="int">
+		SELECT 
+			 COUNT(*)
+		FROM member
+		WHERE member_id = #{memberId} and member_pw = #{memberPw}
+	</select>
+
+	<select id="loginCheck" parameterType="String" resultType="com.smart.rider.member.dto.MemberDTO">
+		SELECT 
+			 member_id AS memberId
+			,member_pw AS memberPw
+			,member_name AS memberName
+			,member_level AS memberLevel
+			,contract_shop_code AS contractShopCode
+		FROM member
+		WHERE member_id = #{memberId} and member_pw = #{memberPw}
+	</select>
+</mapper>

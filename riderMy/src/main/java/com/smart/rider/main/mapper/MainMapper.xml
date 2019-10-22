@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.smart.rider.main.mapper.MainMapper">
+
+	<!-- 191008 재욱, Select : 급여 월별 spend_salary_pay 컬럼의 합 -->
+	<select id="salaryChart" resultType="com.smart.rider.main.dto.ChartValueDTO" parameterType="java.util.Map">
+		SELECT 
+			 DATE_FORMAT(spend_salary_date,'%Y-%m') chartValueMonth
+			,SUM(spend_salary_pay) AS chartValueSum
+		FROM spend_utility
+		WHERE DATE_FORMAT(spend_salary_date,'%Y-%m') = #{checkMonth}
+		
+		<if test="contractShopCode neq ''.toString() and contractShopCode neq null">
+			AND contract_shop_code = #{contractShopCode}
+		</if>
+	</select>
+
+	<!-- 191008 재욱, Select : 공과금/기타 월별 spend_utility_pay 컬럼의 합 -->
+	<select id="utilityChart" resultType="com.smart.rider.main.dto.ChartValueDTO" parameterType="java.util.Map">
+		SELECT 
+			 DATE_FORMAT(spend_utility_date,'%Y-%m') chartValueMonth
+			,SUM(spend_utility_pay) AS chartValueSum
+		FROM spend_utility
+		WHERE DATE_FORMAT(spend_utility_date,'%Y-%m') = #{checkMonth}
+		
+		<if test="contractShopCode neq ''.toString() and contractShopCode neq null">
+			AND contract_shop_code = #{contractShopCode}
+		</if>
+	</select>
+
+	<!-- 190926 재욱,  월별로 컬럼의 합을 구하는 쿼리, 값이  없을 경우 null -->
+	<select id="chartValue" resultType="com.smart.rider.main.dto.ChartValueDTO" parameterType="java.util.Map">
+		SELECT 
+			 DATE_FORMAT(${columnDate},'%Y-%m') chartValueMonth
+			,SUM(${columnInt}) AS chartValueSum
+		FROM ${chartTable}
+		WHERE DATE_FORMAT(${columnDate},'%Y-%m') = #{checkMonth} 
+		<if test="contractShopCode neq ''.toString() and contractShopCode neq null">
+			AND contract_shop_code = #{contractShopCode}
+		</if>
+	</select>
+</mapper>
+

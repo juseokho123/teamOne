@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{layout/default}">
+<th:block layout:fragment="customTitle">
+</th:block>
+<th:block layout:fragment="customContents">
+	<body>
+		<div class="main-height">
+			<!-- MAIN CONTENT -->
+			<div class="main-content">
+				<div class="container">
+					<div class="row">
+						<div class="col">
+							<p class="text-white mt-5 mb-5">
+								<b>계약관리 >계약금 납부관리 </b>
+							</p>
+						</div>
+					</div>
+					<div class="tm-bg-primary-dark tm-block tm-block-h-auto-copy">
+						<form action="managementSearchList" class="tm-search-form row" method="post">
+							<div class="form-group col-3">
+								<select class="custom-select-sj">
+									<option selected="selected">최근 계약금 관리일자</option>
+								</select>
+							</div>
+							<div class="form-group col-3">
+								<input id="beginDate" name="beginDate" readonly style="background-color: #4e657a"
+								 		type="text" class="form-control validate" />
+							</div>
+							<div class="form-group col-1 text-center">
+								<h2 class="tm-site-title mb-0">~</h2>
+							</div>
+							<div class="form-group col-3">
+								<input id="endDate" name="endDate" readonly style="background-color: #4e657a"
+									   type="text" class="form-control validate" />
+							</div>
+							<div class="form-group col-2"></div>
+							<div class="form-group col-3">
+								<select class="custom-select" id="searchKey" name="searchKey">
+									<option value="">납부방식</option>
+									<option value="월 납부">월 납부</option>
+									<option value="1년 일시불">1년 일시불</option>
+									<option value="2년 일시불">2년 일시불</option>
+								</select>
+							</div>
+							<div class="form-group col-7">
+								<input class="form-control placeholder validate" name="searchValue" type="text" 
+									   id="input" style="background-color: #4e657a" placeholder="검색 할 아이디를 입력해주세요" />
+							</div>
+							<div class="form-group col-2">
+								<button type="submit" class="btn btn-primary btn-block">
+									검색
+								</button>
+							</div>
+						</form>
+					</div>
+					<br /><br /><br />
+					<!-- row -->
+					<div class="row tm-content-row">
+						<div class="col-12 tm-block-col">
+							<div class="tm-bg-primary-dark tm-block-scroll tm-block-big">
+								<h3 style="color: white">계약금 납부 및 계약 상태 변경은 오프라인 문의 , 일정 기간
+									미납 시 중지</h3>
+								<h4 style="color: white">회원 탈퇴 시 삭제(별도 삭제 없음)</h4>
+								<h5 style="color: white">
+									계약상태 : 계약시작일 전<br /> 정상 : 계약시작일 부터 계약종료일(납부 확인 후) <br /> 보류 :
+									계약종료일부터 계약보류일자(+10day)<br /> 종료 : 계약보류일자까지 끝난 상태<br /> 중지 :
+									미납금액이 있거나 점주의 요청을 했을 때<br />
+								</h5>
+								<br />
+								<table class="table">
+									<thead>
+										<tr>
+											<th scope="col">아이디</th>
+											<th scope="col">납부 방식</th>
+											<th scope="col">총금액</th>
+											<th scope="col">납부금액</th>
+											<th scope="col">미납금액</th>
+											<th scope="col">계약상태</th>
+											<th scope="col">사유</th>
+											<th scope="col">최근 수정일자</th>
+											<th scope="col">수정</th>
+										</tr>
+									</thead>
+									<tbody>
+										<tr th:each="mlist : ${managementList}">
+											<td th:text="${mlist.memberId}"></td>
+											<td th:text="${mlist.contractMethod}"></td>
+											<td th:text="${mlist.contractPay}"></td>
+											<td th:text="${mlist.contractManagementAmout}"></td>
+											<td th:text="${mlist.contractManagementUnpaid}"></td>
+											<td th:text="${mlist.contractManagementState}"></td>
+											<td th:text="${mlist.contractManagementContents}"></td>
+											<td th:text="${mlist.contractManagementDate}"></td>
+											<td class="text-center"><a
+												th:href="@{managementUpdate(contractManagementCode=${mlist.contractManagementCode})}"
+												class="tm-product-delete-link"> <i
+													class="fas fa-check tm-product-check-icon"
+													style="color: white"></i>
+											</a></td>
+									</tbody>
+									<th:block th:if="${alert} neq null">
+										<tr class="text-center">
+											<td colspan="7" th:text="${alert}"></td>
+										</tr>
+									</th:block>
+								</table>
+								<br />
+								<ul class="pagination justify-content-center mt-3 mr-3">
+									<li class="page-item"><a class="page-link btn-primary"
+										style="color: white;" th:href="@{/managementList}">맨처음</a></li>
+									<li class="page-item" th:if="${currentPage > 1}"><a
+										class="page-link btn-primary" style="color: white;"
+										th:href="@{/managementList(currentPage=${currentPage-1})}">이전</a>
+									</li>
+									<li class="page-item" th:if="${currentPage < lastPage}"><a
+										class="page-link btn-primary" style="color: white;"
+										th:href="@{/managementList(currentPage=${currentPage+1})}">다음</a>
+									</li>
+									<li class="page-item"><a class="page-link btn-primary"
+										style="color: white;"
+										th:href="@{/managementList(currentPage=${lastPage})}">마지막</a>
+									</li>
+								</ul>
+							</div>
+						</div>
+					</div>
+
+
+				</div>
+			</div>
+		</div>
+	</body>
+</th:block>
+</th:block>
+<th:block layout:fragment="customScript">
+
+	<script type="text/javascript">
+		$(function() {
+			$(".tm-product-name").on("click", function() {
+				window.location.href = "#";
+			});
+		});
+		//시작 일자 텍스트상자 클릭시 달력 표기 
+		$('#beginDate').datepicker({});
+		$('#beginDate').datepicker('option', 'dateFormat', 'yy-mm-dd'); // 기존 dd/mm/yy에서 yy-mm-dd로 format 변경   
+
+		//종료 일자 텍스트상자 클릭시 달력 표기 
+		$('#endDate').datepicker({});
+		$('#endDate').datepicker('option', 'dateFormat', 'yy-mm-dd'); // 기존 dd/mm/yy에서 yy-mm-dd로 format 변경
+	</script>
+
+</th:block>
+</html>

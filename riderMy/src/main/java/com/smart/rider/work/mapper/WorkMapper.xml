@@ -1,0 +1,179 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.smart.rider.work.mapper.WorkMapper">
+	
+	<!-- 직원 아이디와 비밀번호 확인 -->
+	<select id="employeeCheck" parameterType="String" resultType="com.smart.rider.member.dto.MemberDTO">
+		SELECT 
+			 member_id 			AS memberId
+			,member_pw 			AS memberPw
+			,member_name 		AS memberName
+			,member_level 		AS memberLevel
+			,contract_shop_code AS contractShopCode
+		FROM member
+		WHERE 
+			member_id = #{memberId} 
+		AND member_pw = #{memberPw}
+	</select>
+	
+	<!-- 코드 자동증가 -->
+	<select id="workCodeCount" resultType="String">
+		SELECT 
+			MAX(LPAD(RIGHT(work_code, 4)+1, '4' , '0')) 
+		FROM work;
+	</select>
+	
+	<!-- 출근 등록  -->
+	<insert id="goInsert" parameterType="com.smart.rider.work.dto.WorkDTO">
+		INSERT INTO work(
+				 work_code
+				,contract_shop_code
+				,member_id
+				,work_start
+				,work_finish
+				,work_today
+				,work_date
+			)VALUES (
+				 #{workCode}
+				,#{contractShopCode}
+				,#{memberId}
+				,NOW()
+				,0
+				,0
+				,CURDATE())
+	</insert>
+	
+	<!-- 근태목록  -->
+	<select id="workList" resultType="com.smart.rider.work.dto.WorkDTO">
+		SELECT 
+			 w.work_code AS workCode
+			,w.contract_shop_code AS contractShopCode
+			,w.member_id AS memberId
+			,w.work_start AS workStart
+			,w.work_finish AS workFinish
+			,w.work_today AS workToday
+			,w.work_date AS workDate
+			,m.member_name AS memberName
+		FROM 
+			work w
+		INNER JOIN
+			member m			 
+		INNER JOIN 
+			shop_relation s
+		ON 
+			m.member_id 		 = w.member_id			
+		AND s.contract_shop_code = w.contract_shop_code
+		AND s.contract_shop_code = m.contract_shop_code
+		<trim prefix="where" prefixOverrides="AND|OR">
+			<if test="contractShopCode neq null and contractShopCode neq ''.toString()">
+				AND w.contract_shop_code = #{contractShopCode}
+			</if>
+			<if test="memberId neq ''.toString() and memberId neq ''.toString()">
+				AND w.member_id = #{memberId}
+			</if>
+		</trim>
+		ORDER BY w.work_date DESC 
+		LIMIT #{startRow},#{rowPerPage}
+	</select>
+	
+	<!-- 퇴근 등록처리  -->
+	<update id="leaveInsert" parameterType="com.smart.rider.work.dto.WorkDTO">
+		UPDATE work
+		SET
+			work_finish	= NOW(),
+			work_today	= TIMEDIFF(CURTIME(),work_start)
+		WHERE 
+			member_id = #{memberId}
+		AND 
+			work_date = CURDATE()
+	</update>
+	
+	<!-- 19.10.02페이지작업위한작성  -->
+	<select id="getWorkAllCount" resultType="int">
+		SELECT
+			COUNT(*)
+		FROM work
+		<trim prefix="where" prefixOverrides="AND|OR">
+			<if test="contractShopCode neq null and contractShopCode neq ''.toString()">
+				AND contract_shop_code = #{contractShopCode}
+			</if>
+			<if test="memberId neq ''.toString() and memberId neq ''.toString()">
+				AND member_id = #{memberId}
+			</if>
+		</trim>
+	</select>
+	
+	<!-- 19.10.07근태 검색 -->
+	<select id="searchWork" resultType="com.smart.rider.work.dto.WorkDTO">
+		SELECT 
+			 w.work_code 		  AS workCode
+			,w.contract_shop_code AS contractShopCode
+			,w.member_id 		  AS memberId
+			,w.work_start 		  AS workStart
+			,w.work_finish 		  AS workFinish
+			,w.work_today 		  AS workToday
+			,w.work_date 		  AS workDate
+			,m.member_name 		  AS memberName
+		FROM 
+			work w
+		INNER JOIN
+			member m			 
+		INNER JOIN 
+			shop_relation s
+		ON 
+			m.member_id 		 = w.member_id			
+		AND s.contract_shop_code = w.contract_shop_code
+		AND s.contract_shop_code = m.contract_shop_code
+		<trim prefix="where" prefixOverrides="AND|OR">
+			<if test="searchInput neq null and searchInput neq ''.toString()">
+				AND ${select} Like CONCAT('%',#{searchInput},'%')
+			</if>
+			<if test="beginDate neq ''.toString() and endDate neq ''.toString()">
+				AND w.work_date between #{beginDate} and #{endDate}
+			</if>
+			<if test="beginDate eq ''.toString() and endDate neq ''.toString()">
+				AND w.work_date between '2000-01-01' and #{endDate}
+			</if>
+			<if test="beginDate neq ''.toString() and endDate eq ''.toString()">
+				AND w.work_date between #{beginDate} and NOW()
+			</if>
+			<if test="contractShopCode neq null and contractShopCode neq ''.toString()">
+				AND w.contract_shop_code = #{contractShopCode}
+			</if>
+		</trim>
+		ORDER BY w.work_date DESC 
+		LIMIT #{startRow},#{rowPerPage}
+	</select>
+	
+	<!-- 19.10.07 검색 페이지작업위한작성  -->
+	<select id="getSearchAllCount" resultType="int">
+		SELECT
+			COUNT(*)
+		FROM work w
+		INNER JOIN
+			member m			 
+		INNER JOIN 
+			shop_relation s
+		ON 
+			m.member_id 		 = w.member_id			
+		AND s.contract_shop_code = w.contract_shop_code
+		AND s.contract_shop_code = m.contract_shop_code
+		<trim prefix="where" prefixOverrides="AND|OR">
+			<if test="searchInput neq null and searchInput neq ''.toString()">
+				AND ${select} Like CONCAT('%',#{searchInput},'%')
+			</if>
+			<if test="beginDate neq ''.toString() and endDate neq ''.toString()">
+				AND w.work_date between #{beginDate} and #{endDate}
+			</if>
+			<if test="beginDate eq ''.toString() and endDate neq ''.toString()">
+				AND w.work_date between '2000-01-01' and #{endDate}
+			</if>
+			<if test="beginDate neq ''.toString() and endDate eq ''.toString()">
+				AND w.work_date between #{beginDate} and NOW()
+			</if>
+			<if test="contractShopCode neq null and contractShopCode neq ''.toString()">
+				AND w.contract_shop_code = #{contractShopCode}
+			</if>
+		</trim>
+	</select>
+</mapper>

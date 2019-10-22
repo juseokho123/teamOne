@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{layout/default}">
+<th:block layout:fragment="customTitle">
+</th:block>
+<th:block layout:fragment="customContents">
+	<!-- MAIN -->
+	<div class="main">
+		<div class="container mt-5">
+		<h2 class="tm-block-title">상품DB리스트</h2>
+		<div class="row tm-content-row">
+				<div class="col-12 tm-block-col">
+					<div class="tm-bg-primary-dark tm-block tm-block-h-auto-copy">
+						<form action="goodsDbSearchList" class="tm-search-form row" method="post">
+							<div class="form-group col-3">
+								<select class="custom-select" name="goodsDbDate">
+									<option value="goods_database_date">DB등록일자검색</option>
+								</select>
+							</div>
+							<div class="form-group col-3">
+								<input id="beginDate" name="beginDate" 
+									   type="text" class="form-control validate"/>
+							</div>
+							<div class="form-group col-1 text-center">
+								<h2 class="tm-site-title mb-0">~</h2>
+							</div>
+							<div class="form-group col-3">
+								<input id="endDate" name="endDate" 
+									   type="text" class="form-control validate"/>
+							</div>
+							<div class="form-group col-2">
+							</div>
+							
+							<div class="form-group col-3">
+								
+								<select class="custom-select" name="select">
+									
+									<option value="goods_database_category">상품 카테고리명</option>
+																
+								</select>
+							</div>
+							<div class="form-group col-7">
+								
+								<input id="searchInput" name="searchInput" type="text" class="form-control validate" />
+							</div>
+							<div class="form-group col-2">
+								
+								<button type="submit" id="searchButton" name="searchButton" class="btn btn-primary btn-block">
+									검색
+								</button>
+							</div>
+						</form>
+					</div>
+				</div>
+			</div>
+			<div class="row tm-content-row">			
+				<div class="col-sm-12 col-md-12 col-lg-8 col-xl-8 tm-block-col">							
+					<div class="tm-bg-primary-dark tm-block tm-block-products">
+						<h4 style="color: white;">상품기본정보제공///점주는 상세보기하여 매입등록할수있음</h4>	
+						<div class="tm-product-table-container">
+							<table class="table table-hover tm-table-small tm-product-table">
+								<thead>
+									<tr>
+										<th scope="col">종류</th>
+										<th scope="col">이름</th>										
+										<th scope="col">상품번호</th>
+										<th scope="col">색상</th>	
+										<th scope="col">상세보기</th>
+										
+									</tr>
+								</thead>
+								<tbody>
+									<!--전체 리스트 -->
+									<!-- <tr th:each="g : ${gList}">
+										<th th:text="${g.goodsDbCode}"></th>	
+										<th th:text="${g.goodsDbName}"></th>										
+										<th th:text="${g.goodsDbNumber}"></th>
+										<th th:text="${g.goodsDbColor}"></th>										
+										<th th:text="${g.goodsDbDescription}"></th>
+										<td>
+										<a
+										 th:href="@{/getGoodsDbList(goodsDbCode=${g.goodsDbCode})}"
+										 class="tm-product-delete-link">
+										 <i class="fas fa-check tm-product-check-icon"></i>
+										</a>
+										</td>
+										<td>
+										<a
+										 th:href="@{/goodsInsert(goodsDbCode=${gDbList.goodsDbCode})}"
+										 class="tm-product-delete-link">
+										 <i class="fas fa-check tm-product-check-icon"></i>
+										</a>
+										</td>
+									</tr> -->
+								<!-- 삭제가능 리스트 -->
+									<tr th:each="y : ${yList}">
+										<th th:text="${y.goodsDbCategory}"></th>	
+										<th th:text="${y.goodsDbName}"></th>										
+										<th th:text="${y.goodsDbNumber}"></th>
+										<th th:text="${y.goodsDbColor}"></th>										
+										
+										<td>
+										<a
+										 th:href="@{/yesGoodsDbList(goodsDbCode=${y.goodsDbCode})}"
+										 class="tm-product-delete-link">
+										 <i class="fas fa-check tm-product-check-icon"></i>
+										</a>
+										</td>
+									<!-- 	<td>
+										<a
+										 th:href="@{/goodsInsert(goodsDbCode=${gDbList.goodsDbCode})}"
+										 class="tm-product-delete-link">
+										 <i class="fas fa-check tm-product-check-icon"></i>
+										</a>
+										</td> -->
+									</tr>
+									<!-- 삭제불가능리스트 -->
+									<tr th:each="n : ${nList}">
+										<th th:text="${n.goodsDbCategory}"></th>
+										<th th:text="${n.goodsDbName}"></th>										
+										<th th:text="${n.goodsDbNumber}"></th>
+										<th th:text="${n.goodsDbColor}"></th>										
+										
+										<td>
+										<a
+										 th:href="@{/getGoodsDbList(goodsDbCode=${n.goodsDbCode})}"
+										 class="tm-product-delete-link">
+										 <i class="fas fa-check tm-product-check-icon"></i>
+										</a>
+										</td>
+										
+										<!-- <td>
+										<a
+										 th:href="@{/goodsInsert(goodsDbCode=${gDbList.goodsDbCode})}"
+										 class="tm-product-delete-link">
+										 <i class="fas fa-check tm-product-check-icon"></i>
+										</a>
+										</td> -->
+									</tr>
+									<th:block th:if="${alert} neq null">
+										<tr class="text-center">
+											<td colspan="7" th:text="${alert}"></td>
+										</tr>
+									</th:block>								
+								</tbody>
+							</table>
+						</div>
+						<!-- table container -->
+						<a href="/goodsDbInsert" th:if="${session.SLEVEL eq '관리자'}"
+							class="btn btn-primary btn-block text-uppercase mb-3">DB상품
+							추가하기</a>
+						<!-- <button class="btn btn-primary btn-block text-uppercase">
+							선택상품 삭제하기</button> -->
+					</div>
+				</div>
+				<div class="col-sm-12 col-md-12 col-lg-4 col-xl-4 tm-block-col">
+					<div class="tm-bg-primary-dark tm-block tm-block-product-categories">
+						<h2 class="tm-block-title">상품 카테고리 종류</h2>
+						<div class="tm-product-table-container">
+							<table class="table tm-table-small tm-product-table">
+								<tbody>
+									<tr>
+										<td class="tm-product-name">전동 킥보드</td>
+										<td class="text-center"><a href="#"
+											class="tm-product-delete-link"> <i
+												class="fas fa-check tm-product-check-icon"></i>
+
+										</a></td>
+									</tr>
+									<tr>
+										<td class="tm-product-name" >전동 휠</td>
+										<td class="text-center" ><a href="#"
+											class="tm-product-delete-link"> <i
+												class="fas fa-check tm-product-check-icon"></i>
+										</a></td>
+									</tr>
+									<tr>
+										<td class="tm-product-name">전동 자전거</td>
+										<td class="text-center"><a href="#"
+											class="tm-product-delete-link"> <i
+												class="fas fa-check tm-product-check-icon"></i>
+										</a></td>
+									</tr>
+									<tr>
+										<td class="tm-product-name" id="goods_database_category">전동 바이크</td>
+										<td class="text-center"><a href="#"
+											class="tm-product-delete-link"> <i
+												class="fas fa-check tm-product-check-icon"></i>
+										</a></td>
+									</tr>
+
+								</tbody>
+							</table>
+						</div>
+						<!-- table container -->
+						<button class="btn btn-primary btn-block text-uppercase mb-3">
+							카테고리추가하기</button>
+					</div>
+				</div>
+						
+				
+			</div>
+		</div>
+
+	</div>
+	<!-- END MAIN -->
+	<script type="text/javascript">
+		$(function() {
+			$(".tm-product-name").on("click", function() {
+				window.location.href = "#";
+			});
+		});
+		//시작 일자 텍스트상자 클릭시 달력 표기 
+		$('#beginDate').datepicker({
+		});
+		$('#beginDate').datepicker('option','dateFormat','yy-mm-dd'); // 기존 dd/mm/yy에서 yy-mm-dd로 format 변경   
+		
+		//종료 일자 텍스트상자 클릭시 달력 표기 
+		$('#endDate').datepicker({
+		});
+		$('#endDate').datepicker('option','dateFormat','yy-mm-dd'); // 기존 dd/mm/yy에서 yy-mm-dd로 format 변경 
+		
+	</script>
+</th:block>
+</th:block>
+<th:block layout:fragment="customScript">
+</th:block>
+</html>
+
+

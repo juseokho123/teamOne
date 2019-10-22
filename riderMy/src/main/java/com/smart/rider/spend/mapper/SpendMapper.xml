@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.smart.rider.spend.mapper.SpendMapper">
+
+	<resultMap type="com.smart.rider.spend.dto.SpendAdminDTO" id="spendAdminMap">
+		<result column="shop_code" 					property="shopCode"/>
+		<result column="contract_code" 				property="contractCode"/>
+		<result column="member_id"					property="memberId"/>
+		<result column="shop_name" 					property="shopName"/>
+		<result column="shop_address" 				property="shopAddress"/>
+		<result column="shop_phone" 				property="shopPhone"/>
+		<result column="shop_date" 					property="shopDate"/>
+		<result column="contract_unit_code" 		property="contractUnitCode"/>
+		<result column="contract_start" 			property="contractStart"/>
+		<result column="contract_finish" 			property="contractFinish"/>
+		<result column="contract_date" 				property="contractDate"/>
+		<result column="contract_valid_date" 		property="contractValidDate"/>
+		<result column="contract_management_state"	property="contractManagementState"/>
+		<result column="contract_shop_code"			property="contractShopCode"/>
+		<result column="member_birth"				property="memberBirth"/>
+	</resultMap>
+	
+	<!-- 191008 재욱, Select : 지출통합 코드 자동증가용 Count -->
+	<select id="spendTotalCount" resultType="String">
+		SELECT 
+			MAX(LPAD(RIGHT(spend_total_code, 4)+1, '4' , '0')) 
+		FROM spend_total;
+	</select>
+	
+	<!-- 191004 재욱, Read : 관리자 확인 카운트, 2일 때 관리자 비밀번호와 점주 생년월일 일치 -->
+	<select id="spendAdminCheck" resultType="int" parameterType="String">
+		SELECT 
+			COUNT(DISTINCT m.member_id)
+		FROM member m, shop_relation sr
+		WHERE sr.contract_shop_code = #{contractShopCode} 
+		AND m.member_id = #{memberId} AND m.member_birth = #{memberBirth}
+		OR m.member_id = 'id001' AND m.member_pw = #{adminPw}
+	</select>
+	
+	<!-- 191004 재욱, Read : 계약된 매장 리스트 상세보기 -->
+	<select id="spendAdminDetails" resultMap="spendAdminMap" parameterType="String">
+		SELECT
+			 s.shop_code
+			,s.member_id
+			,s.shop_name
+			,cm.contract_management_state
+			,s.shop_address
+			,s.shop_phone
+			,s.shop_date
+			,c.contract_start
+			,c.contract_finish
+			,c.contract_valid_date
+			,c.contract_date
+			,m.member_birth
+			,sr.contract_shop_code
+		FROM shop s, contract c, contract_management cm, member m, shop_relation sr
+		WHERE s.member_id = c.member_id 
+		AND s.contract_code = cm.contract_code 
+		AND c.member_id = m.member_id
+		AND sr.shop_code = s.shop_code
+		AND sr.contract_shop_code = #{contractShopCode}
+		ORDER BY c.contract_date DESC 
+		LIMIT 1;
+	</select>
+	
+	<!-- 191007 재욱, 페이징 처리를 위한 매장 리스트 AllCount -->
+	<select id="shopAllCount" resultType="int">
+		SELECT 
+			COUNT(*)
+		FROM shop s, contract_management cm, shop_relation sr
+		WHERE s.contract_code = cm.contract_code AND sr.member_id = s.member_id
+		ORDER BY sr.contract_shop_code
+	</select>
+
+	<!-- 191004 재욱, Read : 계약된 매장 리스트 -->
+	<select id="spendShopList" resultMap="spendAdminMap" parameterType="java.util.Map">
+		SELECT 
+			 s.shop_code
+			,s.member_id
+			,s.shop_name
+			,cm.contract_management_state
+			,sr.contract_shop_code
+			,c.contract_date
+		FROM shop s, contract_management cm, shop_relation sr, contract c
+		WHERE s.contract_code = cm.contract_code AND sr.member_id = s.member_id
+		AND c.contract_code = s.contract_code
+		
+		<!-- 계약된 매장 검색 조건문 -->
+        <if test="searchKey neq null and searchValue neq ''.toString()">
+            AND
+                s.${searchKey} LIKE CONCAT('%',#{searchValue},'%')
+        </if>
+        <if test="beginDate neq ''.toString() and endDate eq ''.toString()">
+        	AND 
+        		c.contract_date between #{beginDate} and NOW()		
+        </if>
+        <if test="beginDate eq ''.toString() and endDate neq ''.toString()">
+        	AND 
+        		c.contract_date between '2000-01-01' and #{endDate}
+        </if>
+        <if test="beginDate neq ''.toString() and beginDate neq null and endDate neq ''.toString() and endDate neq null">
+        	AND 
+        		c.contract_date between #{beginDate} and #{endDate}
+        </if>
+		
+		ORDER BY sr.contract_shop_code
+		
+		<!-- 다른 메서드 호출시 반영되지 않기위해 걸어놓은 조건문 -->
+        <if test="startRow neq lastPage"> 
+            LIMIT #{startRow},#{rowPerPage}
+        </if>
+	</select>
+</mapper>

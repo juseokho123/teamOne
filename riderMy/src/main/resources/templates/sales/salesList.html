@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{layout/default}">
+
+<th:block layout:fragment="customTitle">
+</th:block>
+<th:block layout:fragment="customContents">
+
+	<!-- MAIN -->
+	<div class="height-sub">
+		<!-- MAIN CONTENT -->
+		<div class="main-content">
+			<div class="container">
+				<div class="row">
+					<div class="col">
+						<p class="text-white mt-5 mb-5">
+							<b>매출내역</b>
+						</p>
+					</div>
+				</div>
+
+				<!-- 매출 현황 -->
+				<div class="row tm-content-row">
+					<div class="col-12 tm-block-col">
+						<div class="tm-bg-primary-dark tm-block-util">
+						<form action="/salesList" method="get" id="selectYearForm" name="selectYearForm">
+							<span style="display:inline-block; float: left">
+								<strong class="tm-block-title">매출현황 </strong>
+							</span>
+    						<span style="display:inline-block; float: right">
+    							<select style="width: 80px;" class="custom-select" name="salesYear" id="salesYear">
+   									<option value="2019" id="2019">2019</option>
+									<option value="2018" id="2018">2018</option>
+									<option value="2017" id="2017">2017</option>
+								</select>
+    						</span>
+						</form>
+							
+							<!-- charts.js -->
+							<canvas id="salesChart" height="100px;"></canvas>
+						</div>
+					</div>
+				</div>
+				
+				<!-- 매출 검색 -->
+				<div class="row tm-content-row">
+				<div class="tm-bg-primary-dark tm-block tm-block-h-auto-copy">
+				<div class="tm-bg-primary-dark tm-block tm-block-h-auto-copy">
+						<form action="salesSearchList" class="tm-search-form row" method="post">
+							<div class="form-group col-3">
+								<select class="custom-select" name="salesDate">
+									<option value="sales_date">매출등록일자검색</option>
+								</select>
+							</div>
+							<div class="form-group col-3">
+								<input id="beginDate" name="beginDate" 
+									   type="text" class="form-control validate"/>
+							</div>
+							<div class="form-group col-1 text-center">
+								<h2 class="tm-site-title mb-0">~</h2>
+							</div>
+							<div class="form-group col-3">
+								<input id="endDate" name="endDate" 
+									   type="text" class="form-control validate"/>
+							</div>
+							<div class="form-group col-2">
+							</div>
+							
+							<div class="form-group col-3">
+								
+								<select class="custom-select" name="select">
+									
+									<option value="sales_type">판매/대여 </option>
+																
+								</select>
+							</div>
+							<div class="form-group col-7">
+								
+								<input id="searchInput" name="searchInput" type="text" class="form-control validate" />
+							</div>
+							<div class="form-group col-2">
+								
+								<button type="submit" id="searchButton" name="searchButton" class="btn btn-primary btn-block">
+									검색
+								</button>
+							</div>
+						</form>
+					</div>
+					<!-- 매출검색 끝 -->	
+
+				
+
+					<!-- 최근 판매매출 내역 -->
+					<div class="col-sm-12 col-md-12  tm-block-col">
+						<div class="tm-bg-primary-dark tm-block-scroll tm-block-sc">
+						<div class="tm-bg-primary-dark tm-block-spend ">
+							<h4 class="tm-block-title">매출 내역</h4>
+							<div style="min-height: 320px;">
+							<table class="table">
+								<thead>
+									<tr class="text-center">
+											
+										<th scope="col">결제수단</th>
+										<th scope="col">판매/대여</th>
+										<th scope="col">금액</th>									
+										<th scope="col">매출일자</th>
+										<th scope="col">매출수정</th>
+										<th scope="col">매출삭제</th>
+									</tr>
+								</thead>
+								<tbody class="text-center">
+									<tr th:each="s : ${sList}">
+										
+										<th th:text="${s.salesPayType}"></th>
+										<th th:text="${s.salesType}"></th>
+										<th th:text="${s.salesAmount}+원"></th>
+										<th th:text="${s.salesDate}"></th>
+									<td>
+										<a
+										 th:href="@{/getSalesList(salesCode=${s.salesCode})}"
+										 class="tm-product-delete-link">
+										 <i class="fas fa-check tm-product-check-icon"></i>
+										</a>									
+									</td>
+									<td>										
+										<a
+										  th:href="@{/salesDelete(salesCode=${s.salesCode})}"
+										 class="tm-product-delete-link">
+										 <i class="far fa-trash-alt" style="color: gray;">
+												</i>
+										</a>
+									</td>
+								</tr>
+								
+									<th:block th:if="${alert} neq null">
+										<tr class="text-center">
+											<td colspan="7" th:text="${alert}"></td>
+										</tr>
+									</th:block>		
+								
+								</tbody>
+							</table>
+							</div>
+							
+			
+						</div>
+					</div>
+
+
+				
+					
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+</div>
+</th:block>
+<th:block layout:fragment="customScript">
+
+	<script th:inline="javascript">
+    
+    <!-- charts.js script-->
+	var chartJanuary 	= [[${sales0}]];
+	var chartFebruary 	= [[${sales1}]];
+	var chartMarch 		= [[${sales2}]];
+	var chartApril 		= [[${sales3}]]; 
+	var chartMay 		= [[${sales4}]];
+	var chartJune		= [[${sales5}]];
+	var chartJuly		= [[${sales6}]];
+	var chartAugust		= [[${sales7}]];
+	var chartSeptember 	= [[${sales8}]];
+	var chartOctober 	= [[${sales9}]];
+	var chartNovember 	= [[${sales10}]];
+	var chartDecember 	= [[${sales11}]];
+
+	$(function() {
+		var uctx = document.getElementById('salesChart').getContext('2d');
+		var salesChart = new Chart(uctx, {
+			
+		    // The type of chart we want to create
+		    type: 'bar',
+		
+		    // The data for our dataset
+		    data: {
+		        labels: ['1월', '2월', '3월', '4월', '5월', '6월', '7월','8월','9월','10월','11월','12월'],
+		        datasets: [{
+		            label: '총매출 금액',
+		            backgroundColor: 'rgb(245, 166, 35)',
+		            borderColor: 'rgb(245, 166, 35)',
+		            data: [chartJanuary,chartFebruary,chartMarch,chartApril,chartMay,chartJune,chartJuly,chartAugust,chartSeptember,chartOctober,chartNovember,chartDecember]
+		        }]
+		    },
+		
+		    // Configuration options
+		    options: {
+		    	legend: {
+		             labels: {
+		                  fontColor: 'white' // label color
+		                 }
+		              },
+			    scales: {
+			    	// y축
+			        yAxes: [{
+			            ticks: {
+			                fontColor:'white' // y축 폰트 color
+			            }
+			     	}],
+			     	// x축
+			     	xAxes: [{
+			            ticks: {
+			            	
+			                fontColor:'white' // x축 폰트 color
+			            }
+			     	}]
+			    }
+		    }
+		});
+	})
+	
+	<!-- 화면 전환 후 select box 고정 -->
+	var selectedYear = [[${selectedYear}]];
+	
+	if(selectedYear == 2018){
+		$('#2018').attr('selected','selected');
+	} else if(selectedYear == 2017){
+		$('#2017').attr('selected','selected');
+	} else{
+		$('#2019').attr('selected','selected');
+	}
+	
+	<!-- 연도 선택 화면전환 -->
+	$('#salesYear').change(function() {
+		$('#selectYearForm').submit();
+	})
+	
+	<!-- datepicker -->
+	//시작 일자 텍스트상자 클릭시 달력 표기 
+	$('#beginDate').datepicker({
+	});
+	$('#beginDate').datepicker('option','dateFormat','yy-mm-dd'); // 기존 dd/mm/yy에서 yy-mm-dd로 format 변경   
+	
+	//종료 일자 텍스트상자 클릭시 달력 표기 
+	$('#endDate').datepicker({
+	});
+	$('#endDate').datepicker('option','dateFormat','yy-mm-dd'); // 기존 dd/mm/yy에서 yy-mm-dd로 format 변경 
+	
+	
+</script>
+</th:block>
+</html>
+
+
+

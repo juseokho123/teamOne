@@ -1,0 +1,208 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.smart.rider.goods.mapper.GoodsRentalMapper">
+	<!-- 코드자동증가쿼리  -->
+	<select id="goodsRentalCodeCount" resultType="String">
+		SELECT 
+			MAX(LPAD(RIGHT(goods_rental_code, 4)+1, '4' , '0')) 
+		FROM goods_rental;
+	</select>
+	
+		<!-- 대여상품검색 등록  -->
+	<select id="goodsRentalSearchList" resultMap="ASid" parameterType="String">
+			SELECT 
+				*
+				FROM
+				goods_rental gr
+				INNER join
+				goods g
+				INNER JOIN 
+				goods_database gb
+				ON 
+				g.goods_code =  gr.goods_code		
+				and
+				g.goods_database_code = gb.goods_database_code
+							<where>
+				<if test="searchInput != null and searchInput neq ''.toString()">
+				AND
+					${select} Like CONCAT('%',#{searchInput},'%')
+				</if>
+				<if test="beginDate neq ''.toString() and endDate eq ''.toString()">
+		        	AND 
+		        		gr.goods_rental_date between #{beginDate} and NOW()		
+		        </if>
+		        <if test="beginDate eq ''.toString() and endDate neq ''.toString()">
+		        	AND 
+		        		gr.goods_rental_date between '2000-01-01' and #{endDate}
+		        </if>
+		        <if test="beginDate neq ''.toString() and endDate neq ''.toString()">
+		        	AND 
+		        		gr.goods_rental_date between #{beginDate} and #{endDate}
+		        </if>	
+				<if test="SCODE neq 'A'.toString()">
+        			AND gr.contract_shop_code  = #{SCODE}
+       			</if>
+			</where>
+	</select>
+	
+	
+	<!-- 대여상품삭제  -->
+	<delete id="goodsRentalDelete" parameterType="String">
+		DELETE
+			gr
+			FROM
+			goods_rental gr
+			INNER JOIN 	member m							
+			WHERE 
+			gr.goods_rental_code=#{goodsRentalCode}
+		  	AND m.member_id = #{memberId}
+			AND m.member_pw = #{memberPw}
+	</delete>
+	
+	<!-- 대여상품수정 update 문영성 -->
+	<update id="goodsRentalUpdate" parameterType="com.smart.rider.goods.dto.GoodsRentalDTO">
+		UPDATE goods_rental
+			SET
+				goods_rental_code=#{goodsRentalCode},			
+				goods_rental_period_pay=#{goodsRentalPeriodPay},
+				goods_rental_deposit=#{goodsRentalDeposit},
+				goods_rental_position=#{goodsRentalPosition}				
+		WHERE goods_rental_code=#{goodsRentalCode}
+	</update>
+	
+	<!-- 대여상품상세조회  -->
+	<select id="getGoodsRentalList" resultMap="ASid" parameterType="String">
+		SELECT 
+			*
+			FROM
+			goods_rental gr
+			INNER join
+			goods g
+			INNER JOIN 
+			goods_database gb
+			ON 
+			g.goods_code =  gr.goods_code		
+			and
+			g.goods_database_code = gb.goods_database_code
+			where
+			gr.goods_rental_code = #{goodsRentalCode}
+			
+		
+	
+	</select>
+	
+	<!-- 대여상품리스트  -->
+	<select id="goodsRentalList" resultMap="ASid" parameterType="String">
+			SELECT 
+				*
+				FROM
+				goods_rental gr
+				INNER join
+				goods g
+				INNER JOIN 
+				goods_database gb
+				ON 
+				g.goods_code =  gr.goods_code		
+				and
+				g.goods_database_code = gb.goods_database_code
+				<where>
+				<if test="searchInput != null and searchInput neq ''.toString()">
+				AND
+					${select} Like CONCAT('%',#{searchInput},'%')
+				</if>
+				<if test="beginDate neq ''.toString() and endDate eq ''.toString()">
+		        	AND 
+		        		gr.goods_rental_date between #{beginDate} and NOW()		
+		        </if>
+		        <if test="beginDate eq ''.toString() and endDate neq ''.toString()">
+		        	AND 
+		        		gr.goods_rental_date between '2000-01-01' and #{endDate}
+		        </if>
+		        <if test="beginDate neq ''.toString() and endDate neq ''.toString()">
+		        	AND 
+		        		gr.goods_rental_date between #{beginDate} and #{endDate}
+		        </if>	
+				<if test="SCODE neq 'A'.toString()">
+        			AND gr.contract_shop_code  = #{SCODE}
+       			</if>
+			</where>
+	</select>
+	
+	<!-- 대여상품등록 INSERT  -->
+	<insert id="goodsRentalInsert" parameterType="com.smart.rider.goods.dto.GoodsRentalDTO">
+		INSERT INTO
+			 goods_rental
+				(goods_rental_code
+				, contract_shop_code
+				, goods_code
+				, goods_rental_period_pay
+				, goods_rental_deposit
+				, goods_rental_position
+				, goods_rental_date)
+				VALUES
+				 (#{goodsRentalCode}
+				 , #{contractShopCode}
+				 , #{goodsCode}
+				 , #{goodsRentalPeriodPay}
+				 , #{goodsRentalDeposit}
+				 , #{goodsRentalPosition}
+				 , NOW()
+			 )	
+		
+	</insert>
+
+
+
+
+
+
+
+
+
+
+	<resultMap type="com.smart.rider.goods.dto.GoodsHapDTO" id="ASid">
+    	<result column="purchase_code"     property="purchaseCode"/>
+    	<result column="account_code"     property="accountCode"/>
+    	<result column="contract_shop_code"     		property="contractShopCode"/>
+    	<result column="goods_database_code"    	property="goodsDbCode"/>
+    	<result column="purchase_pay" 		property="purchasePay"/>
+    	<result column="purchase_state"     property="purchaseState"/>
+    	<result column="purchase_date"	 	property="purchaseDate"/>
+    	<result column="goods_database_name"	 	property="goodsDbName"/>
+    	<result column="goods_database_category"     property="goodsDbCategory"/>
+    	<result column="goods_database_number"     property="goodsDbNumber"/>
+    	<result column="goods_database_color"     		property="goodsDbColor"/>
+    	<result column="goods_database_speed"     		property="goodsDbSpeed"/>
+    	<result column="goods_database_weight"    	property="goodsDbWeight"/>
+    	<result column="goods_database_size" 		property="goodsDbSize"/>
+    	<result column="goods_database_nation"     property="goodsDbNation"/>
+    	<result column="goods_database_load"	 	property="goodsDbLoad"/>
+    	<result column="goods_database_distance"	 	property="goodsDbDistance"/>
+    	<result column="goods_database_battery"     property="goodsDbBattery"/>
+    	<result column="goods_database_time"     property="goodsDbTime"/>
+    	<result column="goods_database_made"     		property="goodsDbMade"/>
+    	<result column="goods_database_description"    	property="goodsDbDescription"/>
+    	<result column="account_market"    	property="accountMarket"/>
+    	<result column="shop_code"     property="shopCode"/>
+    	<result column="shop_name"     		property="shopName"/>
+    	<result column="shop_address"    	property="shopAddress"/>
+    	<result column="shop_phone"    	property="shopPhone"/>
+    	<result column="goods_code"	 	property="goodsCode"/>
+    	<result column="goods_pay"	 	property="goodsPay"/>
+    	<result column="goods_position"     property="goodsPosition"/>
+    	<result column="goods_rental"     property="goodsRental"/>
+    	<result column="goods_state"     		property="goodsState"/>
+    	<result column="goods_completion_state"    	property="goodsCompletionState"/>
+    	<result column="goods_rental_state"    	property="goodsRentalState"/>
+    	<result column="goods_inventory_date"     property="goodsInventoryDate"/>
+    	<result column="goods_date"     		property="goodsDate"/>    	
+    	<result column="goods_rental_code"     		property="goodsRentalCode"/>
+    	<result column="goods_rental_period_pay"    	property="goodsRentalPeriodPay"/>
+    	<result column="goods_rental_deposit"    	property="goodsRentalDeposit"/>
+    	<result column="goods_rental_position"     property="goodsRentalPosition"/>
+    	<result column="goods_rental_date"     		property="goodsRentalDate"/>
+    	
+    </resultMap>
+</mapper>

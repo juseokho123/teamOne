@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{layout/default}">
+<th:block layout:fragment="customTitle">
+</th:block>
+<th:block layout:fragment="customContents">
+	<div class="main-height">
+		<div class="container">
+			<div class="row">
+				<div class="col">
+					<p class="text-white mt-5 mb-5">
+					<h2 class="tm-block-title">직원목록</h2>
+				</div>
+			</div>
+			<hr>
+			<div class="row tm-content-row">
+				<div class="col-12 col-12 tm-block-col">
+					<div class="tm-bg-primary-dark tm-block tm-block-h-auto-copy">
+						<form action="/searchEmployee" class="tm-signup-form row" method="post">
+							<input type="hidden" id="contractShopCode" name="contractShopCode" th:value="${session.SCODE}">
+							<div class="form-group col-3">
+								<select class="custom-select" name="searchDate">
+									<option value="member_insert_date">등록일자</option>
+								</select>
+							</div>
+							<div class="form-group col-3">
+								<input id="beginDate" name="beginDate" 
+									   type="text" class="form-control validate" style="background-color: #54657D" readonly/>
+							</div>
+							<div class="form-group col-1 text-center">
+								<h2 class="tm-site-title mb-0">~</h2>
+							</div>
+							<div class="form-group col-3">
+								<input id="endDate" name="endDate" 
+									   type="text" class="form-control validate" style="background-color: #54657D" readonly/>
+							</div>
+							<div class="form-group col-2">
+							</div>
+							<div class="form-group col-3">
+								<select class="custom-select" name="select">
+									<option value="member_name">이름</option>
+								</select>
+							</div>
+							<div class="form-group col-7">
+								<input id="searchInput" name="searchInput" type="text" class="form-control validate" />
+							</div>
+							<div class="form-group col-2">
+								<button type="submit" id="searchButton" name="searchButton" class="btn btn-primary btn-block">
+									검색
+								</button>
+							</div>
+						</form>
+					</div>
+				</div>
+			</div>
+			
+			<div class="row tm-content-row">
+				<div class="col-12 tm-block-col">
+					<div class="col-lx tm-bg-primary-dark tm-block-sub tm-block-scroll">
+						<table class="table">
+							<thead>
+								<tr>
+									<th scope="col">ID</th>
+									<th scope="col">이름</th>
+									<th scope="col">생년월일</th>
+									<th scope="col">전화번호</th>
+									<th scope="col">직급</th>
+									<th scope="col">직원등록일자</th>
+									<th scope="col" class="text-center">상세보기</th>
+								</tr>
+							</thead>
+							<tbody>
+								<tr th:each="employee : ${employeeList}">
+									<th th:text="${employee.memberId}"></th>
+									<td th:text="${employee.memberName}"></td>
+									<td th:text="${employee.memberBirth}"></td>
+									<td th:text="${employee.memberPhone}"></td>
+									<td th:text="${employee.memberLevel}"></td>
+									<td th:text="${employee.memberInsertDate}"></td>
+									<td class="text-center">
+										<a th:href="@{/getEmployeeList(memberId=${employee.memberId})}" class="tm-product-delete-link">
+										<i class="far fa-address-card tm-product-delete-icon"></i></a>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</th:block>
+<th:block layout:fragment="customScript">
+<script>
+
+//시작 일자 텍스트상자 클릭시 달력 표기 
+$('#beginDate').datepicker({
+});
+$('#beginDate').datepicker('option','dateFormat','yy-mm-dd'); // 기존 dd/mm/yy에서 yy-mm-dd로 format 변경   
+
+//종료 일자 텍스트상자 클릭시 달력 표기 
+$('#endDate').datepicker({
+});
+$('#endDate').datepicker('option','dateFormat','yy-mm-dd'); // 기존 dd/mm/yy에서 yy-mm-dd로 format 변경 
+</script>
+</th:block>
+</html>

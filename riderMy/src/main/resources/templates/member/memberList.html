@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{layout/default}">
+<th:block layout:fragment="customTitle">
+</th:block>
+<th:block layout:fragment="customContents">
+	<div class="main-height">
+		<div class="container">
+			<div class="row">
+				<div class="col">
+					<p class="text-white mt-5 mb-5">
+					<h2 class="tm-block-title">회원목록</h2>
+				</div>
+			</div>
+			<hr>
+			<div class="row tm-content-row">
+				<div class="col-12 tm-block-col">
+					<div class="tm-bg-primary-dark tm-block tm-block-h-auto-copy">
+						<form action="/searchMember" class="tm-search-form row" method="post">
+							<div class="form-group col-3">
+								<select class="custom-select" name="searchDate">
+									<option value="member_insert_date">등록일자</option>
+								</select>
+							</div>
+							<div class="form-group col-3">
+								<input id="beginDate" name="beginDate" 
+									   type="text" class="form-control validate" style="background-color: #54657D" readonly/>
+							</div>
+							<div class="form-group col-1 text-center">
+								<h2 class="tm-site-title mb-0">~</h2>
+							</div>
+							<div class="form-group col-3">
+								<input id="endDate" name="endDate" 
+									   type="text" class="form-control validate" style="background-color: #54657D" readonly/>
+							</div>
+							<div class="form-group col-2">
+								<select class="custom-select" name="shopCode">
+									<option value="0">매장</option>
+									<th:block th:each="shop : ${utilityShop}">
+										<option th:text="${shop.shopName}"
+												th:value="${shop.contractShopCode}"
+												id="shopCode"></option>
+									</th:block>
+								</select>
+							</div>
+							<div class="form-group col-3">
+								<select class="custom-select" name="select">
+									<option value="member_name">이름</option>
+									<option value="member_level">권한</option>
+								</select>
+							</div>
+							<div class="form-group col-7">
+								
+								<input id="searchInput" name="searchInput" type="text" class="form-control validate" />
+							</div>
+							<div class="form-group col-2">
+								
+								<button type="submit" id="searchButton" name="searchButton" class="btn btn-primary btn-block">
+									검색
+								</button>
+							</div>
+						</form>
+					</div>
+				</div>
+			</div>
+			
+			<div class="row tm-content-row">
+				<div class="col-12 tm-block-col">
+					<div class="col-lx tm-bg-primary-dark tm-block-sub tm-block-scroll">
+						<table class="table">
+							<thead>
+								<tr>
+									<th scope="col">ID</th>
+									<th scope="col">이름</th>
+									<th scope="col">접근권한</th>
+									<th scope="col">생년월일</th>
+									<th scope="col">전화번호</th>
+									<th scope="col">회원가입일자</th>
+									<th scope="col" class="text-center">수정</th>
+									<th scope="col" class="text-center">삭제</th>
+								</tr>
+							</thead>
+							<tbody>
+								<tr th:each="member : ${memberList}">
+									<th th:text="${member.memberId}"></th>
+									<td th:text="${member.memberName}"></td>
+									<td th:text="${member.memberLevel}"></td>
+									<td th:text="${member.memberBirth}"></td>
+									<td th:text="${member.memberPhone}"></td>
+									<td th:text="${member.memberInsertDate}"></td>
+									<td class="text-center">
+										<a th:href="@{/getMemberList(memberId=${member.memberId})}"
+										   	class="tm-product-delete-link">
+										   <i class="fas fa-check tm-product-check-icon" style="color: white"></i>
+										</a>
+									</td>
+									<td class="text-center">
+										<a th:href="@{/levelDelete(memberId=${member.memberId})}" 
+										   class="tm-product-delete-link"
+										   onclick="return deleteOk();">
+											<i class="far fa-trash-alt tm-product-delete-icon"></i>
+										</a>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<hr>
+						<!--------------------------------------------- 페이지 버튼 ---------------------------------------------->
+						<div class="text-center">
+						<!-- 이전 -->
+						<a class="text-white" th:if="${currentPage > 1}" 
+						   th:href="@{/memberList(currentPage=${currentPage - 1})}">[이전]</a>
+						<th:block th:each="num:${#numbers.sequence(startPageNum, lastPageNum)}">
+							<span class="text-info" th:if="${currentPage == num}" th:text="${'['+num+']'}"></span>
+							<a class="text-white" th:unless="${currentPage == num}" th:text="${'['+num+']'}"
+							   th:href="@{/memberList(currentPage=${num})}"></a>
+						</th:block>
+						<!-- 다음 -->
+						<a class="text-white" th:if="${currentPage < lastPage}" 
+						   th:href="@{/memberList(currentPage=${currentPage + 1})}">[다음]</a>
+						</div>
+						
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</th:block>
+<th:block layout:fragment="customScript">
+<script>
+function deleteOk() {
+    return confirm("정말로 삭제하시겠습니까?");
+}
+
+//시작 일자 텍스트상자 클릭시 달력 표기 
+$('#beginDate').datepicker({
+});
+$('#beginDate').datepicker('option','dateFormat','yy-mm-dd'); // 기존 dd/mm/yy에서 yy-mm-dd로 format 변경   
+
+//종료 일자 텍스트상자 클릭시 달력 표기 
+$('#endDate').datepicker({
+});
+$('#endDate').datepicker('option','dateFormat','yy-mm-dd'); // 기존 dd/mm/yy에서 yy-mm-dd로 format 변경 
+</script>
+</th:block>
+</html>

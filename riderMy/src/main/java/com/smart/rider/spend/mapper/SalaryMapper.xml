@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.smart.rider.spend.mapper.SalaryMapper">
+
+	<!-- SalaryDTO resultMap -->
+	<resultMap type="com.smart.rider.spend.dto.JoinSalaryDTO" id="salaryMap">
+		<result column="spend_salary_code" 		property="spendSalaryCode"/>
+		<result column="contract_shop_code" 	property="contractShopCode"/>
+		<result column="member_id" 				property="memberId"/>
+		<result column="member_name" 			property="memberName"/>
+		<result column="spend_salary_pay" 		property="spendSalaryPay"/>
+		<result column="spend_salary_overpay"	property="spendSalaryOverpay"/>
+		<result column="spend_salary_bonus" 	property="spendSalaryBonus"/>
+		<result column="spend_salary_free" 		property="spendSalaryFree"/>
+		<result column="spend_salary_total" 	property="spendSalaryTotal"/>
+		<result column="spend_salary_date" 		property="spendSalaryDate"/>
+	</resultMap>
+	
+	<!--  191002 재욱, Read : 지출_급여 등록 내역 페이징 AllCount -->
+	<select id="salaryAllCount" resultType="int" parameterType="String">
+		SELECT 
+			COUNT(*)
+		FROM spend_salary 
+		WHERE contract_shop_code = #{contractShopCode}
+		ORDER BY spend_salary_date DESC;
+	</select>
+	
+	
+	<!-- 191002 재욱, Update : 지출_급여 수정 -->
+	<update id="salaryUpdate" parameterType="com.smart.rider.spend.dto.JoinSalaryDTO">
+		UPDATE spend_salary
+			SET
+				 spend_salary_pay=#{spendSalaryPay}
+			   , spend_salary_overpay=#{spendSalaryOverpay}
+			   , spend_salary_bonus=#{spendSalaryBonus}
+			   , spend_salary_free=#{spendSalaryFree}
+			   , spend_salary_total=#{spendSalaryTotal}
+		WHERE spend_salary_code = #{spendSalaryCode};
+	</update>
+	
+	
+	<!-- 190930 재욱, Read : 지출_급여 등록 내역 -->
+	<select id="salaryList" resultMap="salaryMap" parameterType="java.util.Map">
+		SELECT 
+	 		 ss.spend_salary_code
+			,m.member_name
+			,ss.contract_shop_code
+			,ss.member_id
+			,ss.spend_salary_pay
+			,ss.spend_salary_overpay
+			,ss.spend_salary_bonus
+			,ss.spend_salary_free
+			,ss.spend_salary_total
+			,ss.spend_salary_date	
+		FROM spend_salary ss, member m
+		WHERE ss.member_id = m.member_id 
+		
+		<if test="contractShopCode neq null and contractShopCode neq ''.toString()">
+			AND 
+				ss.contract_shop_code = #{contractShopCode}
+		</if>
+		
+		<if test="spendSalaryCode neq null and spendSalaryCode neq ''.toString()">
+			AND
+				spend_salary_code = #{spendSalaryCode}
+		</if>
+		
+		<!-- 지출_급여 검색 조건문 -->
+        <if test="searchKey neq null and searchValue neq ''.toString()">
+            AND
+                m.${searchKey} LIKE CONCAT('%',#{searchValue},'%')
+        </if>
+        <if test="beginDate neq ''.toString() and endDate eq ''.toString()">
+        	AND 
+        		ss.spend_salary_date between #{beginDate} and NOW()		
+        </if>
+        <if test="beginDate eq ''.toString() and endDate neq ''.toString()">
+        	AND 
+        		ss.spend_salary_date  between '2000-01-01' and #{endDate}
+        </if>
+        <if test="beginDate neq ''.toString() and beginDate neq null and endDate neq ''.toString() and endDate neq null">
+        	AND 
+        		ss.spend_salary_date  between #{beginDate} and #{endDate}
+        </if>
+        
+		ORDER BY ss.spend_salary_date DESC
+		
+		<!-- 다른 메서드 호출시 반영되지 않기위해 걸어놓은 조건문 -->
+        <if test="startRow neq lastPage"> 
+            LIMIT #{startRow},#{rowPerPage}
+        </if>
+		
+	</select>
+	
+	<!-- 190930 재욱, Read : 지출_급여 코드 자동증가용 카운트 -->
+	<select id="salaryCodeCount" resultType="String">
+		SELECT 
+			MAX(LPAD(RIGHT(spend_salary_code, 4)+1, '4' , '0')) 
+		FROM spend_salary;
+	</select>
+
+	<!-- 190930 재욱, Insert : 지출_급여 내역 등록 -->
+	<insert id="salaryInsert" parameterType="com.smart.rider.spend.dto.JoinSalaryDTO">
+		INSERT INTO spend_salary(
+			  spend_salary_code
+			, contract_shop_code
+			, member_id
+			, spend_salary_pay
+			, spend_salary_overpay
+			, spend_salary_bonus
+			, spend_salary_free
+			, spend_salary_total
+			, spend_salary_date)
+		VALUES (
+			  #{spendSalaryCode}
+			, #{contractShopCode}
+			, #{memberId}
+			, #{spendSalaryPay}
+			, #{spendSalaryOverpay}
+			, #{spendSalaryBonus}
+			, #{spendSalaryFree}
+			, #{spendSalaryTotal}
+			, NOW())
+	</insert>
+
+	<!-- 지출_급여 직원 select box list -->
+	<select id="salarySelectBox" resultType="com.smart.rider.member.dto.MemberDTO" parameterType="String">
+		SELECT 
+			 member_id 			AS memberId
+			,member_name		AS memberName
+			,member_level		AS meberLevel
+			,contract_shop_code	AS contractShopCode
+		FROM member
+		WHERE member_level = '직원'  AND contract_shop_code = #{contractShopCode}	
+	</select>
+	
+	
+</mapper>

@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{layout/default}">
+<th:block layout:fragment="customTitle">
+</th:block>
+<th:block layout:fragment="customContents">
+	
+	<div class="container tm-mt-big tm-mb-big main-height">
+		<div class="row" >
+			<div class="col-xl-9 col-lg-10 col-md-12 col-sm-12 mx-auto">
+				<div class="tm-bg-primary-dark tm-block tm-block-h-auto">
+					<div class="row">
+						<div class="col-12" >
+						 <h2 class="tm-block-title d-inline-block">매장 수정</h2>
+						</div>
+					</div>
+            		<div class="row tm-edit-product-row">
+              			<div  class="col-xl-12 col-lg-6 col-md-12" style="float:right;" th:each="slist : ${shopList}">
+                			<form action="/shopUpdate" id="form" class="tm-edit-product-form" method="post">
+                			
+				                   <div class="form-group mb-3" >
+									<input type="hidden" id="shopCode" name="shopCode" th:value="${slist.shopCode}">
+									<input type="hidden" id="contractCode" name="contractCode" th:value="${slist.contractCode}">
+				                  	<input type="hidden" id="memberId" name="memberId" th:value="${slist.memberId}">
+				                  </div>
+				              		<div class="form-group mb-3">
+				                    <label
+				                      for="name"
+				                      style="float:right;"
+				                      >매장명
+				                    </label>
+				                    <input
+				                      name= "shopName"
+				                      id= "shopName"
+				                      type="text"
+				                      th:value="${slist.shopName}"			    
+				                      class="form-control validate"
+				                      required
+				                    />
+				                  </div>
+				                   <div class="form-group mb-3">
+				                    <label
+				                      for="name"
+				                      style="float:right;"
+				                      >매장 주소
+				                    </label>
+				                    <input
+				                    	id=  "shopAddress"
+				                      name= "shopAddress"
+				                      type="text"
+				                      th:value="${slist.shopAddress}"
+				                      class="form-control validate"
+				                      required
+				                    />
+				                  </div>
+				                       <div class="form-group mb-3">
+				                    <label
+				                      for="name"
+				                      style="float:right;"
+				                      >매장번화번호
+				                    </label>
+				                    <input
+				                      name="shopPhone"
+				                      id=  "shopPhone"
+				                      type="text"
+				                      th:value="${slist.shopAddress}"
+				                      class="form-control validate"
+				                      required
+				                    />
+				                  </div>
+				                  
+				                  
+				                  
+                  					<br/>
+					         		<div style="float:right;">
+					              		<div class="col-12">
+					               		 <button type="submit"  class="btn btn-primary btn-block text-uppercase">매장 수정</button>
+					              		</div>
+					              </div>
+            				</form>
+            			</div>
+          			</div>
+        		</div>
+      		</div>
+    	</div>
+	</div>	
+</th:block>
+<th:block layout:fragment="customScript">
+
+
+
+</th:block>
+</html>

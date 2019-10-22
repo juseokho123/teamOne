@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{layout/default}">
+
+<th:block layout:fragment="customTitle">
+</th:block>
+<th:block layout:fragment="customContents">
+
+	<!-- MAIN -->
+	<div class="height-sub">
+		<!-- MAIN CONTENT -->
+		<div class="main-content">
+			<div class="container">
+				<div class="row">
+					<div class="col">
+						<p class="text-white mt-5 mb-5">
+							<b>지출/매출 > 지출 > 공과금 > 상세보기</b>
+						</p>
+					</div>
+				</div>
+
+				<div class="row tm-content-row">
+
+					<!-- 공과금 내역 상세보기-->
+					<div class="col-12 tm-block-col">
+						<div class="tm-bg-primary-dark tm-block-details">
+							<h4 class="tm-block-title">등록내역 상세보기</h4>
+							
+							<!-- 등록내역 상세보기 수정 폼-->
+							<form action="/spendUtilityUpdate" method="post" th:each="list : ${detailsList}">
+								<input type="hidden" th:value="${list.spendUtilityCode}" name="spendUtilityCode">
+								<input type="hidden" th:value="${list.contractShopCode}" name="selectShopCode">
+								<div class="tm-bg-primary-dark">
+									<table class="table">
+										<tr>
+											<td class="text-center" style="width: 15%">내역
+											</td>
+											<td>
+												<input type="text" class="form-control validate" 
+													   th:value="${list.subjectName}" 
+													   name="subjectName"
+													   style="background-color: #54657D" readonly>
+											</td>
+										</tr>
+										<tr>
+											<td class="text-center" style="width: 15%">금액</td>
+											<td>
+												<input type="text" class="form-control validate" 
+													   name="spendUtilityPay"
+													   th:value="${list.spendUtilityPay}"> 
+											</td>
+										</tr>
+										<tr>
+											<td class="text-center" style="width: 15%">등록날짜</td>
+											<td>
+												<input type="text" class="form-control validate"
+													   name="spendUtilityDate" 
+													   th:value="${list.spendUtilityDate}"
+												 	   style="background-color: #54657D" readonly> 
+											</td>
+										</tr>
+										<tr>
+											<td class="text-center" style="width: 15%">내용</td>
+											<td>
+												<textarea rows="5" cols="6" style="resize: none" 
+														  class="form-control validate" 
+														  name="spendUtilityContents"
+														  th:text="${list.spendUtilityContents}">
+												</textarea> 
+											</td>
+										</tr>
+									</table>
+								</div>
+								<hr>
+								<!-- 수정 확인 버튼 -->
+								<button type="submit" 
+										class="btn-sub btn-primary text-uppercase" 
+										style="float:right">
+										수정
+								</button>
+							</form>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</th:block>
+<th:block layout:fragment="customScript">
+
+	<script th:inline="javascript">
+
+</script>
+</th:block>
+</html>
+

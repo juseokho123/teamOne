@@ -1,0 +1,223 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+	PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- namespace가 인터페이스와 일치해야 연결된다 -->
+<mapper namespace="com.smart.rider.goods.mapper.GoodsPurchaseMapper">
+	
+
+
+	<!-- 코드자동증가 -->
+	<select id="purchaseCodeCount" resultType="String">
+		SELECT 
+			MAX(LPAD(RIGHT(purchase_code, 4)+1, 4 , '0')) 
+		FROM purchase;
+	</select>
+	
+	<!-- 삭제가능한 리스트 상세조회  -->
+	<select id="yesPurchaseList" resultMap="ASid">
+		SELECT	
+			 p.*
+			 ,g.*
+			 ,gb.*
+			FROM purchase p LEFT JOIN goods g 
+			ON p.purchase_code = g.purchase_code
+			LEFT JOIN goods_database gb
+			ON p.goods_database_code = gb.goods_database_code
+			WHERE g.purchase_code IS NULL
+			AND p.purchase_code = #{purchaseCode} 
+		
+	</select>
+	<!-- 삭제불가능한 매입상품리트스  -->
+	<select id="purchaseNlist" parameterType="String" resultMap="ASid">
+		SELECT	
+			 p.*
+			 ,g.*
+			 ,gb.*
+		FROM purchase p , goods g , goods_database gb 
+		WHERE p.purchase_code = g.purchase_code
+		AND p.goods_database_code = gb.goods_database_code
+		<if test="searchInput neq null and searchInput neq ''.toString()">
+			AND
+			${select} LIKE CONCAT('%',#{searchInput},'%')
+		</if>
+		<if test="beginDate neq ''.toString() and endDate eq ''.toString()">
+			AND
+			p.purchase_date between #{beginDate} and NOW()
+		</if>
+		<if test="beginDate eq ''.toString() and endDate neq ''.toString()">
+			AND
+			p.purchase_date  between '2000-01-01' and #{endDate}
+		</if>
+		<if
+			test="beginDate neq ''.toString() and endDate neq ''.toString()">
+			AND
+			p.purchase_date between #{beginDate} and #{endDate}
+		</if> 
+		<if test="SCODE neq 'A'.toString()">
+        	AND 
+        		p.contract_shop_code  = #{SCODE}
+        </if>
+	</select>
+	
+		<!-- 삭제가능한 매입상품리스트  -->
+	<select id="purchaseYlist" parameterType="String" resultMap="ASid">
+			SELECT	
+				 p.*
+				 ,g.*
+				 ,gb.*
+				 ,s.shop_name
+				FROM purchase p LEFT JOIN goods g 
+				ON p.purchase_code = g.purchase_code
+				LEFT JOIN goods_database gb
+				ON p.goods_database_code = gb.goods_database_code
+				INNER  JOIN shop s
+				WHERE g.purchase_code IS NULL 
+		<if test="searchInput neq null and searchInput neq ''.toString()">
+			AND
+			${select} LIKE CONCAT('%',#{searchInput},'%')
+		</if>
+		<if test="beginDate neq ''.toString() and endDate eq ''.toString()">
+			AND
+			p.purchase_date between #{beginDate} and NOW()
+		</if>
+		<if test="beginDate eq ''.toString() and endDate neq ''.toString()">
+			AND
+			p.purchase_date  between '2000-01-01' and #{endDate}
+		</if>
+		<if
+			test="beginDate neq ''.toString() and endDate neq ''.toString()">
+			AND
+			p.purchase_date between #{beginDate} and #{endDate}
+		</if> 
+		<if test="SCODE neq 'A'.toString()">
+        	AND 
+        		p.contract_shop_code  = #{SCODE}
+        </if>
+	</select>		
+		
+	<delete id="purchaseDelete" parameterType="String">
+		DELETE 
+ 				p
+ 		FROM purchase p INNER JOIN member m
+ 		WHERE 
+ 				p.purchase_code =#{purchaseCode}
+ 			AND m.member_id = #{memberId} 
+			AND m.member_pw = #{memberPw}
+	</delete>
+	<!-- 매입 검색  -->
+	<select id="purchaseSearchList" parameterType="String" resultMap="ASid">
+			SELECT 
+			*
+			FROM
+			purchase p			 
+			INNER JOIN 
+			goods_database gb
+			ON 
+			gb.goods_database_code = p.goods_database_code
+			INNER JOIN 
+			account a
+			ON p.account_code = a.account_code 		 
+			<if test="searchInput != null and searchInput neq ''.toString()">
+			WHERE 
+				${select} Like CONCAT('%',#{searchInput},'%')
+		</if>
+		<if test="beginDate neq ''.toString() and endDate eq ''.toString()">
+        	AND 
+        		p.purchase_date between #{beginDate} and NOW()		
+        </if>
+        <if test="beginDate eq ''.toString() and endDate neq ''.toString()">
+        	AND 
+        		p.purchase_date between '2000-01-01' and #{endDate}
+        </if>
+        <if test="beginDate neq ''.toString() and endDate neq ''.toString()">
+        	AND 
+        		p.purchase_date between #{beginDate} and #{endDate}
+        </if>
+        
+        
+	</select>
+	
+	<!-- 매입 상세보기 -->
+	<select id="getPurchaseList" resultMap="ASid" resultType="com.smart.rider.goods.dto.GoodsPurchaseDTO" parameterType="String">
+	SELECT *
+			FROM
+			purchase p			 
+			INNER JOIN 
+			goods_database gb
+			ON 
+			gb.goods_database_code = p.goods_database_code
+			INNER JOIN 
+			account a
+			ON p.account_code = a.account_code 
+			 WHERE
+			 p.purchase_code = #{purchaseCode}
+					
+	</select>
+	<!-- 매입리스트조회 -->
+	<select id="purchaseList"  resultMap="ASid" resultType="com.smart.rider.goods.dto.GoodsHapDTO" parameterType="String">
+		SELECT *
+			FROM
+			purchase p			 
+			INNER JOIN 
+			goods_database gb
+			ON 
+			gb.goods_database_code = p.goods_database_code
+			INNER JOIN 
+			account a
+			ON p.account_code = a.account_code 
+		
+					
+	</select>
+	
+	<!-- 매입 INSERT -->
+	<insert id="purchaseInsert" parameterType="com.smart.rider.goods.dto.GoodsPurchaseDTO">
+		INSERT INTO purchase
+			(purchase_code
+			, account_code
+			, contract_shop_code
+			, goods_database_code
+			, purchase_pay
+			, purchase_state
+			, purchase_date)
+			VALUES 
+			(#{purchaseCode}
+			, #{accountCode}
+			, #{contractShopCode}
+			, #{goodsDbCode}
+			, #{purchasePay}
+			, #{purchaseState}
+			, NOW()
+			)
+	</insert>
+	
+		
+	<resultMap type="com.smart.rider.goods.dto.GoodsHapDTO" id="ASid">
+    	 <result column="purchase_code"     property="purchaseCode"/>
+    	<result column="account_code"     property="accountCode"/>
+    	<result column="contract_shop_code"     		property="contractShopCode"/>
+    	<result column="goods_database_code"    	property="goodsDbCode"/>
+    	<result column="purchase_pay" 		property="purchasePay"/>
+    	<result column="purchase_state"     property="purchaseState"/>
+    	<result column="purchase_date"	 	property="purchaseDate"/>
+    	<result column="goods_database_name"	 	property="goodsDbName"/>
+    	<result column="goods_database_category"     property="goodsDbCategory"/>
+    	<result column="goods_database_number"     property="goodsDbNumber"/>
+    	<result column="goods_database_color"     		property="goodsDbColor"/>
+    	<result column="goods_database_speed"     		property="goodsDbSpeed"/>
+    	<result column="goods_database_weight"    	property="goodsDbWeight"/>
+    	<result column="goods_database_size" 		property="goodsDbSize"/>
+    	<result column="goods_database_nation"     property="goodsDbNation"/>
+    	<result column="goods_database_load"	 	property="goodsDbLoad"/>
+    	<result column="goods_database_distance"	 	property="goodsDbDistance"/>
+    	<result column="goods_database_battery"     property="goodsDbBattery"/>
+    	<result column="goods_database_time"     property="goodsDbTime"/>
+    	<result column="goods_database_made"     		property="goodsDbMade"/>
+    	<result column="goods_database_description"    	property="goodsDbDescription"/>
+    	<result column="goods_database_date"    	property="goodsDbDate"/>
+    	<result column="account_market"    	property="accountMarket"/>
+    	<result column="goods_state"    	property="goodsState"/>
+    	<result column="shop_name"    	property="shopName"/>
+    	
+	</resultMap>
+</mapper>

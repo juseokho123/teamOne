@@ -1,0 +1,196 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.smart.rider.member.mapper.MemberMapper">
+	
+	<!-- 회원 등록처리  -->
+	<insert id="memberInsert" parameterType="com.smart.rider.member.dto.MemberDTO">
+		INSERT INTO member(
+			 member_id
+			,member_pw
+			,member_name
+			,member_level
+			,member_birth
+			,member_address
+			,member_email
+			,member_phone
+			,contract_shop_code
+			,member_insert_date
+			,member_update_date
+		)VALUES (
+			 #{memberId}
+			,#{memberPw}
+			,#{memberName}
+			,'점주'
+			,#{memberBirth}
+			,#{memberAddress}
+			,#{memberEmail}
+			,#{memberPhone}
+			,'SR0000'
+			,CURDATE()
+			,CURDATE())
+	</insert>
+	
+	<!-- 회원 목록  -->
+	<select id="memberList" resultType="com.smart.rider.member.dto.MemberDTO">
+		SELECT 
+			 member_id 			AS memberId
+			,member_pw 			AS memberPw
+			,member_name		AS memberName
+			,member_level 		AS memberLevel
+			,member_birth 		AS memberBirth
+			,member_address 	AS memberAddress
+			,member_email 		AS memberEmail
+			,member_phone 		AS memberPhone
+			,contract_shop_code	AS contractShopCode
+			,member_insert_date AS memberInsertDate
+			,member_update_date AS memberUpdateDate
+		FROM member
+		ORDER BY member_insert_date DESC 
+		LIMIT #{startRow},#{rowPerPage}
+	</select>
+	
+	<!-- 19.09.16작성 회원가입 아이디 중복체크 -->
+	<select id="memberIdCheck" parameterType="String" resultType="int">
+		SELECT 
+			count(*)
+		FROM member 
+		WHERE 
+			member_id= #{memberId}
+	</select>
+	
+	<!-- 회원 상세보기  -->
+	<select id="getMemberList" parameterType="String" resultType="com.smart.rider.member.dto.MemberDTO">
+		SELECT 
+			 member_id 			AS memberId
+			,member_pw 			AS memberPw
+			,member_name		AS memberName
+			,member_level 		AS memberLevel
+			,member_birth 		AS memberBirth
+			,member_address 	AS memberAddress
+			,member_email 		AS memberEmail
+			,member_phone 		AS memberPhone
+			,contract_shop_code	AS contractShopCode
+		FROM member
+		WHERE
+			member_id = #{memberId}
+	</select>
+	
+	<!-- 19.09.17작성 회원 수정 -->
+	<update id="memberUpdate" parameterType="com.smart.rider.member.dto.MemberDTO">
+		UPDATE member
+		SET
+			 member_name		= #{memberName}
+			,member_birth		= #{memberBirth}
+			,member_address		= #{memberAddress}
+			,member_email		= #{memberEmail}
+			,member_phone		= #{memberPhone}
+			,member_update_date	= CURDATE()
+		WHERE
+			member_id = #{memberId}
+	</update>
+	
+	<!-- 회원 검색  -->
+	<select id="searchMember" parameterType="java.util.Map" resultType="com.smart.rider.member.dto.MemberDTO">
+		SELECT 
+			 member_id 			AS memberId
+			,member_pw 			AS memberPw
+			,member_name		AS memberName
+			,member_level 		AS memberLevel
+			,member_birth 		AS memberBirth
+			,member_address 	AS memberAddress
+			,member_email 		AS memberEmail
+			,member_phone 		AS memberPhone
+			,contract_shop_code AS contractShopCode
+			,member_insert_date AS memberInsertDate
+			,member_update_date AS memberUpdateDate
+		FROM member
+		<trim prefix="where" prefixOverrides="AND|OR">
+			<if test="searchInput neq null and searchInput neq ''.toString()">
+				AND ${select} Like CONCAT('%',#{searchInput},'%')
+			</if>
+			<if test="beginDate neq ''.toString() and endDate neq ''.toString()">
+				AND member_insert_date between #{beginDate} and #{endDate}
+			</if>
+			<if test="beginDate eq ''.toString() and endDate neq ''.toString()">
+				AND member_insert_date between '2000-01-01' and #{endDate}
+			</if>
+			<if test="beginDate neq ''.toString() and endDate eq ''.toString()">
+				AND member_insert_date between #{beginDate} and NOW()
+			</if>
+			<if test="shopCode neq '0'.toString() and shopCode neq null">
+				AND contract_shop_code = #{shopCode}
+			</if>
+		</trim>
+		ORDER BY member_insert_date DESC
+		LIMIT #{startRow},#{rowPerPage}
+	</select>
+	
+	<!-- 19.09.18작성 회원 탈퇴 처리 -->
+	<delete id="memberDelete" parameterType="String">
+		DELETE 
+		FROM member
+		WHERE
+			member_id = #{memberId}
+		and member_pw = #{memberPw}
+	</delete>
+	
+	<!-- 19.09.24작성 관리자 권한일때 리스트에서 바로 삭제 -->
+	<delete id="levelDelete" parameterType="String">
+		DELETE 
+		FROM member
+		WHERE
+			member_id = #{memberId}
+	</delete>
+	
+	<!-- 19.09.25작성 비밀번호 수정하기 -->
+	<update id="changePassword" parameterType="String">
+		UPDATE member
+		SET
+			member_pw = #{memberPw2}
+		WHERE
+			member_id = #{memberId}
+		and member_pw = #{memberPw}
+	</update>
+	
+	<!-- 19.10.02페이지작업위한작성  -->
+	<select id="getMemberAllCount" resultType="int">
+		SELECT
+			COUNT(*)
+		FROM member
+	</select>
+	
+	<!-- 19.10.04 검색페이지작업 -->
+	<select id="getSearchAllCount" resultType="int">
+		SELECT
+			COUNT(*)
+		FROM member
+		<trim prefix="where" prefixOverrides="AND|OR">
+			<if test="searchInput neq null and searchInput neq ''.toString()">
+				AND ${select} Like CONCAT('%',#{searchInput},'%')
+			</if>
+			<if test="beginDate neq ''.toString() and endDate neq ''.toString()">
+				AND member_insert_date between #{beginDate} and #{endDate}
+			</if>
+			<if test="beginDate eq ''.toString() and endDate neq ''.toString()">
+				AND member_insert_date between '2000-01-01' and #{endDate}
+			</if>
+			<if test="beginDate neq ''.toString() and endDate eq ''.toString()">
+				AND member_insert_date between #{beginDate} and NOW()
+			</if>
+			<if test="shopCode neq '0'.toString() and shopCode neq null">
+				AND contract_shop_code = #{shopCode}
+			</if>
+		</trim>
+	</select>
+	
+	<!-- 계약된 매장 가져오기  -->
+	<select id="utilityShop" resultType="com.smart.rider.shop.dto.SsrHapDTO">
+		SELECT 
+			 s.shop_code AS shopCode
+			,s.shop_name AS shopName
+			,sr.contract_shop_code AS contractShopCode
+			,sr.member_id AS memberId
+		FROM shop s, shop_relation sr
+		WHERE s.shop_code = sr.shop_code
+	</select>
+</mapper>
