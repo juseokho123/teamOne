@@ -23,12 +23,16 @@
 								<input type="button" class="btn btn-primary" th:if="${session.SLEVEL eq '관리자'}"
 									   style="float: right; line-height: 50pt; WIDTH: 150pt; margin-top: 75pt;"
 									   onclick="location.href='contractList' " value="계약자 명단 조회" />
+								<h5 class="tm-block-title" style="float: right; margin-top:20px;">계약자 명단 조회는 관리자만 사용가능합니다.</h5>
 							</div>
 						</div>
 					</div>
 					<div class=" tm-block-col ">
+					
 						<h2 class="tm-block-title">계약 내용</h2>
 						<div class="tm-bg-primary-dark tm-block-big">
+						<h5 class="tm-block-title">계약 내용은 관리자는 전체 계약 내용을 점주는 점주의 매장 계약내용만 볼 수 있습니다.</h5>
+						<h5 class="tm-block-title" style="margin-bottom: 20px;">계약금 납부 조회를 할 수 없는 점주를 위해 더보기 클릭시 점주의 납부내용을 확인 할 수 있습니다.</h5>
 							<table class="table">
 								<thead>
 									<tr>
